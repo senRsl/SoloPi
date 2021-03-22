@@ -11,14 +11,14 @@ package com.mdit.library;
 
 public interface NoOp {
 
-    public static final MethodInterceptor INSTANCE = new MethodInterceptor(){
+    public static final MethodInterceptor INSTANCE = new MethodInterceptor() {
 
         @Override
         public Object intercept(Object object, Object[] args, MethodProxy methodProxy) throws Exception {
             return methodProxy.invokeSuper(object, args);
         }
     };
-    public static final MethodInterceptor INSTANCE_EMPTY = new MethodInterceptor(){
+    public static final MethodInterceptor INSTANCE_EMPTY = new MethodInterceptor() {
 
         @Override
         public Object intercept(Object object, Object[] args, MethodProxy methodProxy) throws Exception {

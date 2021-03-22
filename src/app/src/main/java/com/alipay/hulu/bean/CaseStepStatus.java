@@ -1,14 +1,14 @@
 package com.alipay.hulu.bean;
 
-import androidx.annotation.StringRes;
-
 import com.alipay.hulu.R;
 import com.alipay.hulu.common.utils.StringUtil;
+
+import androidx.annotation.StringRes;
 
 /**
  * Created by qiaoruikai on 2019/12/18 2:29 PM.
  */
-public enum  CaseStepStatus {
+public enum CaseStepStatus {
     FINISH("finish", R.string.case_step_status__finish),
     FAIL("fail", R.string.case_step_status__fail),
     UNENFORCED("unenforced", R.string.case_step_status__unenforced),
@@ -23,11 +23,12 @@ public enum  CaseStepStatus {
 
     /**
      * 根据Code查找
+     *
      * @param code
      * @return
      */
     public static CaseStepStatus getByCode(String code) {
-        for (CaseStepStatus status: values()) {
+        for (CaseStepStatus status : values()) {
             if (status.code.equals(code)) {
                 return status;
             }

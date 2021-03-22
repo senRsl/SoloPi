@@ -15,8 +15,6 @@
  */
 package com.alipay.hulu.shared.node.utils;
 
-import android.view.accessibility.AccessibilityEvent;
-
 import com.alipay.hulu.common.application.LauncherApplication;
 import com.alipay.hulu.common.injector.InjectorService;
 import com.alipay.hulu.common.injector.param.Subscriber;
@@ -27,7 +25,10 @@ import com.alipay.hulu.common.utils.MiscUtil;
 import com.alipay.hulu.shared.event.bean.UniversalEventBean;
 import com.alipay.hulu.shared.event.constant.Constant;
 
-/**s
+import android.view.accessibility.AccessibilityEvent;
+
+/**
+ * s
  * Created by qiaoruikai on 2018/11/13 12:34 PM.
  */
 public class ContentChangeWatcher {
@@ -65,6 +66,7 @@ public class ContentChangeWatcher {
 
     /**
      * 设置窗口变化监控时间
+     *
      * @param filterTime
      */
     public void setFilterTime(long filterTime) {
@@ -73,7 +75,6 @@ public class ContentChangeWatcher {
 
     /**
      * 等待sleep结束
-     *
      */
     public void sleepUntilContentDontChange() {
         // 先注册监听event消息

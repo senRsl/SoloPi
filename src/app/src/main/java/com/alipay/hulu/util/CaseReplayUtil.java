@@ -15,20 +15,8 @@
  */
 package com.alipay.hulu.util;
 
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.BaseAdapter;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.alibaba.fastjson.JSON;
 import com.alipay.hulu.R;
@@ -50,8 +38,20 @@ import com.alipay.hulu.service.CaseReplayManager;
 import com.alipay.hulu.shared.io.bean.RecordCaseInfo;
 import com.alipay.hulu.shared.node.utils.AppUtil;
 
-import java.util.ArrayList;
-import java.util.List;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 
 /**
  * 用例回放管理器
@@ -62,6 +62,7 @@ public class CaseReplayUtil {
 
     /**
      * 开始回放单条用例
+     *
      * @param recordCase
      */
     public static void startReplay(@NonNull final RecordCaseInfo recordCase) {
@@ -122,6 +123,7 @@ public class CaseReplayUtil {
 
     /**
      * 关闭后重启应用
+     *
      * @param packageName
      */
     public static void restartTargetApp(final String packageName) {
@@ -146,9 +148,10 @@ public class CaseReplayUtil {
 
     /**
      * 开始重复回放用例
+     *
      * @param recordCase
      * @param times
-     * @param restart 执行前重启
+     * @param restart    执行前重启
      */
     public static void startReplayMultiTimes(@NonNull RecordCaseInfo recordCase, int times, boolean restart) {
         RepeatStepProvider stepProvider = new RepeatStepProvider(recordCase, times, restart);
@@ -159,8 +162,9 @@ public class CaseReplayUtil {
 
     /**
      * 开始回放多条用例
+     *
      * @param recordCases 用例列表
-     * @param restart 执行前重启
+     * @param restart     执行前重启
      */
     public static void startReplayMultiCase(@NonNull List<RecordCaseInfo> recordCases, boolean restart) {
         BatchStepProvider provider = new BatchStepProvider(new ArrayList<>(recordCases), restart);
@@ -170,6 +174,7 @@ public class CaseReplayUtil {
 
     /**
      * 选择回放应用
+     *
      * @param context
      * @param listener
      */

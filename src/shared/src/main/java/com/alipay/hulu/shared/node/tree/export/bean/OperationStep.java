@@ -15,12 +15,12 @@
  */
 package com.alipay.hulu.shared.node.tree.export.bean;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import com.alipay.hulu.common.utils.StringUtil;
 import com.alipay.hulu.shared.node.action.OperationMethod;
 import com.alipay.hulu.shared.node.tree.OperationNode;
+
+import android.os.Parcel;
+import android.os.Parcelable;
 
 /**
  * 操作步骤
@@ -28,29 +28,46 @@ import com.alipay.hulu.shared.node.tree.OperationNode;
  */
 public class OperationStep implements Parcelable {
 
+    public static final Creator<OperationStep> CREATOR = new Creator<OperationStep>() {
+        @Override
+        public OperationStep createFromParcel(Parcel source) {
+            return new OperationStep(source);
+        }
+
+        @Override
+        public OperationStep[] newArray(int size) {
+            return new OperationStep[size];
+        }
+    };
     /**
      * 操作节点
      */
     private OperationNode operationNode;
-
     /**
      * 操作方法
      */
     private OperationMethod operationMethod;
-
     /**
      * 操作顺序
      */
     private int operationIndex;
-
     /**
      * 操作ID
      */
     private String operationId;
-
     private String stepId;
 
+    public OperationStep() {
+        stepId = StringUtil.generateRandomString(10);
+    }
 
+    private OperationStep(Parcel in) {
+        operationNode = in.readParcelable(OperationNode.class.getClassLoader());
+        operationMethod = in.readParcelable(OperationMethod.class.getClassLoader());
+        operationIndex = in.readInt();
+        operationId = in.readString();
+        stepId = in.readString();
+    }
 
     @Override
     public int describeContents() {
@@ -64,30 +81,6 @@ public class OperationStep implements Parcelable {
         dest.writeInt(operationIndex);
         dest.writeString(operationId);
         dest.writeString(stepId);
-    }
-
-    public static final Creator<OperationStep> CREATOR = new Creator<OperationStep>() {
-        @Override
-        public OperationStep createFromParcel(Parcel source) {
-            return new OperationStep(source);
-        }
-
-        @Override
-        public OperationStep[] newArray(int size) {
-            return new OperationStep[size];
-        }
-    };
-
-    public OperationStep(){
-        stepId = StringUtil.generateRandomString(10);
-    }
-
-    private OperationStep(Parcel in) {
-        operationNode = in.readParcelable(OperationNode.class.getClassLoader());
-        operationMethod = in.readParcelable(OperationMethod.class.getClassLoader());
-        operationIndex = in.readInt();
-        operationId = in.readString();
-        stepId = in.readString();
     }
 
     /**

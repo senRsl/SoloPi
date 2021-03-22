@@ -15,12 +15,11 @@
  */
 package com.alipay.hulu.event;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import com.alipay.hulu.common.utils.StringUtil;
 import com.alipay.hulu.shared.scan.ScanCodeType;
-import com.google.zxing.BarcodeFormat;
+
+import android.os.Parcel;
+import android.os.Parcelable;
 
 /**
  * Created by lezhou.wyl on 2018/2/7.
@@ -33,9 +32,32 @@ public class ScanSuccessEvent implements Parcelable {
     public static final int SCAN_TYPE_OTHER = 7;
     public static final int SCAN_TYPE_QR_CODE = 10;
     public static final int SCAN_TYPE_BAR_CODE = 11;
+    public static final Parcelable.Creator<ScanSuccessEvent> CREATOR = new Creator<ScanSuccessEvent>() {
+        @Override
+        public ScanSuccessEvent createFromParcel(Parcel source) {
+            return new ScanSuccessEvent(source);
+        }
+
+        @Override
+        public ScanSuccessEvent[] newArray(int size) {
+            return new ScanSuccessEvent[size];
+        }
+    };
     private int type;
     private String content;
     private ScanCodeType codeType;
+
+    public ScanSuccessEvent() {
+    }
+
+    protected ScanSuccessEvent(Parcel in) {
+        this.type = in.readInt();
+        this.content = in.readString();
+        String code = in.readString();
+        if (StringUtil.isNotEmpty(code)) {
+            this.codeType = ScanCodeType.getByCode(code);
+        }
+    }
 
     public int getType() {
         return type;
@@ -74,28 +96,4 @@ public class ScanSuccessEvent implements Parcelable {
             dest.writeString(this.codeType.getCode());
         }
     }
-
-    public ScanSuccessEvent() {
-    }
-
-    protected ScanSuccessEvent(Parcel in) {
-        this.type = in.readInt();
-        this.content = in.readString();
-        String code = in.readString();
-        if (StringUtil.isNotEmpty(code)) {
-            this.codeType = ScanCodeType.getByCode(code);
-        }
-    }
-
-    public static final Parcelable.Creator<ScanSuccessEvent> CREATOR = new Creator<ScanSuccessEvent>() {
-        @Override
-        public ScanSuccessEvent createFromParcel(Parcel source) {
-            return new ScanSuccessEvent(source);
-        }
-
-        @Override
-        public ScanSuccessEvent[] newArray(int size) {
-            return new ScanSuccessEvent[size];
-        }
-    };
 }

@@ -15,13 +15,13 @@
  */
 package com.alipay.hulu.activity;
 
-import android.os.Bundle;
-import androidx.annotation.Nullable;
-import android.view.View;
-import android.webkit.WebView;
-
 import com.alipay.hulu.R;
 import com.alipay.hulu.ui.HeadControlPanel;
+
+import android.os.Bundle;
+import android.view.View;
+import android.webkit.WebView;
+import androidx.annotation.Nullable;
 
 /**
  * Created by qiaoruikai on 2018/10/24 3:42 PM.

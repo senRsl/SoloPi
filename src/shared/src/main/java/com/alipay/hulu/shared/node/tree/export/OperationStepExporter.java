@@ -15,9 +15,11 @@
  */
 package com.alipay.hulu.shared.node.tree.export;
 
-import android.content.Context;
-import android.util.DisplayMetrics;
-import android.view.WindowManager;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.alipay.hulu.common.application.LauncherApplication;
 import com.alipay.hulu.common.service.SPService;
@@ -28,11 +30,9 @@ import com.alipay.hulu.shared.node.tree.OperationNode;
 import com.alipay.hulu.shared.node.tree.capture.CaptureTree;
 import com.alipay.hulu.shared.node.tree.export.bean.OperationStep;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
+import android.content.Context;
+import android.util.DisplayMetrics;
+import android.view.WindowManager;
 
 /**
  * Created by qiaoruikai on 2018/10/10 5:15 PM.
@@ -46,27 +46,6 @@ public class OperationStepExporter implements BaseStepExporter<OperationStep> {
     public OperationStepExporter(String operationId) {
         this.operationId = operationId;
         operationIdx = new AtomicInteger(0);
-    }
-
-    public void refresh(String operationId) {
-        this.operationId = operationId;
-        this.operationIdx.set(0);
-    }
-
-    @Override
-    public OperationStep exportStep(AbstractNodeTree root, AbstractNodeTree currentNode, OperationMethod method) {
-        OperationNode node = null;
-        if (currentNode != null) {
-            node = exportNodeToOperationNode(currentNode);
-        }
-        // 组装步骤信息
-        OperationStep step = new OperationStep();
-        step.setOperationNode(node);
-        step.setOperationMethod(method);
-        step.setOperationId(operationId);
-        step.setOperationIndex(operationIdx.getAndIncrement());
-
-        return step;
     }
 
     /**
@@ -170,5 +149,26 @@ public class OperationStepExporter implements BaseStepExporter<OperationStep> {
         }
 
         return node;
+    }
+
+    public void refresh(String operationId) {
+        this.operationId = operationId;
+        this.operationIdx.set(0);
+    }
+
+    @Override
+    public OperationStep exportStep(AbstractNodeTree root, AbstractNodeTree currentNode, OperationMethod method) {
+        OperationNode node = null;
+        if (currentNode != null) {
+            node = exportNodeToOperationNode(currentNode);
+        }
+        // 组装步骤信息
+        OperationStep step = new OperationStep();
+        step.setOperationNode(node);
+        step.setOperationMethod(method);
+        step.setOperationId(operationId);
+        step.setOperationIndex(operationIdx.getAndIncrement());
+
+        return step;
     }
 }

@@ -15,28 +15,19 @@
  */
 package com.alipay.hulu.service;
 
-import android.app.ProgressDialog;
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.ServiceConnection;
-import android.graphics.Bitmap;
-import android.graphics.Point;
-import android.graphics.Rect;
-import android.os.Build;
-import android.os.Environment;
-import android.os.IBinder;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import android.text.TextUtils;
-import android.util.DisplayMetrics;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import java.io.File;
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.alipay.hulu.R;
 import com.alipay.hulu.activity.MyApplication;
@@ -87,19 +78,28 @@ import com.alipay.hulu.shared.node.utils.RectUtil;
 import com.alipay.hulu.tools.HighLightService;
 import com.alipay.hulu.util.DialogUtils;
 
-import java.io.File;
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
+import android.app.ProgressDialog;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.graphics.Bitmap;
+import android.graphics.Point;
+import android.graphics.Rect;
+import android.os.Build;
+import android.os.Environment;
+import android.os.IBinder;
+import android.text.TextUtils;
+import android.util.DisplayMetrics;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 
 /**
  * 操作回放服务
@@ -109,74 +109,64 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class CaseReplayManager implements ExportService {
     public static final String REPLAY_STEP_FINISH_EVENT = "REPLAY_STEP_FINISH_EVENT";
     private static final String TAG = "CaseReplayManager";
-
-    /**
-     * 运行标记
-     */
-    boolean runningFlag;
-
-    /**
-     * 故障步骤
-     */
-    OperationStep exceptionStep;
-
-    /**
-     * 操作提供器
-     */
-    private AbstractStepProvider provider;
-
-    /**
-     * 操作服务
-     */
-    private OperationService operationService;
-
-    /**
-     * 操作服务
-     */
-    private TouchService touchService;
-
-    /**
-     * 高亮服务
-     */
-    private HighLightService highLightService;
-
-    /**
-     * 截图服务
-     */
-    private ScreenCaptureService captureService;
-
-    private WindowManager windowManager;
-
-    /**
-     * 消息服务
-     */
-    private InjectorService injectorService;
-
     /**
      * 用例运行器
      */
     private final ThreadPoolExecutor runningExecutor = new ThreadPoolExecutor(2, 2, 0L,
             TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(), new ThreadFactory() {
         private final AtomicInteger RUNNING_COUNTER = new AtomicInteger(1);
+
         @Override
         public Thread newThread(@NonNull Runnable r) {
             String name = String.format(Locale.CHINA, "CaseReplayThread-%d", RUNNING_COUNTER.getAndIncrement());
             return new Thread(r, name);
         }
     });
-
     /**
      * Daemon 执行器
      */
     private final ScheduledExecutorService daemonExecutor = Executors.newScheduledThreadPool(2, new ThreadFactory() {
         private final AtomicInteger DAEMON_COUNTER = new AtomicInteger(1);
+
         @Override
         public Thread newThread(@NonNull Runnable r) {
             String name = String.format(Locale.CHINA, "CaseReplayThread-%d", DAEMON_COUNTER.getAndIncrement());
             return new Thread(r, name);
         }
     });
-
+    /**
+     * 运行标记
+     */
+    boolean runningFlag;
+    /**
+     * 故障步骤
+     */
+    OperationStep exceptionStep;
+    /**
+     * 操作提供器
+     */
+    private AbstractStepProvider provider;
+    /**
+     * 操作服务
+     */
+    private OperationService operationService;
+    /**
+     * 操作服务
+     */
+    private TouchService touchService;
+    /**
+     * 高亮服务
+     */
+    private HighLightService highLightService;
+    /**
+     * 截图服务
+     */
+    private ScreenCaptureService captureService;
+    private WindowManager windowManager;
+    /**
+     * 消息服务
+     */
+    private InjectorService injectorService;
     /**
      * 目标应用
      */
@@ -197,7 +187,17 @@ public class CaseReplayManager implements ExportService {
     private ContentChangeWatcher watcher;
 
     private EventService eventService;
-
+    private FloatWinService.OnFloatListener floatListener = new FloatWinService.OnFloatListener() {
+        @Override
+        public void onFloatClick(boolean hide) {
+            if (!hide && provider != null) {
+                provider.onFloatClick(binder.loadServiceContext(), CaseReplayManager.this);
+            }
+        }
+    };
+    private int stepCount = 0;
+    private String defaultIme = null;
+    private CaseReplayStatus currentStatus = CaseReplayStatus.NONE;
     private FloatWinService.OnRunListener listener = new FloatWinService.OnRunListener() {
         @Override
         public int onRunClick() {
@@ -209,21 +209,7 @@ public class CaseReplayManager implements ExportService {
             return 0;
         }
     };
-
-    private FloatWinService.OnFloatListener floatListener = new FloatWinService.OnFloatListener() {
-        @Override
-        public void onFloatClick(boolean hide) {
-            if (!hide && provider != null) {
-                provider.onFloatClick(binder.loadServiceContext(), CaseReplayManager.this);
-            }
-        }
-    };
-
-    private int stepCount = 0;
-
-    private String defaultIme = null;
-
-    private CaseReplayStatus currentStatus = CaseReplayStatus.NONE;
+    private WeakReference<AlertDialog> dialogRef;
 
     public void onCreate(Context context) {
         LauncherApplication app = LauncherApplication.getInstance();
@@ -443,6 +429,7 @@ public class CaseReplayManager implements ExportService {
 
     /**
      * 单步操作
+     *
      * @return 是否执行完毕
      */
     private boolean stepAction(InjectorService injector) {
@@ -530,7 +517,7 @@ public class CaseReplayManager implements ExportService {
         final List<ReplayResultBean> resultBeans = provider.genReplayResult();
         if (resultBeans != null && resultBeans.size() > 0) {
             DeviceInfo deviceInfo = DeviceInfoUtil.generateDeviceInfo();
-            for (ReplayResultBean result: resultBeans) {
+            for (ReplayResultBean result : resultBeans) {
                 result.setDeviceInfo(deviceInfo);
                 result.setPlatform("Android");
                 result.setPlatformVersion(deviceInfo.getSystemVersion());
@@ -553,9 +540,9 @@ public class CaseReplayManager implements ExportService {
         this.runningFlag = false;
     }
 
-
     /**
      * 执行截图
+     *
      * @param captureFile
      * @return
      */
@@ -577,12 +564,13 @@ public class CaseReplayManager implements ExportService {
 
     /**
      * 处理单步操作
+     *
      * @param operation
      * @return
      */
     private String processOperation(OperationStep operation) {
         if (!runningFlag) {
-            return  "回放终止";
+            return "回放终止";
         }
 
         if (operation == null) {
@@ -782,6 +770,7 @@ public class CaseReplayManager implements ExportService {
 
     /**
      * 更新悬浮窗图标
+     *
      * @param res
      */
     public void updateFloatIcon(final int res) {
@@ -795,6 +784,7 @@ public class CaseReplayManager implements ExportService {
 
     /**
      * 高亮操作节点后隐藏
+     *
      * @param nodeTree
      * @param method
      */
@@ -831,8 +821,6 @@ public class CaseReplayManager implements ExportService {
         this.app = app;
     }
 
-
-
     @Subscriber(value = @Param(type = UIOperationMessage.class, sticky = false), thread = RunningThread.MAIN_THREAD)
     public void receiveDeviceInfoMessage(UIOperationMessage message) {
         if (message.eventType == UIOperationMessage.TYPE_DEVICE_INFO) {
@@ -853,10 +841,9 @@ public class CaseReplayManager implements ExportService {
         }
     }
 
-    private WeakReference<AlertDialog> dialogRef;
-
     /**
      * 显示设备悬浮窗
+     *
      * @param deviceInfo
      * @param context
      */
@@ -903,7 +890,7 @@ public class CaseReplayManager implements ExportService {
 
             // 提前500ms隐藏下
             if (timeOut > 0) {
-                long count = timeOut > 500? timeOut - 500: timeOut;
+                long count = timeOut > 500 ? timeOut - 500 : timeOut;
 
                 LauncherApplication.getInstance().runOnUiThread(new Runnable() {
                     @Override
@@ -915,6 +902,22 @@ public class CaseReplayManager implements ExportService {
         } catch (Exception e) {
             LogUtil.e(TAG, "显示设备信息异常", e);
         }
+    }
+
+    /**
+     * 运行状态
+     */
+    private enum CaseReplayStatus {
+        NONE,
+        BEFORE_PREPARE,
+        PREPARED,
+        RUNNING,
+        FINISH_RUNNING,
+        STOP,
+    }
+
+    public interface OnFinishListener {
+        void onFinish(List<ReplayResultBean> resultBeans, Context context);
     }
 
     private static class ReplayConnection implements ServiceConnection {
@@ -954,21 +957,5 @@ public class CaseReplayManager implements ExportService {
         @Override
         public void onServiceDisconnected(ComponentName name) {
         }
-    }
-
-    public interface OnFinishListener {
-        void onFinish(List<ReplayResultBean> resultBeans, Context context);
-    }
-
-    /**
-     * 运行状态
-     */
-    private enum CaseReplayStatus {
-        NONE,
-        BEFORE_PREPARE,
-        PREPARED,
-        RUNNING,
-        FINISH_RUNNING,
-        STOP,
     }
 }

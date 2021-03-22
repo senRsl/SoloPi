@@ -15,7 +15,12 @@
  */
 package com.alipay.hulu.shared.node.utils;
 
-import android.util.Pair;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.alipay.hulu.common.application.LauncherApplication;
 import com.alipay.hulu.common.utils.ClassUtil;
@@ -30,17 +35,7 @@ import com.liulishuo.filedownloader.BaseDownloadTask;
 import com.liulishuo.filedownloader.FileDownloadSampleListener;
 import com.liulishuo.filedownloader.FileDownloader;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import okhttp3.Call;
-import okhttp3.Callback;
+import android.util.Pair;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -51,9 +46,8 @@ import okhttp3.Response;
  */
 public class AssetsManager {
 
-    public static long MAX_PENDING_TIME = 15000;
-
     private static final String TAG = "AssetsManager";
+    public static long MAX_PENDING_TIME = 15000;
 
     public static PatchLoadResult loadPatchFromServer(String name, PrepareUtil.PrepareStatus prepareStatus) {
         LauncherApplication.getInstance().showToast(StringUtil.getString(R.string.assets__load_plugin, name));
@@ -104,6 +98,7 @@ public class AssetsManager {
 
     /**
      * 获取asset资源文件
+     *
      * @param assetInfo
      * @param status
      * @return
@@ -217,6 +212,7 @@ public class AssetsManager {
 
     /**
      * 获取asset资源文件
+     *
      * @param assetInfo
      * @param status
      * @return
@@ -255,8 +251,9 @@ public class AssetsManager {
 
     /**
      * 下载文件
-     * @param url          下载连接
-     * @param targetFile   目标文件
+     *
+     * @param url        下载连接
+     * @param targetFile 目标文件
      */
     public static boolean download(final String url, final File targetFile) {
         Request request = new Request.Builder()
@@ -269,7 +266,7 @@ public class AssetsManager {
         try {
             response = client.newCall(request).execute();
         } catch (IOException e) {
-            LogUtil.e(TAG,"Open connection fail", e);
+            LogUtil.e(TAG, "Open connection fail", e);
             return false;
         }
 

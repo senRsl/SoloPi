@@ -15,17 +15,13 @@
  */
 package com.alipay.hulu.adapter;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 import com.alipay.hulu.R;
 import com.alipay.hulu.actions.ImageCompareActionProvider;
@@ -44,13 +40,17 @@ import com.alipay.hulu.ui.CaseStepStatusView;
 import com.alipay.hulu.ui.ReverseImageView;
 import com.yydcdut.sdlv.SlideAndDragListView;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 /**
  * Created by qiaoruikai on 2019/2/18 9:50 PM.
@@ -108,6 +108,7 @@ public class CaseStepAdapter extends BaseAdapter implements View.OnClickListener
 
     /**
      * 设置当前模式
+     *
      * @param selectMode
      */
     public void setCurrentMode(boolean selectMode) {
@@ -117,6 +118,7 @@ public class CaseStepAdapter extends BaseAdapter implements View.OnClickListener
 
     /**
      * 获取选中的IDX
+     *
      * @return
      */
     public List<MyDataWrapper> getAndClearSelectOperationSteps() {
@@ -138,6 +140,7 @@ public class CaseStepAdapter extends BaseAdapter implements View.OnClickListener
 
     /**
      * 替换steps为step
+     *
      * @param idxs
      * @param step
      */
@@ -332,6 +335,7 @@ public class CaseStepAdapter extends BaseAdapter implements View.OnClickListener
 
     /**
      * 加载特定操作名称
+     *
      * @param actionEnum
      * @param method
      * @return
@@ -387,7 +391,7 @@ public class CaseStepAdapter extends BaseAdapter implements View.OnClickListener
             if (listener != null) {
                 listener.scroll(-v.getContext().getResources().getDimensionPixelSize(R.dimen.dp_72));
             }
-        } else if (id == R.id.case_step_edit_content_move_bottom){
+        } else if (id == R.id.case_step_edit_content_move_bottom) {
             if (position == data.size() - 1) {
                 return;
             }
@@ -416,21 +420,6 @@ public class CaseStepAdapter extends BaseAdapter implements View.OnClickListener
 
     }
 
-    public static class MyDataWrapper {
-        public OperationStep currentStep;
-        /**
-         * idx，全局唯一
-         */
-        public final int idx;
-
-        public int scopeTo = -1;
-
-        public MyDataWrapper(OperationStep currentStep, int idx) {
-            this.currentStep = currentStep;
-            this.idx = idx;
-        }
-    }
-
     private void reloadScope() {
         List<int[]> group = new ArrayList<>();
         for (int i = 0; i < data.size() - 1; i++) {
@@ -438,7 +427,7 @@ public class CaseStepAdapter extends BaseAdapter implements View.OnClickListener
             if (item.scopeTo > -1) {
                 for (int j = i + 1; j < data.size(); j++) {
                     if (data.get(j).idx == item.scopeTo) {
-                        group.add(new int[] {i, j});
+                        group.add(new int[]{i, j});
                         break;
                     }
                 }
@@ -469,7 +458,22 @@ public class CaseStepAdapter extends BaseAdapter implements View.OnClickListener
 
     public interface OnStepListener {
         void insertAfter(int position);
+
         void scroll(int px);
+    }
+
+    public static class MyDataWrapper {
+        /**
+         * idx，全局唯一
+         */
+        public final int idx;
+        public OperationStep currentStep;
+        public int scopeTo = -1;
+
+        public MyDataWrapper(OperationStep currentStep, int idx) {
+            this.currentStep = currentStep;
+            this.idx = idx;
+        }
     }
 }
 

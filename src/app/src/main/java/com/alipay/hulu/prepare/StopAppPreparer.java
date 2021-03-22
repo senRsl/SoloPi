@@ -20,8 +20,6 @@ import com.alipay.hulu.common.application.LauncherApplication;
 import com.alipay.hulu.common.service.SPService;
 import com.alipay.hulu.common.utils.StringUtil;
 import com.alipay.hulu.shared.node.OperationService;
-import com.alipay.hulu.shared.node.action.OperationMethod;
-import com.alipay.hulu.shared.node.action.PerformActionEnum;
 import com.alipay.hulu.shared.node.utils.AppUtil;
 import com.alipay.hulu.shared.node.utils.PrepareUtil;
 import com.alipay.hulu.shared.node.utils.prepare.PrepareWorker;
@@ -34,6 +32,7 @@ import com.alipay.hulu.shared.node.utils.prepare.PrepareWorker;
 public class StopAppPreparer implements PrepareWorker {
     public static final String KEY_CLEAR_APP_DATA = "K_clearAppData";
     public static final String KEY_CLEARED_APP_DATA = "K_clearedAppData";
+
     @Override
     public boolean doPrepareWork(String targetApp, PrepareUtil.PrepareStatus status) {
         // 拉起应用

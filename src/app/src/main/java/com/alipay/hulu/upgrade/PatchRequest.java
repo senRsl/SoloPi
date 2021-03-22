@@ -15,8 +15,14 @@
  */
 package com.alipay.hulu.upgrade;
 
-import android.app.Activity;
-import android.util.Pair;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.alipay.hulu.R;
 import com.alipay.hulu.activity.BaseActivity;
@@ -33,20 +39,12 @@ import com.alipay.hulu.common.utils.StringUtil;
 import com.alipay.hulu.common.utils.patch.PatchLoadResult;
 import com.alipay.hulu.shared.node.utils.AssetsManager;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
-
+import android.util.Pair;
 import okhttp3.Call;
 
 /**
  * Created by ruyao.yry on 2018/3/25.
- *
+ * <p>
  * 升级管理
  */
 
@@ -62,6 +60,13 @@ public class PatchRequest {
      * 基础依赖插件
      */
     private static final String BASE = "base";
+    private static final Set<String> ACCEPT_ABI = new HashSet<String>() {
+        {
+            add("armeabi");
+            add("armeabi-v7a");
+            add("arm64-v8a");
+        }
+    };
 
     /**
      * 更新Patch列表
@@ -102,6 +107,7 @@ public class PatchRequest {
 
     /**
      * 解析Patch列表
+     *
      * @param response
      */
     public static void doUpgradePatch(PatchResponse response) {
@@ -222,16 +228,9 @@ public class PatchRequest {
         ClassUtil.updateAvailablePatches(patchMap);
     }
 
-    private static final Set<String> ACCEPT_ABI = new HashSet<String>() {
-        {
-            add("armeabi");
-            add("armeabi-v7a");
-            add("arm64-v8a");
-        }
-    };
-
     /**
      * 过滤可用ABI
+     *
      * @param abi
      * @return
      */
@@ -244,6 +243,7 @@ public class PatchRequest {
 
     public interface LoadPatchCallback {
         void onLoaded();
+
         void onFailed();
     }
 }

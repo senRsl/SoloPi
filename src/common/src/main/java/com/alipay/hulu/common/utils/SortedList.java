@@ -15,11 +15,11 @@
  */
 package com.alipay.hulu.common.utils;
 
-import androidx.annotation.NonNull;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+
+import androidx.annotation.NonNull;
 
 /**
  * Created by qiaoruikai on 2019/11/8 11:46 PM.
@@ -88,10 +88,12 @@ public class SortedList<T> implements Iterable<T> {
     public static class MyIterator<T> implements Iterator<T> {
         private SortedList<T> list;
         private int position;
+
         MyIterator(SortedList<T> list) {
             this.list = list;
             position = 0;
         }
+
         @Override
         public boolean hasNext() {
             return position < list.size();

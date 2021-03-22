@@ -15,15 +15,16 @@
  */
 package com.alipay.hulu.activity;
 
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.os.Bundle;
-import androidx.appcompat.app.AlertDialog;
-import android.util.Pair;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.TextView;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONException;
@@ -56,16 +57,15 @@ import com.zhy.view.flowlayout.FlowLayout;
 import com.zhy.view.flowlayout.TagAdapter;
 import com.zhy.view.flowlayout.TagFlowLayout;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.Bundle;
+import android.util.Pair;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
+import androidx.appcompat.app.AlertDialog;
 
 import static com.alipay.hulu.util.DialogUtils.showMultipleEditDialog;
 
@@ -277,22 +277,22 @@ public class SettingsActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 showMultipleEditDialog(SettingsActivity.this, new OnDialogResultListener() {
-                    @Override
-                    public void onDialogPositive(List<String> data) {
-                        if (data.size() == 1) {
-                            String path = data.get(0);
-                            SPService.putString(SPService.KEY_PATCH_URL, path);
-                            if (StringUtil.isEmpty(path)) {
-                                mPatchListInfo.setText(R.string.constant__not_config);
-                            } else {
-                                mPatchListInfo.setText(path);
+                            @Override
+                            public void onDialogPositive(List<String> data) {
+                                if (data.size() == 1) {
+                                    String path = data.get(0);
+                                    SPService.putString(SPService.KEY_PATCH_URL, path);
+                                    if (StringUtil.isEmpty(path)) {
+                                        mPatchListInfo.setText(R.string.constant__not_config);
+                                    } else {
+                                        mPatchListInfo.setText(path);
 
-                                // 更新patch列表
-                                PatchRequest.updatePatchList(null);
+                                        // 更新patch列表
+                                        PatchRequest.updatePatchList(null);
+                                    }
+                                }
                             }
-                        }
-                    }
-                }, getString(R.string.settings__plugin_url),
+                        }, getString(R.string.settings__plugin_url),
                         Collections.singletonList(new Pair<>(getString(R.string.settings__plugin_url),
                                 SPService.getString(SPService.KEY_PATCH_URL, "https://raw.githubusercontent.com/alipay/SoloPi/master/<abi>.json"))));
             }
@@ -302,15 +302,15 @@ public class SettingsActivity extends BaseActivity {
             @Override
             public void onClick(View v) {
                 showMultipleEditDialog(SettingsActivity.this, new DialogUtils.OnDialogResultListener() {
-                                           @Override
-                                           public void onDialogPositive(List<String> data) {
-                                               if (data.size() == 1) {
-                                                   String charset = data.get(0);
-                                                   SPService.putString(SPService.KEY_OUTPUT_CHARSET, charset);
-                                                   mOutputCharsetSettingInfo.setText(charset);
-                                               }
-                                           }
-                                       }, getString(R.string.settings__output_charset),
+                            @Override
+                            public void onDialogPositive(List<String> data) {
+                                if (data.size() == 1) {
+                                    String charset = data.get(0);
+                                    SPService.putString(SPService.KEY_OUTPUT_CHARSET, charset);
+                                    mOutputCharsetSettingInfo.setText(charset);
+                                }
+                            }
+                        }, getString(R.string.settings__output_charset),
                         Collections.singletonList(new Pair<>(getString(R.string.settings__output_charset),
                                 SPService.getString(SPService.KEY_OUTPUT_CHARSET))));
             }
@@ -339,11 +339,11 @@ public class SettingsActivity extends BaseActivity {
                             }
                         })
                         .setNegativeButton(R.string.constant__cancel, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                }).show();
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        }).show();
             }
         });
 
@@ -501,7 +501,7 @@ public class SettingsActivity extends BaseActivity {
                             SPService.putString(SPService.KEY_AES_KEY, seed);
 
                             // 发生了更新
-                            if (!StringUtil.equals(originSeed,seed)) {
+                            if (!StringUtil.equals(originSeed, seed)) {
                                 updateStoredRecords(originSeed, seed);
                             }
                             mAesSeedSettingInfo.setText(seed);
@@ -793,7 +793,7 @@ public class SettingsActivity extends BaseActivity {
         mChangeRotationSettingWrapper = findViewById(R.id.change_rotation_setting_wrapper);
         mChangeRotationSettingInfo = _findViewById(R.id.change_rotation_setting_info);
         boolean changeRotation = SPService.getBoolean(SPService.KEY_SCREEN_ROTATION, false);
-        mChangeRotationSettingInfo.setText(changeRotation? R.string.constant__yes: R.string.constant__no);
+        mChangeRotationSettingInfo.setText(changeRotation ? R.string.constant__yes : R.string.constant__no);
 
 
         mOutputCharsetSettingWrapper = findViewById(R.id.output_charset_setting_wrapper);
@@ -806,7 +806,7 @@ public class SettingsActivity extends BaseActivity {
 
         mHightlightSettingWrapper = findViewById(R.id.replay_highlight_setting_wrapper);
         mHightlightSettingInfo = (TextView) findViewById(R.id.replay_highlight_setting_info);
-        mHightlightSettingInfo.setText(SPService.getBoolean(SPService.KEY_HIGHLIGHT_REPLAY_NODE, true)? R.string.constant__yes: R.string.constant__no);
+        mHightlightSettingInfo.setText(SPService.getBoolean(SPService.KEY_HIGHLIGHT_REPLAY_NODE, true) ? R.string.constant__yes : R.string.constant__no);
 
         mLanguageSettingWrapper = findViewById(R.id.language_setting_wrapper);
         mLanguageSettingInfo = (TextView) findViewById(R.id.language_setting_info);
@@ -839,12 +839,12 @@ public class SettingsActivity extends BaseActivity {
         mReplayOtherAppSettingWrapper = findViewById(R.id.replay_other_app_setting_wrapper);
         mReplayOtherAppInfo = _findViewById(R.id.replay_other_app_setting_info);
         boolean replayOtherApp = SPService.getBoolean(SPService.KEY_ALLOW_REPLAY_DIFFERENT_APP, false);
-        mReplayOtherAppInfo.setText(replayOtherApp? R.string.constant__yes: R.string.constant__no);
+        mReplayOtherAppInfo.setText(replayOtherApp ? R.string.constant__yes : R.string.constant__no);
 
         mRestartAppSettingWrapper = findViewById(R.id.restart_app_setting_wrapper);
         mRestartAppInfo = _findViewById(R.id.restart_app_setting_info);
         boolean restartApp = SPService.getBoolean(SPService.KEY_RESTART_APP_ON_PLAY, true);
-        mRestartAppInfo.setText(restartApp? R.string.constant__yes: R.string.constant__no);
+        mRestartAppInfo.setText(restartApp ? R.string.constant__yes : R.string.constant__no);
 
         mAdbServerSettingWrapper = findViewById(R.id.adb_server_setting_wrapper);
         mAdbServerSettingInfo = _findViewById(R.id.adb_server_setting_info);
@@ -927,7 +927,7 @@ public class SettingsActivity extends BaseActivity {
         String globalParam = SPService.getString(SPService.KEY_GLOBAL_SETTINGS);
         JSONObject params = JSON.parseObject(globalParam);
         if (params != null && params.size() > 0) {
-            for (String key: params.keySet()) {
+            for (String key : params.keySet()) {
                 paramList.add(new Pair<>(key, params.getString(key)));
             }
         }
@@ -936,7 +936,7 @@ public class SettingsActivity extends BaseActivity {
                 SettingsActivity.this, R.style.AppDialogTheme));
         final View view = inflater.inflate(R.layout.dialog_global_param_setting, null);
         final TagFlowLayout tagFlowLayout = (TagFlowLayout) view.findViewById(R.id.global_param_group);
-        final EditText paramName= (EditText) view.findViewById(R.id.global_param_name);
+        final EditText paramName = (EditText) view.findViewById(R.id.global_param_name);
         final EditText paramValue = (EditText) view.findViewById(R.id.global_param_value);
         View paramAdd = view.findViewById(R.id.global_param_add);
 
@@ -997,7 +997,7 @@ public class SettingsActivity extends BaseActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         JSONObject newGlobalParam = new JSONObject(paramList.size() + 1);
-                        for (Pair<String, String> param: paramList) {
+                        for (Pair<String, String> param : paramList) {
                             newGlobalParam.put(param.first, param.second);
                         }
                         SPService.putString(SPService.KEY_GLOBAL_SETTINGS, newGlobalParam.toJSONString());
@@ -1031,6 +1031,7 @@ public class SettingsActivity extends BaseActivity {
 
     /**
      * 更新存储的用例
+     *
      * @param oldSeed
      * @param newSeed
      */

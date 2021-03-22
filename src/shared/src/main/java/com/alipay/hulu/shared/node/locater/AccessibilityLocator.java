@@ -15,15 +15,15 @@
  */
 package com.alipay.hulu.shared.node.locater;
 
-import android.os.Build;
-import android.view.accessibility.AccessibilityNodeInfo;
+import java.lang.reflect.Method;
 
 import com.alipay.hulu.common.utils.LogUtil;
 import com.alipay.hulu.common.utils.StringUtil;
 import com.alipay.hulu.shared.node.tree.AbstractNodeTree;
 import com.alipay.hulu.shared.node.tree.accessibility.tree.AccessibilityNodeTree;
 
-import java.lang.reflect.Method;
+import android.os.Build;
+import android.view.accessibility.AccessibilityNodeInfo;
 
 /**
  * AccessibilityEvent定位器
@@ -79,6 +79,7 @@ public class AccessibilityLocator {
 
     /**
      * 反射获取ID
+     *
      * @param node
      * @param getMethod
      * @return

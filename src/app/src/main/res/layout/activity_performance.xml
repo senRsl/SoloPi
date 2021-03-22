@@ -14,13 +14,13 @@
   ~ limitations under the License.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
     <include
         android:id="@+id/head_layout"
-        layout="@layout/head_panel_layout"/>
+        layout="@layout/head_panel_layout" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -29,139 +29,157 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:background="@color/white">
+            android:background="@color/white"
+            android:orientation="vertical">
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/control_dp30"
-                android:orientation="horizontal"
-                android:background="@color/default_background_color">
+                android:background="@color/default_background_color"
+                android:orientation="horizontal">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/performance__target_app"
-                    android:textSize="@dimen/textsize_14"
-                    android:layout_marginLeft="@dimen/control_dp8"
-                    android:layout_marginBottom="@dimen/control_dp2"
                     android:layout_gravity="bottom"
-                    android:textColor="#a3a3a3"/>
+                    android:layout_marginBottom="@dimen/control_dp2"
+                    android:layout_marginLeft="@dimen/control_dp8"
+                    android:text="@string/performance__target_app"
+                    android:textColor="#a3a3a3"
+                    android:textSize="@dimen/textsize_14" />
             </LinearLayout>
 
             <include layout="@layout/divider" />
+
             <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <RelativeLayout
+                    android:id="@+id/column_app"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical" >
+                    android:layout_gravity="center_vertical"
+                    android:padding="@dimen/control_dp6">
 
-                    <RelativeLayout
+                    <androidx.appcompat.widget.AppCompatSpinner
+                        android:id="@+id/perform_param_spinner"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:id="@+id/column_app"
-                        android:padding="@dimen/control_dp6"
-                        android:layout_gravity="center_vertical" >
-
-                        <androidx.appcompat.widget.AppCompatSpinner
-                            android:id="@+id/perform_param_spinner"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:spinnerMode="dialog" />
-                    </RelativeLayout>
+                        android:spinnerMode="dialog" />
+                </RelativeLayout>
             </LinearLayout>
+
             <include layout="@layout/divider" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/control_dp36"
-                android:orientation="horizontal"
-                android:background="@color/default_background_color">
+                android:background="@color/default_background_color"
+                android:orientation="horizontal">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:layout_marginBottom="@dimen/control_dp2"
+                    android:layout_marginLeft="@dimen/control_dp8"
                     android:text="@string/performance__performance_data"
-                    android:textSize="@dimen/textsize_14"
-                    android:layout_marginLeft="@dimen/control_dp8"
-                    android:layout_marginBottom="@dimen/control_dp2"
-                    android:layout_gravity="bottom"
-                    android:textColor="#a3a3a3"/>
+                    android:textColor="#a3a3a3"
+                    android:textSize="@dimen/textsize_14" />
             </LinearLayout>
+
             <include layout="@layout/divider" />
 
             <LinearLayout
-                android:orientation="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:orientation="vertical"
                 android:paddingLeft="@dimen/control_dp16">
-                    <com.alipay.hulu.ui.TotalMeasureListView
-                        android:id="@+id/perform_float_list"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:divider="@color/divider_color"
-                        android:dividerHeight="0dip" >
-                    </com.alipay.hulu.ui.TotalMeasureListView>
+
+                <com.alipay.hulu.ui.TotalMeasureListView
+                    android:id="@+id/perform_float_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:divider="@color/divider_color"
+                    android:dividerHeight="0dip"></com.alipay.hulu.ui.TotalMeasureListView>
+
                 <include layout="@layout/divider" />
-                <include layout="@layout/screen_record_entry"
-                    android:id="@+id/screen_record_btn"/>
+
+                <include
+                    android:id="@+id/screen_record_btn"
+                    layout="@layout/screen_record_entry" />
             </LinearLayout>
+
             <include layout="@layout/divider" />
 
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/control_dp36"
-                android:orientation="horizontal"
-                android:background="@color/default_background_color">
+                android:background="@color/default_background_color"
+                android:orientation="horizontal">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:layout_marginBottom="@dimen/control_dp2"
+                    android:layout_marginLeft="@dimen/control_dp8"
                     android:text="@string/performance__test_result"
-                    android:textSize="@dimen/textsize_14"
-                    android:layout_marginLeft="@dimen/control_dp8"
-                    android:layout_marginBottom="@dimen/control_dp2"
-                    android:layout_gravity="bottom"
-                    android:textColor="#a3a3a3"/>
+                    android:textColor="#a3a3a3"
+                    android:textSize="@dimen/textsize_14" />
             </LinearLayout>
 
             <include layout="@layout/divider" />
-            <include layout="@layout/clickable_item"
-                android:id="@+id/chart_button"/>
+
+            <include
+                android:id="@+id/chart_button"
+                layout="@layout/clickable_item" />
+
             <include layout="@layout/divider" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/control_dp36"
-                android:orientation="horizontal"
-                android:background="@color/default_background_color">
+                android:background="@color/default_background_color"
+                android:orientation="horizontal">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/performance__env_press"
-                    android:textSize="@dimen/textsize_14"
-                    android:layout_marginLeft="@dimen/control_dp8"
-                    android:layout_marginBottom="@dimen/control_dp2"
                     android:layout_gravity="bottom"
-                    android:textColor="#a3a3a3"/>
+                    android:layout_marginBottom="@dimen/control_dp2"
+                    android:layout_marginLeft="@dimen/control_dp8"
+                    android:text="@string/performance__env_press"
+                    android:textColor="#a3a3a3"
+                    android:textSize="@dimen/textsize_14" />
             </LinearLayout>
+
             <include layout="@layout/divider" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:paddingLeft="@dimen/control_dp16">
 
-                    <com.alipay.hulu.ui.TotalMeasureListView
-                        android:id="@+id/perform_stress_list"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:divider="@color/divider_color"
-                        android:dividerHeight="0dip" >
-                        </com.alipay.hulu.ui.TotalMeasureListView>
+                <com.alipay.hulu.ui.TotalMeasureListView
+                    android:id="@+id/perform_stress_list"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:divider="@color/divider_color"
+                    android:dividerHeight="0dip"></com.alipay.hulu.ui.TotalMeasureListView>
             </LinearLayout>
+
             <include layout="@layout/divider" />
+
             <View
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/control_dp12"
-                android:orientation="horizontal"
-                android:background="@color/default_background_color"/>
+                android:background="@color/default_background_color"
+                android:orientation="horizontal" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

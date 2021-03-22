@@ -22,27 +22,16 @@ import com.alipay.hulu.common.application.LauncherApplication;
  */
 public class GreenDaoManager {
 
+    private static final String DB_NAME = "record_cases";
     private DaoMaster mDaoMaster;
     private DaoSession mDaoSession;
     //FIXME 实际上不应该将具体的Entity Dao直接放在GreenDaoManager中
     private RecordCaseInfoDao mRecordCaseInfoDao;
 
-    private static final String DB_NAME = "record_cases";
-
     private GreenDaoManager() {
         mDaoMaster = new DaoMaster(new RecordCaseOpenHelper(LauncherApplication.getInstance(), DB_NAME).getWritableDatabase());
         mDaoSession = mDaoMaster.newSession();
         mRecordCaseInfoDao = mDaoSession.getRecordCaseInfoDao();
-    }
-
-    private static class SingletonHolder {
-        private static GreenDaoManager _INSTANCE;
-        private static synchronized GreenDaoManager INSTANCE() {
-            if (_INSTANCE == null) {
-                _INSTANCE = new GreenDaoManager();
-            }
-            return _INSTANCE;
-        }
     }
 
     public static GreenDaoManager getInstance() {
@@ -51,6 +40,17 @@ public class GreenDaoManager {
 
     public RecordCaseInfoDao getRecordCaseInfoDao() {
         return mRecordCaseInfoDao;
+    }
+
+    private static class SingletonHolder {
+        private static GreenDaoManager _INSTANCE;
+
+        private static synchronized GreenDaoManager INSTANCE() {
+            if (_INSTANCE == null) {
+                _INSTANCE = new GreenDaoManager();
+            }
+            return _INSTANCE;
+        }
     }
 
 }

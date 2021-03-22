@@ -15,39 +15,27 @@
  */
 package com.alipay.hulu.screenRecord;
 
+import java.lang.reflect.Method;
+
 import com.alipay.hulu.common.tools.BackgroundExecutor;
 import com.alipay.hulu.common.utils.ClassUtil;
 import com.alipay.hulu.common.utils.LogUtil;
 import com.alipay.hulu.common.utils.patch.PatchLoadResult;
 
-import java.lang.reflect.Method;
-
 public class VideoAnalyzer {
 
     public static final String SCREEN_RECORD_PATCH = "hulu_screenRecord";
-
-    public interface AnalyzeListener {
-        void onAnalyzeFinished(long result);
-        void onAnalyzeFailed(String msg);
-    }
-
     private static final String TAG = VideoAnalyzer.class.getSimpleName();
-
     private long startTime;
     private long t1;    //从开始录屏到检测到点击的时间
     private long t2;    //从开始录屏到检测到加载完成的时间
     private long result;
+    private VideoAnalyzer() {
 
-    private static class SingletonHolder {
-        private static final VideoAnalyzer INSTANCE = new VideoAnalyzer();
     }
 
     public static VideoAnalyzer getInstance() {
         return SingletonHolder.INSTANCE;
-    }
-
-    private VideoAnalyzer() {
-
     }
 
     public void doAnalyze(final long t1, final double exceptDiff, final String path, final AnalyzeListener listener) {
@@ -105,5 +93,15 @@ public class VideoAnalyzer {
                 }
             }
         });
+    }
+
+    public interface AnalyzeListener {
+        void onAnalyzeFinished(long result);
+
+        void onAnalyzeFailed(String msg);
+    }
+
+    private static class SingletonHolder {
+        private static final VideoAnalyzer INSTANCE = new VideoAnalyzer();
     }
 }

@@ -15,12 +15,11 @@
  */
 package com.alipay.hulu.common.injector.cache;
 
+import java.lang.reflect.Method;
+
 import com.alipay.hulu.common.injector.param.InjectParam;
 import com.alipay.hulu.common.injector.param.RunningThread;
 import com.alipay.hulu.common.injector.provider.ParamReference;
-import com.alipay.hulu.common.utils.LogUtil;
-
-import java.lang.reflect.Method;
 
 /**
  * Created by qiaoruikai on 2018/10/12 5:42 PM.

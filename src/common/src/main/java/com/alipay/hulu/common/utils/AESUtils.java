@@ -15,8 +15,6 @@
  */
 package com.alipay.hulu.common.utils;
 
-import com.alipay.hulu.common.service.SPService;
-
 import java.nio.charset.Charset;
 
 import javax.crypto.Cipher;
@@ -24,15 +22,19 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import com.alipay.hulu.common.service.SPService;
+
 /**
  * Created by lezhou.wyl on 2018/8/28.
  */
 
 public class AESUtils {
     public static final String DEFAULT_AES_KEY = "com.alipay.hulu";
+    private final static String HEX = "0123456789ABCDEF";
 
     /**
      * 根据默认配置的Seed加密
+     *
      * @param cleartext
      * @return
      * @throws Exception
@@ -44,6 +46,7 @@ public class AESUtils {
 
     /**
      * 根据默认配置的Seed解密
+     *
      * @param encrypted
      * @return
      * @throws Exception
@@ -55,6 +58,7 @@ public class AESUtils {
 
     /**
      * 根据seed加密clearText
+     *
      * @param cleartext
      * @param seed
      * @return
@@ -66,13 +70,14 @@ public class AESUtils {
             return cleartext;
         }
 
-        byte[] rawKey = deriveKeyInsecurely(seed,32).getEncoded();
+        byte[] rawKey = deriveKeyInsecurely(seed, 32).getEncoded();
         byte[] result = encrypt(rawKey, cleartext.getBytes());
         return toHex(result);
     }
 
     /**
      * 根据seed解密encrypted
+     *
      * @param seed
      * @param encrypted
      * @return
@@ -84,7 +89,7 @@ public class AESUtils {
             return encrypted;
         }
 
-        byte[] rawKey = deriveKeyInsecurely(seed,32).getEncoded();
+        byte[] rawKey = deriveKeyInsecurely(seed, 32).getEncoded();
         byte[] enc = toByte(encrypted);
         byte[] result = decrypt(rawKey, enc);
         return new String(result);
@@ -98,6 +103,7 @@ public class AESUtils {
                         passwordBytes, keySizeInBytes),
                 "AES");
     }
+
     private static byte[] encrypt(byte[] raw, byte[] clear) throws Exception {
         SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
         Cipher cipher = Cipher.getInstance("AES");
@@ -105,6 +111,7 @@ public class AESUtils {
         byte[] encrypted = cipher.doFinal(clear);
         return encrypted;
     }
+
     private static byte[] decrypt(byte[] raw, byte[] encrypted) throws Exception {
         SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
         Cipher cipher = Cipher.getInstance("AES");
@@ -112,12 +119,15 @@ public class AESUtils {
         byte[] decrypted = cipher.doFinal(encrypted);
         return decrypted;
     }
+
     private static String toHex(String txt) {
         return toHex(txt.getBytes());
     }
+
     private static String fromHex(String hex) {
         return new String(toByte(hex));
     }
+
     private static byte[] toByte(String hexString) {
         int len = hexString.length() / 2;
         byte[] result = new byte[len];
@@ -125,6 +135,7 @@ public class AESUtils {
             result[i] = Integer.valueOf(hexString.substring(2 * i, 2 * i + 2), 16).byteValue();
         return result;
     }
+
     private static String toHex(byte[] buf) {
         if (buf == null)
             return "";
@@ -134,7 +145,7 @@ public class AESUtils {
         }
         return result.toString();
     }
-    private final static String HEX = "0123456789ABCDEF";
+
     private static void appendHex(StringBuffer sb, byte b) {
         sb.append(HEX.charAt((b >> 4) & 0x0f)).append(HEX.charAt(b & 0x0f));
     }

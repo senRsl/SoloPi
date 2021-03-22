@@ -15,43 +15,37 @@
  */
 package com.alipay.hulu.common.injector.provider;
 
-import androidx.annotation.NonNull;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.alipay.hulu.common.injector.param.InjectParam;
 import com.alipay.hulu.common.utils.StringUtil;
 
-import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
+import androidx.annotation.NonNull;
 
 public class ProviderInfo implements Comparable<ProviderInfo> {
+    int rank = 0;
     /**
      * 更新间隔
      */
     private long updatePeriod;
-
     /**
      * 上次更新时间
      */
     private long lastUpdateTime = -1;
-
     /**
      * 是否需要由消息中心调用
      */
     private boolean lazy;
-
     /**
      * 运行状态标志
      */
     private AtomicBoolean isRunning;
-
     /**
      * 提供的参数
      */
     private List<InjectParam> provideParams;
-
     private boolean force;
-
-    int rank = 0;
 
 
     public ProviderInfo(long updatePeriod, List<InjectParam> provideParams, boolean lazy, boolean force) {
@@ -64,6 +58,7 @@ public class ProviderInfo implements Comparable<ProviderInfo> {
 
     /**
      * 获取当前是否达到更新时间
+     *
      * @return
      */
     public boolean shouldUpdate() {
@@ -87,12 +82,13 @@ public class ProviderInfo implements Comparable<ProviderInfo> {
 
     /**
      * 查找可提供的参数
+     *
      * @param name
      * @param value
      * @return
      */
     public InjectParam findParam(String name, Object value) {
-        for (InjectParam paramType: provideParams) {
+        for (InjectParam paramType : provideParams) {
             if (StringUtil.equals(paramType.getName(), name)) {
                 if (paramType.isValueValid(value)) {
                     return paramType;
@@ -106,6 +102,7 @@ public class ProviderInfo implements Comparable<ProviderInfo> {
 
     /**
      * 获取是否正在运行
+     *
      * @return
      */
     public boolean isRunning() {

@@ -15,8 +15,7 @@
  */
 package com.alipay.hulu.shared.event;
 
-import android.graphics.Point;
-import android.view.accessibility.AccessibilityNodeInfo;
+import java.util.concurrent.TimeUnit;
 
 import com.alipay.hulu.common.application.LauncherApplication;
 import com.alipay.hulu.common.injector.InjectorService;
@@ -28,7 +27,8 @@ import com.alipay.hulu.shared.event.bean.UniversalEventBean;
 import com.alipay.hulu.shared.event.constant.Constant;
 import com.alipay.hulu.shared.event.touch.TouchEventTracker;
 
-import java.util.concurrent.TimeUnit;
+import android.graphics.Point;
+import android.view.accessibility.AccessibilityNodeInfo;
 
 /**
  * Created by qiaoruikai on 2018/10/9 4:45 PM.

@@ -14,13 +14,12 @@
   ~ limitations under the License.
 -->
 <accessibility-service xmlns:android="http://schemas.android.com/apk/res/android"
-    android:accessibilityEventTypes="typeAllMask"  
+    android:accessibilityEventTypes="typeAllMask"
     android:accessibilityFeedbackType="feedbackAllMask"
-    android:notificationTimeout="1000"
-    android:canRetrieveWindowContent="true"
-	android:canRequestFilterKeyEvents="true"
-	android:description="@string/accessibility_description"
     android:accessibilityFlags="flagDefault|flagIncludeNotImportantViews|flagReportViewIds|flagRequestEnhancedWebAccessibility|flagRetrieveInteractiveWindows"
-	android:canRequestTouchExplorationMode="true"
-	android:canRequestEnhancedWebAccessibility="true">
-</accessibility-service>
+    android:canRequestEnhancedWebAccessibility="true"
+    android:canRequestFilterKeyEvents="true"
+    android:canRequestTouchExplorationMode="true"
+    android:canRetrieveWindowContent="true"
+    android:description="@string/accessibility_description"
+    android:notificationTimeout="1000"></accessibility-service>

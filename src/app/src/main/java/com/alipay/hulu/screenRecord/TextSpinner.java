@@ -15,6 +15,8 @@
  */
 package com.alipay.hulu.screenRecord;
 
+import com.alipay.hulu.R;
+
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -28,8 +30,6 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
-
-import com.alipay.hulu.R;
 
 public class TextSpinner extends LinearLayout {
     private TextView mTitleView;
@@ -94,12 +94,12 @@ public class TextSpinner extends LinearLayout {
         mSpinner.setPrompt(text);
     }
 
-    public void setAdapter(SpinnerAdapter adapter) {
-        mSpinner.setAdapter(adapter);
-    }
-
     public SpinnerAdapter getAdapter() {
         return mSpinner.getAdapter();
+    }
+
+    public void setAdapter(SpinnerAdapter adapter) {
+        mSpinner.setAdapter(adapter);
     }
 
     public <T> T getSelectedItem() throws ClassCastException {

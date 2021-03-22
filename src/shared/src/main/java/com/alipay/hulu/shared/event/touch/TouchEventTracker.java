@@ -16,7 +16,13 @@
 package com.alipay.hulu.shared.event.touch;
 
 
-import android.graphics.Point;
+import java.io.IOException;
+import java.lang.ref.WeakReference;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import com.alipay.hulu.common.application.LauncherApplication;
 import com.alipay.hulu.common.injector.InjectorService;
@@ -30,13 +36,7 @@ import com.alipay.hulu.common.utils.LogUtil;
 import com.alipay.hulu.common.utils.StringUtil;
 import com.alipay.hulu.shared.event.constant.Constant;
 
-import java.io.IOException;
-import java.lang.ref.WeakReference;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import android.graphics.Point;
 
 import static android.view.Surface.ROTATION_0;
 import static android.view.Surface.ROTATION_180;
@@ -48,13 +48,9 @@ import static android.view.Surface.ROTATION_270;
  */
 public class TouchEventTracker {
     private static final String TAG = "TouchEventTracker";
-
-    private volatile TouchListener touchListener;
-
-    private ScheduledExecutorService touchCmdExecutor;
-
     private static final int WAIT_TOUCH_FILTER = 300 * 1000;
-
+    private volatile TouchListener touchListener;
+    private ScheduledExecutorService touchCmdExecutor;
     private InjectorService injectorService;
 
     /**
@@ -68,7 +64,13 @@ public class TouchEventTracker {
     }
 
     /**
+     * 获取CLOCK_MONOTONIC与
+     */
+    public static native long getTimeDiffInMicron(long currentTime);
+
+    /**
      * touchtrack是否活着
+     *
      * @return
      */
     public boolean isTouchTrackRunning() {
@@ -131,6 +133,7 @@ public class TouchEventTracker {
 
     /**
      * 注册触摸监听器
+     *
      * @param listener
      */
     public void registerTouchListener(TouchListener listener) {
@@ -139,7 +142,8 @@ public class TouchEventTracker {
 
     /**
      * 内部通知新触摸事件
-     * @param time 事件时间
+     *
+     * @param time  事件时间
      * @param point 时间坐标
      */
     private void receiveNewTouch(long time, Point point) {
@@ -152,6 +156,7 @@ public class TouchEventTracker {
 
     /**
      * 内部通知新触摸事件
+     *
      * @param time 事件时间
      */
     private void receiveTouchDown(long time) {
@@ -164,6 +169,7 @@ public class TouchEventTracker {
 
     /**
      * 内部通知新触摸事件
+     *
      * @param time 事件时间
      */
     private void receiveTouchUp(long time) {
@@ -175,9 +181,22 @@ public class TouchEventTracker {
     }
 
     /**
+     * 触摸监听器
+     */
+    public interface TouchListener {
+        void notifyTouchStart(long microSecond);
+
+        void notifyTouchEvent(Point p, long microSecond);
+
+        void notifyTouchEnd(long microSecond);
+    }
+
+    /**
      * 读取event的Runnable
      */
     static class StreamReadRunnable implements Runnable {
+        long lastUpActionTime = 0L;
+        long lastDownActionTime = 0L;
         private WeakReference<TouchEventTracker> handlerRef;
         private CmdLine cmdLine;
         private boolean[] waitForXY = {false, false};
@@ -185,12 +204,10 @@ public class TouchEventTracker {
         private float xFactor = 0f;
         private float yFactor = 0f;
         private Map<String, float[]> devicesFactors;
-
         private Point screenSize;
         private long deviceStartTime = 0L;
         private int defaultScreenRotation = 0;
         private boolean changeRotation = false;
-
         /**
          * 默认竖屏
          */
@@ -198,6 +215,7 @@ public class TouchEventTracker {
 
         /**
          * 初始化时执行getevent
+         *
          * @param handler
          * @param cmdLine
          */
@@ -239,6 +257,7 @@ public class TouchEventTracker {
 
         /**
          * 使用新的命令行
+         *
          * @param cmdLine
          */
         public void useNewCmdLine(CmdLine cmdLine) {
@@ -318,6 +337,7 @@ public class TouchEventTracker {
 
         /**
          * 获取设备多个size
+         *
          * @return
          */
         private Map<String, Point> calculateDeviceSize() {
@@ -440,9 +460,6 @@ public class TouchEventTracker {
             return devices;
         }
 
-        long lastUpActionTime = 0L;
-        long lastDownActionTime = 0L;
-
         @Override
         public void run() {
             // handler没了，说明被回收了
@@ -477,6 +494,7 @@ public class TouchEventTracker {
 
         /**
          * 运行环境检查
+         *
          * @return
          */
         private boolean envCheck() {
@@ -497,7 +515,7 @@ public class TouchEventTracker {
                     LogUtil.e(TAG, "初始化流抛出异常", e);
                 }
 
-                count ++;
+                count++;
             }
 
             // adb完全挂了，stream无法恢复，等10s，看看SoloPi的15s的adb保活是否有用
@@ -510,6 +528,7 @@ public class TouchEventTracker {
 
         /**
          * 解析getEvent
+         *
          * @param result
          * @param tracker
          */
@@ -531,6 +550,7 @@ public class TouchEventTracker {
 
         /**
          * 解析单行数据
+         *
          * @param line
          * @param tracker
          */
@@ -630,6 +650,7 @@ public class TouchEventTracker {
 
         /**
          * 获取事件时间
+         *
          * @param line
          * @return
          */
@@ -653,6 +674,7 @@ public class TouchEventTracker {
 
         /**
          * 重载X、Y的缩放比
+         *
          * @param line
          */
         private void reloadFactor(String line) {
@@ -725,20 +747,6 @@ public class TouchEventTracker {
                 handlerRef.get().receiveNewTouch(eventTime, p);
             }
         }
-    }
-
-    /**
-     * 获取CLOCK_MONOTONIC与
-     */
-    public static native long getTimeDiffInMicron(long currentTime);
-
-    /**
-     * 触摸监听器
-     */
-    public interface TouchListener {
-        void notifyTouchStart(long microSecond);
-        void notifyTouchEvent(Point p, long microSecond);
-        void notifyTouchEnd(long microSecond);
     }
 }
 

@@ -14,62 +14,62 @@
   ~ limitations under the License.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="horizontal"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-                android:gravity="center_vertical">
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal">
 
     <LinearLayout
         android:layout_width="0dp"
-        android:layout_weight="1"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         android:layout_marginLeft="@dimen/control_dp16"
-        android:paddingTop="@dimen/control_dp6"
-        android:paddingBottom="@dimen/control_dp6">
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/control_dp6"
+        android:paddingTop="@dimen/control_dp6">
 
         <TextView
             android:id="@+id/case_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/textsize_16"
             android:text=""
-            android:textColor="@color/mainFont"/>
+            android:textColor="@color/mainFont"
+            android:textSize="@dimen/textsize_16" />
 
         <TextView
             android:id="@+id/case_desc"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/textsize_12"
             android:layout_marginTop="@dimen/control_dp6"
             android:text=""
-            android:textColor="@color/subFont"/>
+            android:textColor="@color/subFont"
+            android:textSize="@dimen/textsize_12" />
 
         <TextView
             android:id="@+id/create_time"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/textsize_12"
             android:layout_marginTop="@dimen/control_dp6"
             android:text=""
-            android:textColor="@color/subFont"/>
+            android:textColor="@color/subFont"
+            android:textSize="@dimen/textsize_12" />
 
     </LinearLayout>
 
     <LinearLayout
+        android:id="@+id/batch_item_add"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:paddingRight="@dimen/control_dp12"
-        android:id="@+id/batch_item_add"
         android:foreground="?attr/selectableItemBackground"
+        android:gravity="center_vertical"
         android:paddingLeft="@dimen/control_dp12"
-        android:gravity="center_vertical">
+        android:paddingRight="@dimen/control_dp12">
 
         <ImageView
             android:layout_width="@dimen/control_dp32"
             android:layout_height="@dimen/control_dp32"
             android:src="@drawable/case_step_add"
-            android:tint="@color/dark_gray"/>
+            android:tint="@color/dark_gray" />
     </LinearLayout>
 
 </LinearLayout>

@@ -16,8 +16,6 @@
 package com.alipay.hulu.shared.node.tree.accessibility;
 
 
-import android.view.accessibility.AccessibilityNodeInfo;
-
 import com.alipay.hulu.common.utils.LogUtil;
 import com.alipay.hulu.shared.node.AbstractNodeProcessor;
 import com.alipay.hulu.shared.node.tree.AbstractNodeTree;
@@ -26,7 +24,9 @@ import com.alipay.hulu.shared.node.tree.accessibility.util.AccessibilityUtil;
 import com.alipay.hulu.shared.node.tree.annotation.NodeProcessor;
 import com.alipay.hulu.shared.node.utils.NodeContext;
 
-@NodeProcessor(acceptNodes = { AccessibilityNodeInfo.class, FakeNodeTree.class })
+import android.view.accessibility.AccessibilityNodeInfo;
+
+@NodeProcessor(acceptNodes = {AccessibilityNodeInfo.class, FakeNodeTree.class})
 public class AccessibilityNodeProcessor implements AbstractNodeProcessor {
     private static final String TAG = "AccessibilityNodeProcessor";
 

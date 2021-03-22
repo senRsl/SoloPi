@@ -15,6 +15,12 @@
  */
 package com.alipay.hulu.common.injector.provider;
 
+import java.lang.ref.WeakReference;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
 import com.alipay.hulu.common.application.LauncherApplication;
 import com.alipay.hulu.common.injector.cache.InjectParamTypeCache;
 import com.alipay.hulu.common.injector.param.InjectParam;
@@ -22,67 +28,50 @@ import com.alipay.hulu.common.injector.param.RunningThread;
 import com.alipay.hulu.common.tools.BackgroundExecutor;
 import com.alipay.hulu.common.utils.LogUtil;
 
-import java.lang.ref.WeakReference;
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
 /**
  * 避免引用带来内存泄漏
  */
 public class WeakInjectItem {
-    private static final String TAG = "WeakInjectItem";
-
-    private List<InjectParam> invokationTypes;
-
-    private boolean valid;
-
-    private RunningThread invokeThread;
-
-    /**
-     * 注入类型
-     */
-    private Class targetType;
-
-    // 调用方法
-    private Method invocationMethod;
-    // 注入对象
-    private WeakReference<Object> targetItem;
-
     /**
      * 注入成功
      */
     public static final int INVOCATION_SUCCESS = 0;
-
     /**
-     *  注入失败
+     * 注入失败
      */
     public static final int INVOCATION_FAILED = 1;
-
     /**
      * 引用被回收
      */
     public static final int REFERENCE_GC = 2;
-
     /**
      * 调用方式错误
      */
     public static final int WRONG_INVOCATION = 3;
-
     /**
-     *  调用为空
+     * 调用为空
      */
     public static final int INVOCATION_NULL = 4;
+    private static final String TAG = "WeakInjectItem";
+    private List<InjectParam> invokationTypes;
+    private boolean valid;
+    private RunningThread invokeThread;
+    /**
+     * 注入类型
+     */
+    private Class targetType;
+    // 调用方法
+    private Method invocationMethod;
+    // 注入对象
+    private WeakReference<Object> targetItem;
 
     public WeakInjectItem(Method invocationMethod, Object target, List<InjectParam> params) {
         this(invocationMethod, target, params, RunningThread.MESSAGE_THREAD, null);
     }
 
     /**
-     *
      * @param invocationMethod 调用方法
-     * @param target 目标对象
+     * @param target           目标对象
      */
     public WeakInjectItem(Method invocationMethod, Object target, List<InjectParam> params, RunningThread invokeThread, Class<?> targetType) {
         this.invocationMethod = invocationMethod;
@@ -95,6 +84,7 @@ public class WeakInjectItem {
 
     /**
      * 获取target类
+     *
      * @return
      */
     public String getDeclaredClass() {
@@ -103,6 +93,7 @@ public class WeakInjectItem {
 
     /**
      * 调用注入
+     *
      * @param value 注入参数
      * @return 返回下列结果：
      * {@link WeakInjectItem#INVOCATION_SUCCESS} 成功
@@ -158,6 +149,7 @@ public class WeakInjectItem {
 
     /**
      * 调用获取依赖
+     *
      * @param result 注入参数
      * @return 返回下列结果：
      * {@link WeakInjectItem#INVOCATION_SUCCESS} 成功
@@ -215,7 +207,7 @@ public class WeakInjectItem {
                 return INVOCATION_FAILED;
             }
 
-        // 防止抛出异常导致Injector停止
+            // 防止抛出异常导致Injector停止
         } catch (Throwable e) {
             LogUtil.e(TAG, "get provides throw exception", e);
             return INVOCATION_FAILED;

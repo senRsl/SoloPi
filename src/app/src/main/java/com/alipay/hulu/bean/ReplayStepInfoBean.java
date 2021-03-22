@@ -15,28 +15,44 @@
  */
 package com.alipay.hulu.bean;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.alipay.hulu.shared.node.tree.OperationNode;
 
-import java.util.ArrayList;
-import java.util.List;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 /**
  * 回放步骤信息
  */
 public class ReplayStepInfoBean implements Parcelable {
-    List<String> prepareActionList;
+    public static final Creator<ReplayStepInfoBean> CREATOR = new Creator<ReplayStepInfoBean>() {
+        @Override
+        public ReplayStepInfoBean createFromParcel(Parcel source) {
+            return new ReplayStepInfoBean(source);
+        }
 
+        @Override
+        public ReplayStepInfoBean[] newArray(int size) {
+            return new ReplayStepInfoBean[size];
+        }
+    };
+    List<String> prepareActionList;
     OperationNode findNode;
 
     public ReplayStepInfoBean() {
         prepareActionList = new ArrayList<>();
     }
 
+    protected ReplayStepInfoBean(Parcel in) {
+        this.prepareActionList = in.createStringArrayList();
+        this.findNode = in.readParcelable(OperationNode.class.getClassLoader());
+    }
+
     /**
      * 添加一步准备动作
+     *
      * @param action
      */
     public void addPrepareAction(String action) {
@@ -69,21 +85,4 @@ public class ReplayStepInfoBean implements Parcelable {
         dest.writeStringList(this.prepareActionList);
         dest.writeParcelable(this.findNode, flags);
     }
-
-    protected ReplayStepInfoBean(Parcel in) {
-        this.prepareActionList = in.createStringArrayList();
-        this.findNode = in.readParcelable(OperationNode.class.getClassLoader());
-    }
-
-    public static final Creator<ReplayStepInfoBean> CREATOR = new Creator<ReplayStepInfoBean>() {
-        @Override
-        public ReplayStepInfoBean createFromParcel(Parcel source) {
-            return new ReplayStepInfoBean(source);
-        }
-
-        @Override
-        public ReplayStepInfoBean[] newArray(int size) {
-            return new ReplayStepInfoBean[size];
-        }
-    };
 }

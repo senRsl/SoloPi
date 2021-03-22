@@ -15,51 +15,74 @@
  */
 package com.alipay.hulu.shared.node.action;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import com.alibaba.fastjson.annotation.JSONField;
-import com.alipay.hulu.common.constant.Constant;
 import com.alipay.hulu.common.service.SPService;
 import com.alipay.hulu.common.utils.AESUtils;
 import com.alipay.hulu.common.utils.LogUtil;
 import com.alipay.hulu.common.utils.StringUtil;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 /**
  * 操作方法Bean
  * Created by cathor on 2017/12/12.
  */
 public class OperationMethod implements Parcelable {
-    private static final String TAG = OperationMethod.class.getSimpleName();
+    /**
+     * Parcel Creator
+     */
+    public static final Creator<OperationMethod> CREATOR = new Creator<OperationMethod>() {
+        @Override
+        public OperationMethod createFromParcel(Parcel source) {
+            return new OperationMethod(source);
+        }
 
+        @Override
+        public OperationMethod[] newArray(int size) {
+            return new OperationMethod[size];
+        }
+    };
+    private static final String TAG = OperationMethod.class.getSimpleName();
     private boolean encrypt = true;
     /**
      * 操作方法
      */
     private PerformActionEnum actionEnum;
-
     /**
      * 操作参数
      */
     private Map<String, String> operationParam;
-
     /**
      * 参数后处理器
      */
     private ParamProcessor suffixProcessor;
-
     /**
      * 参数前处理器
      */
     private ParamProcessor prefixProcessor;
 
+    public OperationMethod() {
+    }
+
+    public OperationMethod(PerformActionEnum actionEnum) {
+        this.actionEnum = actionEnum;
+    }
+
+    private OperationMethod(Parcel in) {
+        actionEnum = PerformActionEnum.getActionEnumByCode(in.readString());
+        operationParam = in.readHashMap(ClassLoader.getSystemClassLoader());
+        encrypt = in.readInt() == 1;
+    }
+
     /**
      * 存入参数
+     *
      * @param key
      * @param value
      */
@@ -89,6 +112,7 @@ public class OperationMethod implements Parcelable {
 
     /**
      * 是否包含参数
+     *
      * @param key
      * @return
      */
@@ -101,6 +125,7 @@ public class OperationMethod implements Parcelable {
 
     /**
      * 移除参数
+     *
      * @param key
      * @return
      */
@@ -114,9 +139,10 @@ public class OperationMethod implements Parcelable {
 
     /**
      * 获取参数Key Set
+     *
      * @return
      */
-    @JSONField(serialize=false)
+    @JSONField(serialize = false)
     public Set<String> getParamKeys() {
         if (operationParam == null) {
             return new HashSet<>(0);
@@ -127,9 +153,10 @@ public class OperationMethod implements Parcelable {
 
     /**
      * 获取参数数量
+     *
      * @return
      */
-    @JSONField(serialize=false)
+    @JSONField(serialize = false)
     public int getParamSize() {
         if (operationParam == null) {
             return 0;
@@ -140,6 +167,7 @@ public class OperationMethod implements Parcelable {
 
     /**
      * 获取参数
+     *
      * @param key
      */
     public String getParam(String key) {
@@ -161,6 +189,7 @@ public class OperationMethod implements Parcelable {
         }
         return result;
     }
+
     @Override
     public int describeContents() {
         return CONTENTS_FILE_DESCRIPTOR;
@@ -170,11 +199,12 @@ public class OperationMethod implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(actionEnum.getCode());
         dest.writeMap(operationParam);
-        dest.writeInt(encrypt? 1: 0);
+        dest.writeInt(encrypt ? 1 : 0);
     }
 
     /**
      * 加密
+     *
      * @param origin
      * @return
      */
@@ -194,6 +224,7 @@ public class OperationMethod implements Parcelable {
 
     /**
      * 解密
+     *
      * @param encode
      * @return
      */
@@ -212,6 +243,7 @@ public class OperationMethod implements Parcelable {
 
     /**
      * 设置参数存储处理器
+     *
      * @param processor
      */
     public void setPrefixProcessor(ParamProcessor processor) {
@@ -220,37 +252,11 @@ public class OperationMethod implements Parcelable {
 
     /**
      * 设置参数获取处理器
+     *
      * @param processor
      */
     public void setSuffixProcessor(ParamProcessor processor) {
         this.suffixProcessor = processor;
-    }
-
-    /**
-     * Parcel Creator
-     */
-    public static final Creator<OperationMethod> CREATOR = new Creator<OperationMethod>() {
-        @Override
-        public OperationMethod createFromParcel(Parcel source) {
-            return new OperationMethod(source);
-        }
-
-        @Override
-        public OperationMethod[] newArray(int size) {
-            return new OperationMethod[size];
-        }
-    };
-
-    public OperationMethod() {}
-
-    public OperationMethod(PerformActionEnum actionEnum) {
-        this.actionEnum = actionEnum;
-    }
-
-    private OperationMethod(Parcel in) {
-        actionEnum = PerformActionEnum.getActionEnumByCode(in.readString());
-        operationParam = in.readHashMap(ClassLoader.getSystemClassLoader());
-        encrypt = in.readInt() == 1;
     }
 
     public boolean isEncrypt() {

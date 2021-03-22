@@ -15,6 +15,23 @@
  */
 package com.alipay.hulu.adapter;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.alipay.hulu.R;
+import com.alipay.hulu.actions.ImageCompareActionProvider;
+import com.alipay.hulu.bean.CaseParamBean;
+import com.alipay.hulu.common.injector.InjectorService;
+import com.alipay.hulu.common.utils.LogUtil;
+import com.alipay.hulu.common.utils.StringUtil;
+import com.alipay.hulu.shared.node.action.OperationExecutor;
+import com.alipay.hulu.shared.node.action.OperationMethod;
+import com.alipay.hulu.shared.node.utils.BitmapUtil;
+import com.alipay.hulu.util.DialogUtils;
+
 import android.graphics.Bitmap;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -28,24 +45,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
-
-import com.alipay.hulu.R;
-import com.alipay.hulu.actions.ImageCompareActionProvider;
-import com.alipay.hulu.bean.CaseParamBean;
-import com.alipay.hulu.common.injector.InjectorService;
-import com.alipay.hulu.common.utils.LogUtil;
-import com.alipay.hulu.common.utils.StringUtil;
-import com.alipay.hulu.shared.node.action.OperationExecutor;
-import com.alipay.hulu.shared.node.action.OperationMethod;
-import com.alipay.hulu.shared.node.utils.BitmapUtil;
-import com.alipay.hulu.util.DialogUtils;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import androidx.recyclerview.widget.RecyclerView;
 
 import static com.alipay.hulu.shared.node.utils.LogicUtil.SCOPE;
@@ -55,13 +54,10 @@ import static com.alipay.hulu.shared.node.utils.LogicUtil.SCOPE;
  */
 public class CaseStepMethodAdapter extends RecyclerView.Adapter {
     private static final String TAG = "CaseMethodAdapter";
-    private List<CaseStepAdapter.MyDataWrapper> laterList;
-
-    private OperationMethod method;
-
-    private Map<String, String> paramKeyMap;
-
     List<String> keys;
+    private List<CaseStepAdapter.MyDataWrapper> laterList;
+    private OperationMethod method;
+    private Map<String, String> paramKeyMap;
 
     public CaseStepMethodAdapter(List<CaseStepAdapter.MyDataWrapper> laterList, OperationMethod method) {
         this.method = method;
@@ -69,7 +65,7 @@ public class CaseStepMethodAdapter extends RecyclerView.Adapter {
         // 解析实际文案
         Map<String, Integer> paramMap = method.getActionEnum().getActionParams();
         paramKeyMap = new HashMap<>();
-        for (String key: paramMap.keySet()) {
+        for (String key : paramMap.keySet()) {
             Integer res = paramMap.get(key);
             if (res != null) {
                 paramKeyMap.put(key, StringUtil.getString(res));
@@ -117,7 +113,7 @@ public class CaseStepMethodAdapter extends RecyclerView.Adapter {
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof CaseStepParamHolder) {
             String key = keys.get(position);
-            String desc = paramKeyMap.containsKey(key)? paramKeyMap.get(key): key;
+            String desc = paramKeyMap.containsKey(key) ? paramKeyMap.get(key) : key;
             String value = method.getParam(key);
             ((CaseStepParamHolder) holder).bindData(key, desc, value);
         } else if (holder instanceof ImageParamHolder) {
@@ -137,8 +133,8 @@ public class CaseStepMethodAdapter extends RecyclerView.Adapter {
     private static class SelectAdapter extends RecyclerView.ViewHolder {
         Spinner spinner;
         TextView hint;
-        private OperationMethod method;
         ArrayAdapter<String> adapter;
+        private OperationMethod method;
 
         public SelectAdapter(View itemView, OperationMethod method) {
             super(itemView);
@@ -200,7 +196,6 @@ public class CaseStepMethodAdapter extends RecyclerView.Adapter {
             spinner.setSelection(select);
         }
     }
-
 
 
     /**
@@ -281,7 +276,6 @@ public class CaseStepMethodAdapter extends RecyclerView.Adapter {
                     new Pair<>("默认值", value)));
         }
     }
-
 
 
     public static class ImageParamHolder extends RecyclerView.ViewHolder {

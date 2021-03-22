@@ -55,6 +55,7 @@ public class AdbMessageManager {
 
     /**
      * 添加消息
+     *
      * @param msg
      */
     protected void pushMessage(AdbProtocol.AdbMessage msg) {
@@ -82,6 +83,7 @@ public class AdbMessageManager {
 
     /**
      * 添加adb stream
+     *
      * @param localId
      * @param stream
      */
@@ -96,7 +98,8 @@ public class AdbMessageManager {
              * terminating cleanup for one failed close(). */
             try {
                 s.close();
-            } catch (IOException e) {}
+            } catch (IOException e) {
+            }
         }
 
         /* No open streams anymore */
@@ -105,6 +108,7 @@ public class AdbMessageManager {
 
     /**
      * 处理ADB消息
+     *
      * @param msg
      */
     private void processAdbMessage(AdbProtocol.AdbMessage msg) {

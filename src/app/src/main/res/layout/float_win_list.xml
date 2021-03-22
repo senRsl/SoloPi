@@ -15,43 +15,43 @@
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="@dimen/control_float_title_width"
-    android:focusable="false"
-    android:paddingTop="@dimen/control_dp4"
-    android:paddingBottom="@dimen/control_dp4"
     android:layout_height="wrap_content"
-    android:orientation="horizontal" >
+    android:focusable="false"
+    android:orientation="horizontal"
+    android:paddingBottom="@dimen/control_dp4"
+    android:paddingTop="@dimen/control_dp4">
+
     <TextView
         android:id="@+id/display_title"
-        android:textSize="@dimen/control_float_per_item_text_size"
+        android:layout_width="@dimen/control_float_per_item_title_width"
+        android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:gravity="center"
         android:textColor="@color/colorPrimary"
-        android:layout_width="@dimen/control_float_per_item_title_width"
-        android:layout_height="wrap_content" />
+        android:textSize="@dimen/control_float_per_item_text_size" />
 
     <TextView
         android:id="@+id/display_content"
         android:layout_width="@dimen/control_float_per_item_info_width"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:focusable="false"
         android:layout_gravity="center_vertical"
-        android:textColor="@color/colorPrimaryDark"
+        android:focusable="false"
+        android:gravity="center"
         android:maxLines="2"
-        android:textSize="@dimen/control_float_per_item_text_size"
-        />
+        android:textColor="@color/colorPrimaryDark"
+        android:textSize="@dimen/control_float_per_item_text_size" />
+
     <TextView
         android:id="@+id/display_trigger"
-        android:layout_height="wrap_content"
         android:layout_width="@dimen/control_float_per_item_trigger_width"
-        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
         android:layout_marginRight="@dimen/control_dp8"
         android:clickable="true"
         android:focusable="true"
-        android:layout_gravity="center_vertical"
-        android:textColor="@color/colorAccent"
+        android:gravity="center"
         android:maxLines="2"
-        android:textSize="@dimen/control_float_per_item_trigger_text_size"
-        />
+        android:textColor="@color/colorAccent"
+        android:textSize="@dimen/control_float_per_item_trigger_text_size" />
 
 </LinearLayout>

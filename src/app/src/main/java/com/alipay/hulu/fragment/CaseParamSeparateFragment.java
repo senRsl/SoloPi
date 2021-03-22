@@ -15,19 +15,10 @@
  */
 package com.alipay.hulu.fragment;
 
-import android.content.Intent;
-import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.TextView;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alipay.hulu.R;
@@ -38,10 +29,19 @@ import com.alipay.hulu.bean.CaseRunningParam;
 import com.alipay.hulu.common.utils.LogUtil;
 import com.alipay.hulu.common.utils.StringUtil;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import android.content.Intent;
+import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  * Created by qiaoruikai on 2019-08-19 23:37.
@@ -75,8 +75,8 @@ public class CaseParamSeparateFragment extends CaseParamEditActivity.CaseParamFr
         if (runningParam.getMode() == CaseRunningParam.ParamMode.SEPARATE) {
             List<JSONObject> params = runningParam.getParamList();
             if (params != null) {
-                for (JSONObject obj: params) {
-                    for (String key: obj.keySet()) {
+                for (JSONObject obj : params) {
+                    for (String key : obj.keySet()) {
                         storedParams.put(key, obj.getString(key));
                     }
                 }
@@ -88,12 +88,12 @@ public class CaseParamSeparateFragment extends CaseParamEditActivity.CaseParamFr
     public CaseRunningParam getRunningParam() {
         int count = paramList.getCount();
         List<JSONObject> params = new ArrayList<>(count + 1);
-        for (String key: storedParams.keySet()) {
+        for (String key : storedParams.keySet()) {
             JSONObject paramInfo = new JSONObject(2);
             paramInfo.put(key, storedParams.get(key));
             params.add(paramInfo);
         }
-        LogUtil.d(TAG,"message:" + params);
+        LogUtil.d(TAG, "message:" + params);
 
         runningParam.setMode(CaseRunningParam.ParamMode.SEPARATE);
         runningParam.setParamList(params);

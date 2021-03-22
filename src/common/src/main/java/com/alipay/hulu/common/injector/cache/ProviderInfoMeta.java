@@ -15,12 +15,12 @@
  */
 package com.alipay.hulu.common.injector.cache;
 
+import java.lang.reflect.Method;
+import java.util.List;
+
 import com.alipay.hulu.common.injector.param.InjectParam;
 import com.alipay.hulu.common.injector.provider.ProviderInfo;
 import com.alipay.hulu.common.injector.provider.WeakInjectItem;
-
-import java.lang.reflect.Method;
-import java.util.List;
 
 /**
  * Created by qiaoruikai on 2018/10/12 5:38 PM.
@@ -45,24 +45,25 @@ public class ProviderInfoMeta {
 
     private Method targetMethod;
 
-    public ProviderInfo buildProvider() {
-        return new ProviderInfo(updatePeriod, provideParams, lazy, force);
-    }
-
-    /**
-     * 构建调用类
-     * @param target
-     * @return
-     */
-    public WeakInjectItem buildWeakInjectItem(Object target) {
-        return new WeakInjectItem(targetMethod, target, provideParams);
-    }
-
     public ProviderInfoMeta(long updatePeriod, List<InjectParam> provideParams, boolean lazy, boolean force, Method targetMethod) {
         this.updatePeriod = updatePeriod;
         this.provideParams = provideParams;
         this.lazy = lazy;
         this.force = force;
         this.targetMethod = targetMethod;
+    }
+
+    public ProviderInfo buildProvider() {
+        return new ProviderInfo(updatePeriod, provideParams, lazy, force);
+    }
+
+    /**
+     * 构建调用类
+     *
+     * @param target
+     * @return
+     */
+    public WeakInjectItem buildWeakInjectItem(Object target) {
+        return new WeakInjectItem(targetMethod, target, provideParams);
     }
 }

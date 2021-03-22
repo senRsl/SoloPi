@@ -14,34 +14,35 @@
   ~ limitations under the License.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal" android:layout_width="@dimen/screen_result_width"
+    android:layout_width="@dimen/screen_result_width"
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
-    android:padding="@dimen/control_dp4"
-    >
+    android:orientation="horizontal"
+    android:padding="@dimen/control_dp4">
 
     <TextView
         android:id="@+id/screen_result_title"
         android:layout_width="@dimen/dp_48"
         android:layout_height="wrap_content"
-        android:textSize="@dimen/textsize_16"
-        android:textColor="@color/primaryText"
         android:gravity="center"
-        android:text=""/>
+        android:text=""
+        android:textColor="@color/primaryText"
+        android:textSize="@dimen/textsize_16" />
+
     <TextView
         android:id="@+id/screen_result_value"
         android:layout_width="0dp"
-        android:layout_weight="1"
         android:layout_height="wrap_content"
-        android:textSize="@dimen/textsize_16"
-        android:textColor="@color/colorAccent"
+        android:layout_weight="1"
         android:gravity="center"
-        android:text=""/>
+        android:text=""
+        android:textColor="@color/colorAccent"
+        android:textSize="@dimen/textsize_16" />
+
     <ImageView
         android:id="@+id/screen_result_close"
         android:layout_width="@dimen/control_dp16"
         android:layout_height="@dimen/control_dp16"
         android:src="@drawable/simple_close"
-        android:tint="@color/colorAccent"
-        />
+        android:tint="@color/colorAccent" />
 </LinearLayout>

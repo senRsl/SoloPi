@@ -15,20 +15,20 @@
  */
 package com.alipay.hulu.activity;
 
+import com.alipay.hulu.R;
+import com.alipay.hulu.ui.HeadControlPanel;
+import com.alipay.hulu.util.DialogUtils;
+import com.alipay.hulu.util.SystemUtil;
+
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import com.alipay.hulu.R;
-import com.alipay.hulu.ui.HeadControlPanel;
-import com.alipay.hulu.util.DialogUtils;
-import com.alipay.hulu.util.SystemUtil;
+import androidx.annotation.Nullable;
 
 
 /**

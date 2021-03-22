@@ -15,16 +15,16 @@
  */
 package com.alipay.hulu.shared.node.locater;
 
-import android.graphics.Rect;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 
 import com.alipay.hulu.common.utils.LogUtil;
 import com.alipay.hulu.shared.node.tree.AbstractNodeTree;
 import com.alipay.hulu.shared.node.tree.FakeNodeTree;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import android.graphics.Rect;
 
 /**
  * 坐标定位
@@ -54,7 +54,7 @@ public class PositionLocator {
         if (root instanceof FakeNodeTree) {
             List<AbstractNodeTree> windows = root.getChildrenNodes();
             int maxIdx = -1;
-            for (AbstractNodeTree window: windows) {
+            for (AbstractNodeTree window : windows) {
                 // 找包含该坐标的最上层window
                 if (window.getDrawingOrder() > maxIdx && window.getNodeBound().contains(x, y)) {
                     maxIdx = window.getDrawingOrder();
@@ -92,7 +92,7 @@ public class PositionLocator {
         // 查找最小的节点
         AbstractNodeTree min = candiateNodes.get(0);
         int minSize = calculateRectSize(min.getNodeBound());
-        for (AbstractNodeTree node: candiateNodes) {
+        for (AbstractNodeTree node : candiateNodes) {
             int curSize = calculateRectSize(node.getNodeBound());
 
             if (curSize < minSize) {
@@ -112,6 +112,7 @@ public class PositionLocator {
 
     /**
      * 计算面积
+     *
      * @param rect
      * @return
      */

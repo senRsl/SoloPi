@@ -16,6 +16,16 @@
 
 package com.alipay.hulu.ui.scan.camera;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+import com.alipay.hulu.ui.scan.camera.open.CameraFacing;
+import com.alipay.hulu.ui.scan.camera.open.OpenCamera;
+
 import android.content.Context;
 import android.graphics.Point;
 import android.hardware.Camera;
@@ -23,16 +33,6 @@ import android.util.Log;
 import android.view.Display;
 import android.view.Surface;
 import android.view.WindowManager;
-
-import com.alipay.hulu.ui.scan.camera.open.CameraFacing;
-import com.alipay.hulu.ui.scan.camera.open.OpenCamera;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 
 /**
  * A class which deals with reading, parsing, and setting the camera parameters which are used to
@@ -60,6 +60,68 @@ final class CameraConfigurationManager {
 
     CameraConfigurationManager(Context context) {
         this.context = context;
+    }
+
+    private static String findSettableValue(String name, Collection<String> supportedValues,
+                                            String... desiredValues) {
+        Log.i(TAG, "Requesting " + name + " value from among: " + Arrays.toString(desiredValues));
+        Log.i(TAG, "Supported " + name + " values: " + supportedValues);
+        if (supportedValues != null) {
+            for (String desiredValue : desiredValues) {
+                if (supportedValues.contains(desiredValue)) {
+                    Log.i(TAG, "Can set " + name + " to: " + desiredValue);
+                    return desiredValue;
+                }
+            }
+        }
+        Log.i(TAG, "No supported values match");
+        return null;
+    }
+
+    public static void setTorchEnabled(Camera.Parameters parameters, boolean enabled) {
+        List<String> supportedFlashModes = parameters.getSupportedFlashModes();
+        String flashMode;
+        if (enabled) {
+            flashMode =
+                    findSettableValue("flash mode", supportedFlashModes, Camera.Parameters.FLASH_MODE_TORCH,
+                            Camera.Parameters.FLASH_MODE_ON);
+        } else {
+            flashMode =
+                    findSettableValue("flash mode", supportedFlashModes, Camera.Parameters.FLASH_MODE_OFF);
+        }
+        if (flashMode != null) {
+            if (flashMode.equals(parameters.getFlashMode())) {
+                Log.i(TAG, "Flash mode already set to " + flashMode);
+            } else {
+                Log.i(TAG, "Setting flash mode to " + flashMode);
+                parameters.setFlashMode(flashMode);
+            }
+        }
+    }
+
+    public static void setBestExposure(Camera.Parameters parameters, boolean lightOn) {
+
+        int minExposure = parameters.getMinExposureCompensation();
+        int maxExposure = parameters.getMaxExposureCompensation();
+        float step = parameters.getExposureCompensationStep();
+        if ((minExposure != 0 || maxExposure != 0) && step > 0.0f) {
+            // Set low when light is on
+            float targetCompensation = lightOn ? MIN_EXPOSURE_COMPENSATION : MAX_EXPOSURE_COMPENSATION;
+            int compensationSteps = Math.round(targetCompensation / step);
+            float actualCompensation = step * compensationSteps;
+            // Clamp value:
+            compensationSteps = Math.max(Math.min(compensationSteps, maxExposure), minExposure);
+            if (parameters.getExposureCompensation() == compensationSteps) {
+                Log.i(TAG, "Exposure compensation already set to " + compensationSteps + " / "
+                        + actualCompensation);
+            } else {
+                Log.i(TAG,
+                        "Setting exposure compensation to " + compensationSteps + " / " + actualCompensation);
+                parameters.setExposureCompensation(compensationSteps);
+            }
+        } else {
+            Log.i(TAG, "Camera does not support exposure compensation");
+        }
     }
 
     void initFromCameraParameters(OpenCamera camera, int width, int height) {
@@ -130,6 +192,8 @@ final class CameraConfigurationManager {
         Log.i(TAG, "Preview size on screen: " + previewSizeOnScreen);
     }
 
+    // All references to Torch are removed from here, methods, variables...
+
     void setDesiredCameraParameters(OpenCamera camera, boolean safeMode) {
 
         Camera theCamera = camera.getCamera();
@@ -190,8 +254,6 @@ final class CameraConfigurationManager {
         return resolution;
     }
 
-    // All references to Torch are removed from here, methods, variables...
-
     public Point findBestPreviewSizeValue(Camera.Parameters parameters, Point screenResolution) {
 
         List<Camera.Size> rawSupportedSizes = parameters.getSupportedPreviewSizes();
@@ -204,7 +266,8 @@ final class CameraConfigurationManager {
         // Sort by size, descending
         List<Camera.Size> supportedPreviewSizes = new ArrayList<Camera.Size>(rawSupportedSizes);
         Collections.sort(supportedPreviewSizes, new Comparator<Camera.Size>() {
-            @Override public int compare(Camera.Size a, Camera.Size b) {
+            @Override
+            public int compare(Camera.Size a, Camera.Size b) {
                 int aPixels = a.height * a.width;
                 int bPixels = b.height * b.width;
                 if (bPixels < aPixels) {
@@ -268,22 +331,6 @@ final class CameraConfigurationManager {
         return bestSize;
     }
 
-    private static String findSettableValue(String name, Collection<String> supportedValues,
-                                            String... desiredValues) {
-        Log.i(TAG, "Requesting " + name + " value from among: " + Arrays.toString(desiredValues));
-        Log.i(TAG, "Supported " + name + " values: " + supportedValues);
-        if (supportedValues != null) {
-            for (String desiredValue : desiredValues) {
-                if (supportedValues.contains(desiredValue)) {
-                    Log.i(TAG, "Can set " + name + " to: " + desiredValue);
-                    return desiredValue;
-                }
-            }
-        }
-        Log.i(TAG, "No supported values match");
-        return null;
-    }
-
     boolean getTorchState(Camera camera) {
         if (camera != null) {
             Camera.Parameters parameters = camera.getParameters();
@@ -307,52 +354,6 @@ final class CameraConfigurationManager {
 
         if (!safeMode) {
             setBestExposure(parameters, enabled);
-        }
-    }
-
-    public static void setTorchEnabled(Camera.Parameters parameters, boolean enabled) {
-        List<String> supportedFlashModes = parameters.getSupportedFlashModes();
-        String flashMode;
-        if (enabled) {
-            flashMode =
-                    findSettableValue("flash mode", supportedFlashModes, Camera.Parameters.FLASH_MODE_TORCH,
-                            Camera.Parameters.FLASH_MODE_ON);
-        } else {
-            flashMode =
-                    findSettableValue("flash mode", supportedFlashModes, Camera.Parameters.FLASH_MODE_OFF);
-        }
-        if (flashMode != null) {
-            if (flashMode.equals(parameters.getFlashMode())) {
-                Log.i(TAG, "Flash mode already set to " + flashMode);
-            } else {
-                Log.i(TAG, "Setting flash mode to " + flashMode);
-                parameters.setFlashMode(flashMode);
-            }
-        }
-    }
-
-    public static void setBestExposure(Camera.Parameters parameters, boolean lightOn) {
-
-        int minExposure = parameters.getMinExposureCompensation();
-        int maxExposure = parameters.getMaxExposureCompensation();
-        float step = parameters.getExposureCompensationStep();
-        if ((minExposure != 0 || maxExposure != 0) && step > 0.0f) {
-            // Set low when light is on
-            float targetCompensation = lightOn ? MIN_EXPOSURE_COMPENSATION : MAX_EXPOSURE_COMPENSATION;
-            int compensationSteps = Math.round(targetCompensation / step);
-            float actualCompensation = step * compensationSteps;
-            // Clamp value:
-            compensationSteps = Math.max(Math.min(compensationSteps, maxExposure), minExposure);
-            if (parameters.getExposureCompensation() == compensationSteps) {
-                Log.i(TAG, "Exposure compensation already set to " + compensationSteps + " / "
-                        + actualCompensation);
-            } else {
-                Log.i(TAG,
-                        "Setting exposure compensation to " + compensationSteps + " / " + actualCompensation);
-                parameters.setExposureCompensation(compensationSteps);
-            }
-        } else {
-            Log.i(TAG, "Camera does not support exposure compensation");
         }
     }
 }

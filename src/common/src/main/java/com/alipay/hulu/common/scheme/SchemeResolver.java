@@ -34,6 +34,7 @@ public @interface SchemeResolver {
 
     /**
      * 解析顺序
+     *
      * @return
      */
     int index() default 1;

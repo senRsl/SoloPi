@@ -24,6 +24,7 @@ import com.alipay.hulu.common.service.base.ExportService;
 public interface TouchService extends ExportService {
     /**
      * 点击
+     *
      * @param x
      * @param y
      */
@@ -31,6 +32,7 @@ public interface TouchService extends ExportService {
 
     /**
      * 长按
+     *
      * @param x
      * @param y
      * @param pressTime
@@ -39,6 +41,7 @@ public interface TouchService extends ExportService {
 
     /**
      * 滑动
+     *
      * @param x1
      * @param y1
      * @param x2
@@ -48,6 +51,7 @@ public interface TouchService extends ExportService {
 
     /**
      * 拖动
+     *
      * @param x1
      * @param y1
      * @param dragTime
@@ -59,12 +63,14 @@ public interface TouchService extends ExportService {
 
     /**
      * 连续手势操作
+     *
      * @param gesture
      */
     public void gesture(ContinueGesture gesture);
 
     /**
      * 缩放
+     *
      * @param x
      * @param y
      * @param sourceRadio
@@ -75,6 +81,7 @@ public interface TouchService extends ExportService {
 
     /**
      * 多手势
+     *
      * @param gestures
      */
     public void multiGesture(ContinueGesture[] gestures);
@@ -91,6 +98,7 @@ public interface TouchService extends ExportService {
 
     /**
      * 是否支持高级手势
+     *
      * @return
      */
     public boolean supportGesture();

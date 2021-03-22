@@ -15,13 +15,13 @@
  */
 package com.alipay.hulu.util;
 
+import java.io.IOException;
+
 import com.alipay.hulu.BuildConfig;
 import com.alipay.hulu.bean.GithubReleaseBean;
 import com.alipay.hulu.common.utils.HttpUtil;
 import com.alipay.hulu.common.utils.LogUtil;
 import com.alipay.hulu.common.utils.StringUtil;
-
-import java.io.IOException;
 
 import okhttp3.Call;
 
@@ -31,6 +31,7 @@ public class UpgradeUtil {
 
     /**
      * Check update
+     *
      * @param listener
      */
     public static void checkForUpdate(final CheckUpdateListener listener) {
@@ -67,6 +68,7 @@ public class UpgradeUtil {
 
     /**
      * Check versions
+     *
      * @param newVersion
      * @param oldVersion
      * @return

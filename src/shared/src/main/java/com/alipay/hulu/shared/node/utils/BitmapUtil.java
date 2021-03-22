@@ -15,13 +15,11 @@
  */
 package com.alipay.hulu.shared.node.utils;
 
-import android.content.ContentValues;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.provider.MediaStore;
-import android.util.Base64;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.alipay.hulu.common.application.LauncherApplication;
 import com.alipay.hulu.common.utils.LogUtil;
@@ -32,11 +30,13 @@ import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
+import android.content.ContentValues;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.provider.MediaStore;
+import android.util.Base64;
 
 /**
  * Base64和Bitmap相互转换类
@@ -82,6 +82,7 @@ public class BitmapUtil {
 
     /**
      * 解析base64资源
+     *
      * @param base64Data
      * @return
      */
@@ -95,6 +96,7 @@ public class BitmapUtil {
 
     /**
      * Bitmap转byte数组
+     *
      * @param bitmap
      * @return
      */
@@ -141,6 +143,7 @@ public class BitmapUtil {
 
     /**
      * 通知新图片文件
+     *
      * @param file
      */
     public static void notifyNewImage(final File file) {
@@ -162,6 +165,7 @@ public class BitmapUtil {
 
     /**
      * 生成二维码图片
+     *
      * @param qrCode
      * @param size
      * @return
@@ -172,6 +176,7 @@ public class BitmapUtil {
 
     /**
      * 生成码图片
+     *
      * @param qrCode
      * @param size
      * @return

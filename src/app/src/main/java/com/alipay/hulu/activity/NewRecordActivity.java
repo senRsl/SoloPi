@@ -15,23 +15,8 @@
  */
 package com.alipay.hulu.activity;
 
-import android.content.Intent;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
-import android.os.Bundle;
-import android.provider.Settings;
-import androidx.annotation.Nullable;
-import androidx.drawerlayout.widget.DrawerLayout;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.BaseAdapter;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
+import java.util.Arrays;
+import java.util.List;
 
 import com.alibaba.fastjson.JSON;
 import com.alipay.hulu.R;
@@ -66,8 +51,23 @@ import com.alipay.hulu.ui.HeadControlPanel;
 import com.alipay.hulu.util.CaseReplayUtil;
 import com.alipay.hulu.util.SystemUtil;
 
-import java.util.Arrays;
-import java.util.List;
+import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
+import android.os.Bundle;
+import android.provider.Settings;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
+import androidx.annotation.Nullable;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 /**
  * Created by lezhou.wyl on 2018/2/1.
@@ -75,11 +75,9 @@ import java.util.List;
 @EntryActivity(iconName = "com.alipay.hulu.R$drawable.icon_luxiang", nameResName = "com.alipay.hulu.R$string.activity__record", permissions = {"adb", "float", "background", "toast:${com.alipay.hulu.R$string.toast_message__add_solopi_background}"}, index = 1, cornerText = "New", cornerPersist = 3, cornerBg = 0xFFFF5900)
 public class NewRecordActivity extends BaseActivity {
 
-    private static final String TAG = NewRecordActivity.class.getSimpleName();
     public static final String NEED_REFRESH_PAGE = "NEED_REFRESH_PAGE";
-
     public static final String NEED_REFRESH_LOCAL_CASES_LIST = "NEED_REFRESH_LOCAL_CASES_LIST";
-
+    private static final String TAG = NewRecordActivity.class.getSimpleName();
     private DrawerLayout mDrawerLayout;
 
     private View mAppListContainer;
@@ -184,6 +182,7 @@ public class NewRecordActivity extends BaseActivity {
 
     /**
      * 编辑用例
+     *
      * @param caseInfo
      */
     private void editCase(RecordCaseInfo caseInfo) {
@@ -202,6 +201,7 @@ public class NewRecordActivity extends BaseActivity {
 
     /**
      * 执行用例
+     *
      * @param caseInfo
      */
     private void playCase(final RecordCaseInfo caseInfo) {
@@ -304,7 +304,7 @@ public class NewRecordActivity extends BaseActivity {
 
                 mCurrentApp = (ApplicationInfo) mAdapter.getItem(position);
 
-                ((MyApplication)getApplication()).updateAppAndName(mCurrentApp.packageName, mCurrentApp.loadLabel(getPackageManager()).toString());
+                ((MyApplication) getApplication()).updateAppAndName(mCurrentApp.packageName, mCurrentApp.loadLabel(getPackageManager()).toString());
                 updateHeadView();
             }
         });
@@ -444,49 +444,6 @@ public class NewRecordActivity extends BaseActivity {
         mAppPkgName.setText(mCurrentApp.packageName);
     }
 
-    private class AppAdapter extends BaseAdapter {
-
-        @Override
-        public int getCount() {
-            return mListPack.size();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return mListPack.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return position;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            ViewHolder holder;
-            if (convertView == null) {
-                convertView = LayoutInflater.from(NewRecordActivity.this).inflate(R.layout.item_app_list, parent, false);
-                holder = new ViewHolder();
-                holder.icon = (ImageView) convertView.findViewById(R.id.app_icon);
-                holder.name = (TextView) convertView.findViewById(R.id.app_name);
-                convertView.setTag(holder);
-            } else {
-                holder = (ViewHolder) convertView.getTag();
-            }
-
-            ApplicationInfo info = (ApplicationInfo) getItem(position);
-            GlideUtil.loadIcon(NewRecordActivity.this, info.packageName, holder.icon);
-            holder.name.setText(info.loadLabel(getPackageManager()));
-            return convertView;
-        }
-
-        class ViewHolder {
-            ImageView icon;
-            TextView name;
-        }
-
-    }
-
     private void startRecord(RecordCaseInfo caseInfo) {
         CaseRecordManager manager = LauncherApplication.getInstance().findServiceByName(CaseRecordManager.class.getName());
         manager.setRecordCase(caseInfo);
@@ -553,6 +510,49 @@ public class NewRecordActivity extends BaseActivity {
         if (resultCode == RESULT_OK) {
             startActivity(new Intent(NewRecordActivity.this, NewReplayListActivity.class));
         }
+    }
+
+    private class AppAdapter extends BaseAdapter {
+
+        @Override
+        public int getCount() {
+            return mListPack.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return mListPack.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            ViewHolder holder;
+            if (convertView == null) {
+                convertView = LayoutInflater.from(NewRecordActivity.this).inflate(R.layout.item_app_list, parent, false);
+                holder = new ViewHolder();
+                holder.icon = (ImageView) convertView.findViewById(R.id.app_icon);
+                holder.name = (TextView) convertView.findViewById(R.id.app_name);
+                convertView.setTag(holder);
+            } else {
+                holder = (ViewHolder) convertView.getTag();
+            }
+
+            ApplicationInfo info = (ApplicationInfo) getItem(position);
+            GlideUtil.loadIcon(NewRecordActivity.this, info.packageName, holder.icon);
+            holder.name.setText(info.loadLabel(getPackageManager()));
+            return convertView;
+        }
+
+        class ViewHolder {
+            ImageView icon;
+            TextView name;
+        }
+
     }
 
 }

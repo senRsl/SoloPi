@@ -15,6 +15,9 @@
  */
 package com.alipay.hulu.ui;
 
+import com.alipay.hulu.R;
+import com.alipay.hulu.common.utils.LogUtil;
+
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -26,17 +29,13 @@ import android.widget.Checkable;
 import android.widget.CompoundButton;
 import android.widget.RelativeLayout;
 
-import com.alipay.hulu.R;
-import com.alipay.hulu.common.utils.LogUtil;
-
 /**
  * Created by cathor on 2017/12/13.
  */
 public class CheckableRelativeLayout extends RelativeLayout implements Checkable {
     private static final String TAG = "CheckableRelativeLayout";
-
-    private boolean mChecked = false;
     CompoundButton mCompoundButton = null;
+    private boolean mChecked = false;
     private boolean isInitialized = false;
     private int selectedColor = -1;
 
@@ -96,6 +95,14 @@ public class CheckableRelativeLayout extends RelativeLayout implements Checkable
         setChecked(mChecked);
     }
 
+    public void setOnCheckedChangeListener(OnCheckedChangeListener listener) {
+        _listener = listener;
+    }
+
+    @Override
+    public boolean isChecked() {
+        return mChecked;
+    }
 
     @Override
     public void setChecked(boolean checked) {
@@ -115,15 +122,6 @@ public class CheckableRelativeLayout extends RelativeLayout implements Checkable
                 }
             }
         }
-    }
-
-    public void setOnCheckedChangeListener(OnCheckedChangeListener listener) {
-        _listener = listener;
-    }
-
-    @Override
-    public boolean isChecked() {
-        return mChecked;
     }
 
     @Override

@@ -15,11 +15,11 @@
  */
 package com.alipay.hulu.shared.node.locater;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Rect;
-import android.util.DisplayMetrics;
-import android.view.WindowManager;
+import java.io.File;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import com.alipay.hulu.common.application.LauncherApplication;
 import com.alipay.hulu.common.utils.ClassUtil;
@@ -36,58 +36,50 @@ import com.alipay.hulu.shared.node.tree.export.OperationStepExporter;
 import com.alipay.hulu.shared.node.utils.AssetsManager;
 import com.alipay.hulu.shared.node.utils.BitmapUtil;
 
-import java.io.File;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Rect;
+import android.util.DisplayMetrics;
+import android.view.WindowManager;
 
 /**
  * Created by qiaoruikai on 2018/10/8 8:12 PM.
  */
 public class OperationNodeLocator {
-    private static final String TAG = "OperationNodeLocator";
     public static final String IMAGE_COMPARE_PATCH = "hulu_imageCompare";
-
     /**
      * 通过子节点查找
      */
     public static final int FLAG_CHILDNODE = 0x00000001;
-
     /**
      * 通过自身文本信息查找
      */
     public static final int FLAG_SELF = 0x00000010;
-
     /**
      * 通过XPATH查找
      */
     public static final int FLAG_XPATH = 0x00000100;
-
     /**
      * 通过ResourceId查找
      */
     public static final int FLAG_RESOURCE_ID = 0x00001000;
-
     /**
      * 通过父节点信息查找
      */
     public static final int FLAG_PARENT = 0x00010000;
-
     /**
      * 通过类名查找，目前仅对EditText才用这个
      */
     public static final int FLAG_CLASS_NAME = 0x00100000;
-
     /**
      * 通过类名查找，目前仅对WebView才用这个
      */
     public static final int FLAG_EXTRA = 0x01000000;
-
     /**
      * 通过文字查找
      */
     public static final int FLAG_TEXT = 0X10000000;
+    private static final String TAG = "OperationNodeLocator";
 
     public static AbstractNodeTree findAbstractNode(AbstractNodeTree root, OperationNode operationNode) {
         if (root == null) {
@@ -321,14 +313,13 @@ public class OperationNodeLocator {
                         // 每一个子节点都辅助定位下
                         if (StringUtil.equalsOrMatch(operationNode.getClassName(), current.getClassName())) {
                             findResult.addItem(current, 2);
-                            findCount ++;
+                            findCount++;
                         }
                     }
                     LogUtil.d(TAG, "Child node find %d items", findCount);
                 }
             }
         }
-
 
 
         // 父节点Text和ResourceId定位
@@ -369,7 +360,7 @@ public class OperationNodeLocator {
         // 通过Text查找
         if ((findFlag & FLAG_TEXT) == FLAG_TEXT && !(StringUtil.isEmpty(operationNode.getText())
                 & StringUtil.isEmpty(operationNode.getDescription()))) {
-            final String txt = StringUtil.isEmpty(operationNode.getText())? operationNode.getDescription(): operationNode.getText();
+            final String txt = StringUtil.isEmpty(operationNode.getText()) ? operationNode.getDescription() : operationNode.getText();
             result = findAbstractNodeBySomething(root, new ItemComparator<AbstractNodeTree>() {
                 @Override
                 public boolean isEqual(AbstractNodeTree item) {
@@ -424,7 +415,6 @@ public class OperationNodeLocator {
         }
 
 
-
         if ((findFlag & FLAG_CLASS_NAME) == FLAG_CLASS_NAME && !StringUtil.isEmpty(operationNode.getClassName())) {
             result = findAbstractNodeBySomething(root, new ItemComparator<AbstractNodeTree>() {
                 @Override
@@ -461,9 +451,9 @@ public class OperationNodeLocator {
         for (AbstractNodeTree tmpNode : root) {
             if (comparator.isEqual(tmpNode)) {
                 result.add(tmpNode);
-                findCount ++;
+                findCount++;
             }
-            count ++;
+            count++;
         }
 
         LogUtil.d(TAG, "count: " + count + ", findCount: " + findCount);
@@ -472,6 +462,7 @@ public class OperationNodeLocator {
 
     /**
      * 通过ResourceId查找控件
+     *
      * @param root
      * @param id
      * @return
@@ -496,6 +487,7 @@ public class OperationNodeLocator {
 
     /**
      * 基于文字查找
+     *
      * @param root
      * @param text
      * @return
@@ -520,6 +512,7 @@ public class OperationNodeLocator {
 
     /**
      * 判断是否包含文字
+     *
      * @param root
      * @param text
      * @return
@@ -556,26 +549,29 @@ public class OperationNodeLocator {
 
         /**
          * 批量添加结果项
+         *
          * @param nodes
          */
         void addAllItem(Collection<AbstractNodeTree> nodes) {
-            for (AbstractNodeTree nodeTree: nodes) {
+            for (AbstractNodeTree nodeTree : nodes) {
                 addItem(nodeTree);
             }
         }
 
         /**
          * 批量添加结果项
+         *
          * @param nodes
          */
         void addAllItem(Collection<AbstractNodeTree> nodes, int score) {
-            for (AbstractNodeTree nodeTree: nodes) {
+            for (AbstractNodeTree nodeTree : nodes) {
                 addItem(nodeTree, score);
             }
         }
 
         /**
          * 添加结果项
+         *
          * @param node
          */
         void addItem(AbstractNodeTree node) {
@@ -598,6 +594,7 @@ public class OperationNodeLocator {
 
         /**
          * 找到得分最高的结果
+         *
          * @return
          */
         AbstractNodeTree getTopResult(int filter, OperationNode target) {
@@ -641,7 +638,7 @@ public class OperationNodeLocator {
                 float yP = bound.centerY() / (float) y;
 
                 List<Rect> rects = new ArrayList<>(maxPoses.size() + 1);
-                for (int pos: maxPoses) {
+                for (int pos : maxPoses) {
                     rects.add(findResult.get(pos).getNodeBound());
                 }
 
@@ -657,7 +654,8 @@ public class OperationNodeLocator {
                     float dx = rect.centerX() / (float) metrics.widthPixels;
 
                     // 由两项得分确定，距离和面积差
-                    double score = Math.pow(dx - xP, 2) + Math.pow(dy - yP, 2);                    if (score < minScore) {
+                    double score = Math.pow(dx - xP, 2) + Math.pow(dy - yP, 2);
+                    if (score < minScore) {
                         minScore = score;
                         pos = i;
                     }

@@ -15,6 +15,20 @@
  */
 package com.alipay.hulu.screenRecord;
 
+import java.io.File;
+import java.lang.ref.WeakReference;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
+import com.alipay.hulu.R;
+import com.alipay.hulu.common.application.LauncherApplication;
+import com.alipay.hulu.common.injector.InjectorService;
+import com.alipay.hulu.common.utils.FileUtils;
+import com.alipay.hulu.common.utils.LogUtil;
+import com.alipay.hulu.service.BaseService;
+import com.alipay.hulu.util.VideoUtils;
+
 import android.annotation.TargetApi;
 import android.app.Notification;
 import android.content.Context;
@@ -27,21 +41,6 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
 import android.view.WindowManager;
-
-import com.alipay.hulu.R;
-import com.alipay.hulu.common.application.LauncherApplication;
-import com.alipay.hulu.common.injector.InjectorService;
-import com.alipay.hulu.common.utils.FileUtils;
-import com.alipay.hulu.common.utils.LogUtil;
-import com.alipay.hulu.service.BaseService;
-import com.alipay.hulu.util.VideoUtils;
-
-import java.io.File;
-import java.lang.ref.WeakReference;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -52,19 +51,17 @@ import static android.app.Activity.RESULT_OK;
  */
 @TargetApi(value = Build.VERSION_CODES.LOLLIPOP)
 public class SimpleRecordService extends BaseService {
-    private static final int RECORD_SERVICE_NOTIFICATION_ID = 36231;
-
-    public static final String INTENT_WIDTH =  "INTENT_WIDTH";
-    public static final String INTENT_HEIGHT =  "INTENT_HEIGHT";
-    public static final String INTENT_FRAME_RATE =  "INTENT_FRAME_RATE";
-    public static final String INTENT_VIDEO_BITRATE =  "INTENT_VIDEO_BITRATE";
-    public static final String INTENT_EXCEPT_DIFF =  "INTENT_EXCEPT_DIFF";
+    public static final String INTENT_WIDTH = "INTENT_WIDTH";
+    public static final String INTENT_HEIGHT = "INTENT_HEIGHT";
+    public static final String INTENT_FRAME_RATE = "INTENT_FRAME_RATE";
+    public static final String INTENT_VIDEO_BITRATE = "INTENT_VIDEO_BITRATE";
+    public static final String INTENT_EXCEPT_DIFF = "INTENT_EXCEPT_DIFF";
     public static final String VIDEO_DIR = "ScreenCaptures";
-
+    private static final int RECORD_SERVICE_NOTIFICATION_ID = 36231;
     private static final String TAG = SimpleRecordService.class.getSimpleName();
     private static final int NOTIFICATION_ID = 19222;
 
-    private static final int TYPE_TOAST = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ? WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY: WindowManager.LayoutParams.TYPE_TOAST;
+    private static final int TYPE_TOAST = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ? WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY : WindowManager.LayoutParams.TYPE_TOAST;
 
     static {
         LauncherApplication.getInstance().registerSelfAsForegroundService(SimpleRecordService.class);
@@ -95,7 +92,7 @@ public class SimpleRecordService extends BaseService {
         LogUtil.d(TAG, "onCreate");
         InjectorService.g().register(this);
 
-        mMediaProjectionManager = (MediaProjectionManager)getSystemService(Context.MEDIA_PROJECTION_SERVICE);
+        mMediaProjectionManager = (MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
         mNotifications = new Notifications(getApplicationContext());
     }
 
@@ -177,6 +174,7 @@ public class SimpleRecordService extends BaseService {
                 1, mediaProjection, output.getAbsolutePath());
         r.setCallback(new ScreenRecorder.Callback() {
             long startTime = 0;
+
             @Override
             public void onStop(Throwable error) {
                 isRecording = false;

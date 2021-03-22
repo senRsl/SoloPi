@@ -15,31 +15,35 @@
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <include layout="@layout/head_panel_layout" android:id="@+id/case_edit_head" />
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include
+        android:id="@+id/case_edit_head"
+        layout="@layout/head_panel_layout" />
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/case_edit_tab_layout"
         android:layout_width="match_parent"
         android:layout_height="@dimen/control_dp48"
-        app:tabTextAppearance="@style/TabLayoutTextStyle"
-        app:tabPaddingTop="@dimen/control_dp8"
-        app:tabPaddingBottom="@dimen/control_dp8"
-        app:tabPaddingStart="@dimen/control_dp16"
-        app:tabPaddingEnd="@dimen/control_dp16"
         app:tabGravity="fill"
+        app:tabMaxWidth="0dp"
         app:tabMode="fixed"
-        app:tabMaxWidth="0dp"/>
+        app:tabPaddingBottom="@dimen/control_dp8"
+        app:tabPaddingEnd="@dimen/control_dp16"
+        app:tabPaddingStart="@dimen/control_dp16"
+        app:tabPaddingTop="@dimen/control_dp8"
+        app:tabTextAppearance="@style/TabLayoutTextStyle" />
+
     <View
         android:layout_width="match_parent"
         android:layout_height="1px"
-        android:background="#bebebe"/>
+        android:background="#bebebe" />
+
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/case_edit_pager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    </androidx.viewpager.widget.ViewPager>
+        android:layout_height="match_parent"></androidx.viewpager.widget.ViewPager>
 
 </LinearLayout>

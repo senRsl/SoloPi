@@ -15,10 +15,7 @@
  */
 package com.alipay.hulu.common.injector.param;
 
-import android.accessibilityservice.AccessibilityService;
-import android.app.Service;
-import android.content.Context;
-import androidx.annotation.NonNull;
+import java.util.List;
 
 import com.alipay.hulu.common.bean.ProcessInfo;
 import com.alipay.hulu.common.injector.cache.InjectParamTypeCache;
@@ -26,57 +23,72 @@ import com.alipay.hulu.common.utils.LogUtil;
 import com.alipay.hulu.common.utils.StringUtil;
 import com.mdit.library.Const;
 
-import java.util.List;
+import android.accessibilityservice.AccessibilityService;
+import android.app.Service;
+import android.content.Context;
+import androidx.annotation.NonNull;
 
 /**
  * Created by qiaoruikai on 2018/10/9 6:13 PM.
  */
 public class InjectParam {
-    private static final String TAG = "InjectParam";
-
-    /** 应用包名 */
+    /**
+     * 应用包名
+     */
     public static final InjectParam APP = new InjectParam("app", String.class);
-
-    /** 应用名 */
+    /**
+     * 应用名
+     */
     public static final InjectParam APP_NAME = new InjectParam("appName", String.class);
-
-    /** 屏幕顶层应用包名 */
+    /**
+     * 屏幕顶层应用包名
+     */
     public static final InjectParam PACKAGE = new InjectParam("package", String.class);
-
-    /** 应用所有子进程包名 */
+    /**
+     * 应用所有子进程包名
+     */
     public static final InjectParam PACKAGE_CHILDREN = new InjectParam("packageChildren", List.class);
-
-    /** 屏幕顶层应用包名 */
+    /**
+     * 屏幕顶层应用包名
+     */
     public static final InjectParam TOP_ACTIVITY = new InjectParam("topActivity", String.class);
-
-    /** 服务上下文 */
+    /**
+     * 服务上下文
+     */
     public static final InjectParam CONTEXT = new InjectParam("context", Context.class);
-
-    /** 服务上下文 */
+    /**
+     * 服务上下文
+     */
     public static final InjectParam SERVICE = new InjectParam("service", Service.class);
-
-    /** AccessibilityService */
+    /**
+     * AccessibilityService
+     */
     public static final InjectParam ACCESSIBILITY_SERVICE = new InjectParam("accessibilityService", AccessibilityService.class);
-
-    /** 目标进程pid */
+    /**
+     * 目标进程pid
+     */
     public static final InjectParam PID = new InjectParam("pid", ProcessInfo.class);
-
-    /** 应用所有子进程pid */
+    /**
+     * 应用所有子进程pid
+     */
     public static final InjectParam PID_CHILDREN = new InjectParam("pidChildren", List.class);
-
-    /** ps获取的uid */
+    /**
+     * ps获取的uid
+     */
     public static final InjectParam PUID = new InjectParam("puid", String.class);
-
-    /** 应用UID */
+    /**
+     * 应用UID
+     */
     public static final InjectParam UID = new InjectParam("uid", Integer.class);
-
-    /** 是否显示额外信息 */
+    /**
+     * 是否显示额外信息
+     */
     public static final InjectParam EXTRA = new InjectParam("extra", Boolean.class);
-
     /**
      * 空占位符，勿用
      */
     public static final InjectParam DEFAULT = new InjectParam("default", Object.class);
+    private static final String TAG = "InjectParam";
 
     static {
         // 先预注册预设参数
@@ -123,36 +135,8 @@ public class InjectParam {
     }
 
     /**
-     * 是否是合法内容
-     * @param content
-     * @return
-     */
-    public boolean isValueValid(Object content) {
-        if (content == null) {
-            return true;
-        }
-
-        return type.isInstance(content);
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public Class getType() {
-        return type;
-    }
-
-    public boolean isSticky() {
-        return sticky;
-    }
-
-    public boolean isPersistent() {
-        return persistent;
-    }
-
-    /**
      * 获取InjectParamType实例
+     *
      * @param name
      * @param type
      * @return
@@ -179,6 +163,36 @@ public class InjectParam {
         }
 
         return result;
+    }
+
+    /**
+     * 是否是合法内容
+     *
+     * @param content
+     * @return
+     */
+    public boolean isValueValid(Object content) {
+        if (content == null) {
+            return true;
+        }
+
+        return type.isInstance(content);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Class getType() {
+        return type;
+    }
+
+    public boolean isSticky() {
+        return sticky;
+    }
+
+    public boolean isPersistent() {
+        return persistent;
     }
 
     @Override

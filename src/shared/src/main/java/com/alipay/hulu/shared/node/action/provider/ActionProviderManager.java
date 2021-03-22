@@ -15,7 +15,10 @@
  */
 package com.alipay.hulu.shared.node.action.provider;
 
-import android.content.Context;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.alipay.hulu.common.annotation.Enable;
 import com.alipay.hulu.common.application.LauncherApplication;
@@ -26,19 +29,15 @@ import com.alipay.hulu.shared.node.action.OperationMethod;
 import com.alipay.hulu.shared.node.action.PerformActionEnum;
 import com.alipay.hulu.shared.node.tree.AbstractNodeTree;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import android.content.Context;
 
 /**
  * Created by qiaoruikai on 2018/10/8 8:40 PM.
  */
 public class ActionProviderManager {
-    private static final String TAG = "ActionPvdMng";
     public static final String KEY_TARGET_ACTION = "targetAction";
     public static final String KEY_TARGET_ACTION_DESC = "targetActionDesc";
-
+    private static final String TAG = "ActionPvdMng";
     private List<ActionProvider> mProviders;
     private Map<String, Integer> actionMap = new HashMap<>();
 
@@ -47,6 +46,7 @@ public class ActionProviderManager {
 
     /**
      * 启动
+     *
      * @param context
      */
     public void start(final Context context) {
@@ -70,7 +70,7 @@ public class ActionProviderManager {
             LauncherApplication.getInstance().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    for (ActionProvider provider: mProviders) {
+                    for (ActionProvider provider : mProviders) {
                         provider.onCreate(context);
                     }
                 }
@@ -83,7 +83,7 @@ public class ActionProviderManager {
             LauncherApplication.getInstance().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    for (ActionProvider provider: mProviders) {
+                    for (ActionProvider provider : mProviders) {
                         provider.onDestroy(context);
                     }
 
@@ -95,6 +95,7 @@ public class ActionProviderManager {
 
     /**
      * 处理操作
+     *
      * @param node
      * @param operationMethod
      * @param context
@@ -111,7 +112,7 @@ public class ActionProviderManager {
 
         // 查找目标处理工具
         String targetAction = operationMethod.getParam(KEY_TARGET_ACTION);
-        for (ActionProvider provider: mProviders) {
+        for (ActionProvider provider : mProviders) {
             // 针对需要操作的方法
             if (provider.canProcess(targetAction)) {
                 return provider.processAction(targetAction, node, operationMethod,
@@ -124,6 +125,7 @@ public class ActionProviderManager {
 
     /**
      * 查找所有可用操作
+     *
      * @return
      */
     public Map<String, String> loadProvideActions(AbstractNodeTree node) {
@@ -139,7 +141,7 @@ public class ActionProviderManager {
 
                 if (actions != null) {
                     actionGroup.putAll(actions);
-                    for (String key: actions.keySet()) {
+                    for (String key : actions.keySet()) {
                         // 配置操作处理
                         actionMap.put(key, i);
                     }
@@ -152,6 +154,7 @@ public class ActionProviderManager {
 
     /**
      * 加载action的配置界面
+     *
      * @param method
      * @return
      */

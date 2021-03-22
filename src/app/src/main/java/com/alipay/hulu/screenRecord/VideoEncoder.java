@@ -16,15 +16,15 @@
  */
 package com.alipay.hulu.screenRecord;
 
+import java.util.Objects;
+
+import com.alipay.hulu.common.utils.LogUtil;
+
 import android.annotation.TargetApi;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.os.Build;
 import android.view.Surface;
-
-import com.alipay.hulu.common.utils.LogUtil;
-
-import java.util.Objects;
 
 /**
  * @author yrom

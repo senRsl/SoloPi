@@ -15,6 +15,12 @@
  */
 package com.alipay.hulu.activity;
 
+import com.alipay.hulu.R;
+import com.alipay.hulu.common.utils.MiscUtil;
+import com.alipay.hulu.fragment.ReplayListFragment;
+import com.alipay.hulu.ui.HeadControlPanel;
+import com.google.android.material.tabs.TabLayout;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -22,13 +28,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-
-import com.alipay.hulu.R;
-import com.alipay.hulu.common.utils.MiscUtil;
-import com.alipay.hulu.fragment.ReplayListFragment;
-import com.alipay.hulu.ui.HeadControlPanel;
-import com.google.android.material.tabs.TabLayout;
-
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -66,7 +65,7 @@ public class NewReplayListActivity extends BaseActivity {
         TextView title = rightTitle.findViewById(R.id.item_icon_template_title);
         title.setText(R.string.constant__batch_replay);
         icon.setImageResource(R.drawable.icon_batch_play);
-        params.setMarginEnd(- getResources().getDimensionPixelSize(R.dimen.control_dp4));
+        params.setMarginEnd(-getResources().getDimensionPixelSize(R.dimen.control_dp4));
         params.setMarginStart(getResources().getDimensionPixelSize(R.dimen.control_dp8));
         rightTitle.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -136,6 +135,7 @@ public class NewReplayListActivity extends BaseActivity {
         public CharSequence getPageTitle(int position) {
             return ReplayListFragment.getTypeName(PAGES[position]);
         }
+
         @Override
         public int getCount() {
             return PAGES.length;

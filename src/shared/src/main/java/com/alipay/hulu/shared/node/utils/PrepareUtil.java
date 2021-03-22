@@ -15,14 +15,14 @@
  */
 package com.alipay.hulu.shared.node.utils;
 
-import com.alipay.hulu.common.utils.ClassUtil;
-import com.alipay.hulu.common.utils.LogUtil;
-import com.alipay.hulu.shared.node.utils.prepare.PrepareWorker;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
+import com.alipay.hulu.common.utils.ClassUtil;
+import com.alipay.hulu.common.utils.LogUtil;
+import com.alipay.hulu.shared.node.utils.prepare.PrepareWorker;
 
 /**
  * 环境准备
@@ -40,6 +40,7 @@ public class PrepareUtil {
 
     /**
      * 进行准备工作
+     *
      * @param targetApp
      * @return
      */
@@ -51,7 +52,7 @@ public class PrepareUtil {
 
         // 遍历执行准备工作
         if (PREPARE_WORKERS != null && PREPARE_WORKERS.size() > 0) {
-            for (PrepareWorker prepareWorker: PREPARE_WORKERS) {
+            for (PrepareWorker prepareWorker : PREPARE_WORKERS) {
                 // 如果某步准备工作失败，停止准备
                 try {
                     boolean result = prepareWorker.doPrepareWork(targetApp, status);
@@ -81,7 +82,7 @@ public class PrepareUtil {
                     public int compare(Class<? extends PrepareWorker> o1, Class<? extends PrepareWorker> o2) {
                         PrepareWorker.PrepareTool o1T = o1.getAnnotation(PrepareWorker.PrepareTool.class);
                         PrepareWorker.PrepareTool o2T = o2.getAnnotation(PrepareWorker.PrepareTool.class);
-                        return o2T.priority() < o1T.priority()? -1: ((o2T.priority() == o1T.priority())? 0: 1);
+                        return o2T.priority() < o1T.priority() ? -1 : ((o2T.priority() == o1T.priority()) ? 0 : 1);
                     }
                 });
 

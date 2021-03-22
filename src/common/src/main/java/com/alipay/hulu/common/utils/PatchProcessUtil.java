@@ -15,16 +15,15 @@
  */
 package com.alipay.hulu.common.utils;
 
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.lang.reflect.Method;
+
 import com.alibaba.fastjson.JSON;
 import com.alipay.hulu.common.application.LauncherApplication;
 import com.alipay.hulu.common.utils.patch.PatchDescription;
 import com.alipay.hulu.common.utils.patch.PatchLoadResult;
-
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.lang.reflect.Method;
 
 import dalvik.system.DexClassLoader;
 
@@ -36,6 +35,7 @@ public class PatchProcessUtil {
 
     /**
      * 加载补丁信息
+     *
      * @param file
      * @return
      */
@@ -136,7 +136,7 @@ public class PatchProcessUtil {
 
                     Method[] methods = targetClass.getDeclaredMethods();
                     boolean findFlag = false;
-                    for (Method method: methods) {
+                    for (Method method : methods) {
                         if (StringUtil.equals(method.getName(), patchDesc.getMainMethod())) {
                             findFlag = true;
                             break;

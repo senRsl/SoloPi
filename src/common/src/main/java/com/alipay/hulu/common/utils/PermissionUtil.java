@@ -15,25 +15,6 @@
  */
 package com.alipay.hulu.common.utils;
 
-import android.annotation.TargetApi;
-import android.app.Activity;
-import android.app.AppOpsManager;
-import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.os.Build;
-import android.provider.Settings;
-import androidx.annotation.NonNull;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-
-import com.alipay.hulu.common.R;
-import com.alipay.hulu.common.application.LauncherApplication;
-import com.alipay.hulu.common.tools.BackgroundExecutor;
-import com.alipay.hulu.common.tools.CmdTools;
-import com.alipay.hulu.common.utils.activity.PermissionDialogActivity;
-import com.android.permission.FloatWindowManager;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +27,25 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import com.alipay.hulu.common.R;
+import com.alipay.hulu.common.application.LauncherApplication;
+import com.alipay.hulu.common.tools.BackgroundExecutor;
+import com.alipay.hulu.common.tools.CmdTools;
+import com.alipay.hulu.common.utils.activity.PermissionDialogActivity;
+import com.android.permission.FloatWindowManager;
+
+import android.annotation.TargetApi;
+import android.app.Activity;
+import android.app.AppOpsManager;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.provider.Settings;
+import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 /**
  * Created by cathor on 2017/12/12.
@@ -113,6 +113,7 @@ public class PermissionUtil {
 
     /**
      * 处理权限
+     *
      * @param result
      * @param reason
      */
@@ -134,7 +135,7 @@ public class PermissionUtil {
 
     /**
      * 检查Accessibility权限
-     * */
+     */
     public static boolean isAccessibilitySettingsOn(Context context) {
         int accessibilityEnabled = 0;
         try {
@@ -157,6 +158,7 @@ public class PermissionUtil {
 
     /**
      * 检查悬浮窗权限
+     *
      * @param context
      * @return
      */
@@ -166,6 +168,7 @@ public class PermissionUtil {
 
     /**
      * 检查使用状态权限
+     *
      * @param context
      * @return
      */
@@ -179,6 +182,7 @@ public class PermissionUtil {
 
     /**
      * 检查是否已有高权限
+     *
      * @param context
      * @return
      */
@@ -206,7 +210,8 @@ public class PermissionUtil {
                             new FutureTask<>(new Callable<Boolean>() {//使用Callable接口作为构造参数
                                 public Boolean call() {
                                     return CmdTools.generateConnection();
-                                }});
+                                }
+                            });
                     executor.execute(future);
                     try {
                         if (future.get(5, TimeUnit.SECONDS)) {
@@ -229,6 +234,7 @@ public class PermissionUtil {
 
     /**
      * 检查需动态申请的权限，对未获取的权限进行申请
+     *
      * @param activity
      * @param neededPermissions
      * @return 是否已全部获取
@@ -256,6 +262,7 @@ public class PermissionUtil {
 
     /**
      * 检查需动态申请的权限，对未获取的权限进行申请
+     *
      * @param activity
      * @param neededPermissions
      * @return 是否已全部获取

@@ -15,14 +15,14 @@
  */
 package com.alipay.hulu.common.utils;
 
-import android.content.res.Resources;
+import java.lang.reflect.Field;
 
 import com.google.android.material.tabs.TabLayout;
+
+import android.content.res.Resources;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.LinearLayout;
-
-import java.lang.reflect.Field;
 
 /**
  * Created by lezhou.wyl on 2018/1/11.
@@ -56,11 +56,6 @@ public class MiscUtil {
         return stackTraceToString(Thread.currentThread().getStackTrace());
     }
 
-
-    public interface LogCallback {
-        void onLogFinished();
-    }
-
     public static void setIndicator(TabLayout tabs, int leftDip, int rightDip) {
         Class<?> tabLayout = tabs.getClass();
         Field tabStrip;
@@ -90,5 +85,9 @@ public class MiscUtil {
             child.setLayoutParams(params);
             child.invalidate();
         }
+    }
+
+    public interface LogCallback {
+        void onLogFinished();
     }
 }

@@ -15,16 +15,15 @@
  */
 package com.alipay.hulu.activity;
 
-import android.content.Intent;
-import android.content.res.Resources;
-import android.os.Bundle;
-import android.text.SpannableString;
-import android.text.Spanned;
-import android.text.style.ForegroundColorSpan;
-import android.util.TypedValue;
-import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -43,16 +42,16 @@ import com.alipay.hulu.fragment.ReplayStepFragment;
 import com.alipay.hulu.ui.HeadControlPanel;
 import com.google.android.material.tabs.TabLayout;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-
+import android.content.Intent;
+import android.content.res.Resources;
+import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
+import android.util.TypedValue;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -164,7 +163,7 @@ public class CaseReplayResultActivity extends BaseActivity {
         mStartTime.setText(getString(R.string.case_replay_result__start_time, format.format(result.getStartTime())));
         mEndTime.setText(getString(R.string.case_replay_result__end_time, format.format(result.getEndTime())));
         try {
-            String status = getString(result.getExceptionMessage() != null? R.string.constant__fail : R.string.constant__success);
+            String status = getString(result.getExceptionMessage() != null ? R.string.constant__fail : R.string.constant__success);
             String displayContent = getString(R.string.case_replay_result__running_result, status);
             SpannableString textSpanned1 = new SpannableString(displayContent);
             textSpanned1.setSpan(new ForegroundColorSpan(result.getExceptionMessage() != null ? 0xfff76262 : 0xff65c0ba), displayContent.length() - status.length(), displayContent.length(), Spanned.SPAN_INCLUSIVE_EXCLUSIVE);
@@ -179,6 +178,7 @@ public class CaseReplayResultActivity extends BaseActivity {
 
     /**
      * 保存回放结果
+     *
      * @return
      */
     private File saveReplayResult() {
@@ -303,6 +303,7 @@ public class CaseReplayResultActivity extends BaseActivity {
 
     private static class ReplayResultFragmentAdapter extends FragmentPagerAdapter {
         private ReplayResultBean resultBean;
+
         public ReplayResultFragmentAdapter(FragmentManager fm, ReplayResultBean resultBean) {
             super(fm);
             this.resultBean = resultBean;

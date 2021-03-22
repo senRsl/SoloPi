@@ -15,14 +15,6 @@
  */
 package com.alipay.hulu.common.logger;
 
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.os.Looper;
-import android.os.Message;
-import android.util.Log;
-
-import com.orhanobut.logger.LogStrategy;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -30,6 +22,14 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Calendar;
 import java.util.Locale;
+
+import com.orhanobut.logger.LogStrategy;
+
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Looper;
+import android.os.Message;
+import android.util.Log;
 
 /**
  * Created by qiaoruikai on 2018/10/31 3:10 PM.
@@ -101,6 +101,7 @@ public final class DiskLogStrategy implements LogStrategy {
 
         /**
          * 重载Writer
+         *
          * @param calendar
          */
         private void reloadWriter(Calendar calendar) {
@@ -116,7 +117,7 @@ public final class DiskLogStrategy implements LogStrategy {
                     currentFile = newFile;
                     break;
                 }
-                currentFileIdx ++;
+                currentFileIdx++;
             }
 
             if (writer != null) {

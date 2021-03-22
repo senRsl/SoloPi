@@ -15,11 +15,11 @@
  */
 package com.alipay.hulu.common.utils;
 
-import android.content.Context;
-import android.widget.ImageView;
-
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.bumptech.glide.request.RequestOptions;
+
+import android.content.Context;
+import android.widget.ImageView;
 
 /**
  * 图标加载工具
@@ -27,15 +27,16 @@ import com.bumptech.glide.request.RequestOptions;
 public class GlideUtil {
     /**
      * 加载图标
+     *
      * @param context
      * @return
      */
     public static void loadIcon(Context context, String app, ImageView img) {
         GlideApp.with(context)
-            .applyDefaultRequestOptions(
-                    RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE))
-            .applyDefaultRequestOptions(RequestOptions.fitCenterTransform())
-            .load("package:" + app).into(img);
+                .applyDefaultRequestOptions(
+                        RequestOptions.diskCacheStrategyOf(DiskCacheStrategy.NONE))
+                .applyDefaultRequestOptions(RequestOptions.fitCenterTransform())
+                .load("package:" + app).into(img);
         // cannot disk cache ApplicationInfo, nor Drawables;
     }
 }

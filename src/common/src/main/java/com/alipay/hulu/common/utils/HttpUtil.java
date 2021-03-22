@@ -15,11 +15,6 @@
  */
 package com.alipay.hulu.common.utils;
 
-import android.os.Build;
-
-import com.alibaba.fastjson.JSONException;
-import com.alibaba.fastjson.JSONReader;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +22,10 @@ import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.SSLContext;
 
+import com.alibaba.fastjson.JSONException;
+import com.alibaba.fastjson.JSONReader;
+
+import android.os.Build;
 import okhttp3.Call;
 import okhttp3.ConnectionSpec;
 import okhttp3.OkHttpClient;
@@ -45,6 +44,7 @@ public class HttpUtil {
 
     /**
      * 获取HttpClient
+     *
      * @return
      */
     public static OkHttpClient getHttpClient() {
@@ -66,7 +66,8 @@ public class HttpUtil {
 
     /**
      * get请求
-     * @param url 请求地址
+     *
+     * @param url      请求地址
      * @param callback 回调
      */
     public static void get(String url, okhttp3.Callback callback) {
@@ -84,6 +85,7 @@ public class HttpUtil {
 
     /**
      * get请求
+     *
      * @param url 请求地址
      */
     public static String getSync(String url) throws IOException {
@@ -105,8 +107,9 @@ public class HttpUtil {
 
     /**
      * post请求
-     * @param url 请求地址
-     * @param body 参数
+     *
+     * @param url      请求地址
+     * @param body     参数
      * @param callback 回调
      */
     public static void post(String url, RequestBody body, okhttp3.Callback callback) {
@@ -124,6 +127,7 @@ public class HttpUtil {
 
     /**
      * 同步post
+     *
      * @param url
      * @param body
      * @return
@@ -149,6 +153,7 @@ public class HttpUtil {
     /**
      * 对API19、20以及部分三星api 21的设备需要处理下TLS 1.2<br/>
      * <a href="https://github.com/square/okhttp/issues/2372#issuecomment-244807676">Fix连接</a>
+     *
      * @param client
      * @return
      */
@@ -179,6 +184,7 @@ public class HttpUtil {
 
     /**
      * 包装一层fastJSON解析
+     *
      * @param <T>
      */
     public static abstract class Callback<T> implements okhttp3.Callback {
@@ -199,7 +205,7 @@ public class HttpUtil {
 
             // 空对象直接空返回
             if (body == null) {
-                onResponse(call, (T)null);
+                onResponse(call, (T) null);
             } else {
                 JSONReader reader = null;
                 try {

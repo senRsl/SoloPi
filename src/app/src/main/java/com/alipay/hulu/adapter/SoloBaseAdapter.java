@@ -15,12 +15,12 @@
  */
 package com.alipay.hulu.adapter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.widget.BaseAdapter;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by lezhou.wyl on 2018/8/15.
@@ -52,15 +52,6 @@ public abstract class SoloBaseAdapter<T> extends BaseAdapter {
         return position;
     }
 
-    public void setData(List<T> data) {
-        if (data == null) {
-            mData = new ArrayList<>();
-        } else {
-            mData = new ArrayList<>(data);
-        }
-        notifyDataSetChanged();
-    }
-
     public List<T> getData() {
         List<T> result = new ArrayList<>();
         if (mData != null) {
@@ -68,5 +59,14 @@ public abstract class SoloBaseAdapter<T> extends BaseAdapter {
         }
 
         return result;
+    }
+
+    public void setData(List<T> data) {
+        if (data == null) {
+            mData = new ArrayList<>();
+        } else {
+            mData = new ArrayList<>(data);
+        }
+        notifyDataSetChanged();
     }
 }

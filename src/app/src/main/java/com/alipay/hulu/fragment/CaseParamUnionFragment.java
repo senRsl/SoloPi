@@ -15,17 +15,8 @@
  */
 package com.alipay.hulu.fragment;
 
-import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.TextView;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.alibaba.fastjson.JSONObject;
 import com.alipay.hulu.R;
@@ -38,8 +29,17 @@ import com.zhy.view.flowlayout.FlowLayout;
 import com.zhy.view.flowlayout.TagAdapter;
 import com.zhy.view.flowlayout.TagFlowLayout;
 
-import java.util.ArrayList;
-import java.util.List;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  * Created by qiaoruikai on 2019-08-19 22:25.
@@ -115,7 +115,7 @@ public class CaseParamUnionFragment extends CaseParamEditActivity.CaseParamFragm
             public View getView(FlowLayout parent, int position, JSONObject o) {
                 View root = inflater.inflate(R.layout.item_param_info, parent, false);
                 List<String> diffParams = new ArrayList<>();
-                for (CaseParamBean paramBean: presetParams) {
+                for (CaseParamBean paramBean : presetParams) {
                     diffParams.add(o.getString(paramBean.getParamName()));
                 }
 
@@ -134,7 +134,7 @@ public class CaseParamUnionFragment extends CaseParamEditActivity.CaseParamFragm
         });
 
         final List<ParamHolder> holders = new ArrayList<>();
-        for (CaseParamBean param: presetParams) {
+        for (CaseParamBean param : presetParams) {
             ParamHolder holder = new ParamHolder();
             holder.param = param;
             holders.add(holder);
@@ -166,7 +166,7 @@ public class CaseParamUnionFragment extends CaseParamEditActivity.CaseParamFragm
 
                 ParamHolder holder = (ParamHolder) getItem(position);
                 CaseParamBean paramBean = holder.param;
-                String desc = StringUtil.isEmpty(paramBean.getParamDesc())? paramBean.getParamName(): paramBean.getParamDesc();
+                String desc = StringUtil.isEmpty(paramBean.getParamDesc()) ? paramBean.getParamName() : paramBean.getParamDesc();
 
                 title.setText(desc);
                 holder.edit = edit;
@@ -185,7 +185,7 @@ public class CaseParamUnionFragment extends CaseParamEditActivity.CaseParamFragm
                 }
 
                 storedParams.add(obj);
-                ((BaseAdapter)paramList.getAdapter()).notifyDataSetChanged();
+                ((BaseAdapter) paramList.getAdapter()).notifyDataSetChanged();
                 tagFlowLayout.getAdapter().notifyDataChanged();
             }
         });

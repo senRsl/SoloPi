@@ -16,54 +16,57 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/control_dp16"
     android:paddingLeft="@dimen/control_dp8"
     android:paddingRight="@dimen/control_dp8"
-    android:paddingTop="@dimen/control_dp16"
-    android:orientation="vertical"
-    android:paddingBottom="@dimen/control_dp16">
+    android:paddingTop="@dimen/control_dp16">
 
     <LinearLayout
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
         <EditText
             android:id="@+id/dialog_record_edit"
-            android:textColor="@color/primaryText"
-            android:textColorHint="@color/secondaryText"
-            android:textColorHighlight="@color/colorAccent"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:textColor="@color/primaryText"
+            android:textColorHighlight="@color/colorAccent"
+            android:textColorHint="@color/secondaryText"
             android:textSize="@dimen/dialog_edit_input_size" />
 
         <LinearLayout
             android:id="@+id/dialog_record_edit_hide"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/control_dp8"
+            android:foreground="?attr/selectableItemBackground"
+            android:gravity="center"
+            android:paddingBottom="@dimen/control_dp2"
             android:paddingLeft="@dimen/control_dp6"
             android:paddingRight="@dimen/control_dp6"
-            android:layout_marginLeft="@dimen/control_dp8"
-            android:paddingTop="@dimen/control_dp2"
-            android:paddingBottom="@dimen/control_dp2"
-            android:gravity="center"
-            android:foreground="?attr/selectableItemBackground">
+            android:paddingTop="@dimen/control_dp2">
+
             <TextView
-                android:gravity="center"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="@dimen/dialog_edit_hint_size"
+                android:gravity="center"
                 android:text="@string/attention__hide_ime"
-                android:textColor="@color/colorAccent"/>
+                android:textColor="@color/colorAccent"
+                android:textSize="@dimen/dialog_edit_hint_size" />
         </LinearLayout>
     </LinearLayout>
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/secondaryText"
-        android:textSize="@dimen/dialog_edit_title_size"
         android:layout_gravity="right"
-        android:layout_marginTop="@dimen/control_dp4"
         android:layout_marginRight="@dimen/control_dp16"
-        android:text="@string/attention_input_space"/>
+        android:layout_marginTop="@dimen/control_dp4"
+        android:text="@string/attention_input_space"
+        android:textColor="@color/secondaryText"
+        android:textSize="@dimen/dialog_edit_title_size" />
 </LinearLayout>

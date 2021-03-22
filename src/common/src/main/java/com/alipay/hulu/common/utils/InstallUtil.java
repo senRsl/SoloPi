@@ -15,15 +15,15 @@
  */
 package com.alipay.hulu.common.utils;
 
+import java.io.File;
+
+import com.alipay.hulu.common.application.LauncherApplication;
+
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import androidx.core.content.FileProvider;
-
-import com.alipay.hulu.common.application.LauncherApplication;
-
-import java.io.File;
 
 /**
  * Created by lezhou.wyl on 2018/2/15.
@@ -54,11 +54,11 @@ public class InstallUtil {
         i.addCategory("android.intent.category.DEFAULT");
         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         String type = "application/vnd.android.package-archive";
-        if(Build.VERSION.SDK_INT>=Build.VERSION_CODES.N) {
-            Uri uri= FileProvider.getUriForFile(context, LauncherApplication.getInstance().getApplicationInfo().packageName + ".myProvider",file);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            Uri uri = FileProvider.getUriForFile(context, LauncherApplication.getInstance().getApplicationInfo().packageName + ".myProvider", file);
             i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            i.setDataAndType(uri,type);
-        }else{
+            i.setDataAndType(uri, type);
+        } else {
             i.setDataAndType(Uri.fromFile(file), type);
         }
         context.startActivity(i);

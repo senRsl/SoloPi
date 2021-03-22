@@ -15,10 +15,7 @@
  */
 package com.alipay.hulu.shared.event.accessibility;
 
-import android.accessibilityservice.AccessibilityService;
-import android.accessibilityservice.AccessibilityServiceInfo;
-import android.content.Intent;
-import android.view.accessibility.AccessibilityEvent;
+import java.lang.ref.WeakReference;
 
 import com.alipay.hulu.common.application.LauncherApplication;
 import com.alipay.hulu.common.injector.InjectorService;
@@ -28,11 +25,13 @@ import com.alipay.hulu.common.injector.param.Subscriber;
 import com.alipay.hulu.common.injector.provider.Param;
 import com.alipay.hulu.common.injector.provider.Provider;
 import com.alipay.hulu.common.utils.LogUtil;
-import com.alipay.hulu.common.utils.MiscUtil;
 import com.alipay.hulu.common.utils.StringUtil;
 import com.alipay.hulu.shared.event.constant.Constant;
 
-import java.lang.ref.WeakReference;
+import android.accessibilityservice.AccessibilityService;
+import android.accessibilityservice.AccessibilityServiceInfo;
+import android.content.Intent;
+import android.view.accessibility.AccessibilityEvent;
 
 /**
  * Created by qiaoruikai on 2018/10/9 4:35 PM.
@@ -75,7 +74,8 @@ public class AccessibilityServiceImpl extends AccessibilityService {
 
         if (this.accessibilityEventTrackerRef != null) {
             this.accessibilityEventTrackerRef.clear();
-        }return super.onUnbind(intent);
+        }
+        return super.onUnbind(intent);
     }
 
     @Override

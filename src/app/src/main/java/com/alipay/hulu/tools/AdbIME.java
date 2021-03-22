@@ -15,6 +15,16 @@
  */
 package com.alipay.hulu.tools;
 
+import com.alipay.hulu.R;
+import com.alipay.hulu.common.application.LauncherApplication;
+import com.alipay.hulu.common.constant.Constant;
+import com.alipay.hulu.common.injector.InjectorService;
+import com.alipay.hulu.common.injector.param.RunningThread;
+import com.alipay.hulu.common.injector.param.Subscriber;
+import com.alipay.hulu.common.injector.provider.Param;
+import com.alipay.hulu.common.tools.BackgroundExecutor;
+import com.alipay.hulu.common.utils.MiscUtil;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -26,29 +36,17 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
 
-import com.alipay.hulu.R;
-import com.alipay.hulu.common.application.LauncherApplication;
-import com.alipay.hulu.common.constant.Constant;
-import com.alipay.hulu.common.injector.InjectorService;
-import com.alipay.hulu.common.injector.param.RunningThread;
-import com.alipay.hulu.common.injector.param.Subscriber;
-import com.alipay.hulu.common.injector.provider.Param;
-import com.alipay.hulu.common.tools.BackgroundExecutor;
-import com.alipay.hulu.common.utils.MiscUtil;
-import com.alipay.hulu.common.utils.StringUtil;
-
 /**
  * Created by lezhou.wyl on 2018/2/8.
  */
 public class AdbIME extends InputMethodService {
-    private static final String TAG = "AdbIME";
-    public static final String MSG_HIDE_INPUT =  "MSG_HIDE_INPUT";
-
+    public static final String MSG_HIDE_INPUT = "MSG_HIDE_INPUT";
     public static final String IME_MESSAGE = "ADB_INPUT_TEXT";
     public static final String IME_SEARCH_MESSAGE = "ADB_SEARCH_TEXT";
     public static final String IME_CHARS = "ADB_INPUT_CHARS";
     public static final String IME_KEYCODE = "ADB_INPUT_CODE";
     public static final String IME_EDITORCODE = "ADB_EDITOR_CODE";
+    private static final String TAG = "AdbIME";
     private BroadcastReceiver mReceiver = null;
     private InputMethodManager manager;
 
@@ -129,7 +127,7 @@ public class AdbIME extends InputMethodService {
         if (chars != null) {
             String msg = new String(chars, 0, chars.length);
             InputConnection ic = getCurrentInputConnection();
-            if (ic != null){
+            if (ic != null) {
                 ic.commitText(msg, 1);
                 return true;
             }

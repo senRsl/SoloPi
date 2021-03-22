@@ -15,17 +15,17 @@
  */
 package com.alipay.hulu.screenRecord;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.Objects;
+
+import com.alipay.hulu.common.utils.LogUtil;
+
 import android.annotation.TargetApi;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.os.Build;
 import android.os.Looper;
-
-import com.alipay.hulu.common.utils.LogUtil;
-
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.Objects;
 
 /**
  * @author yrom
@@ -34,16 +34,33 @@ import java.util.Objects;
 @TargetApi(value = Build.VERSION_CODES.LOLLIPOP)
 abstract class BaseEncoder implements Encoder {
 
-    static abstract class Callback implements Encoder.Callback {
-        void onInputBufferAvailable(BaseEncoder encoder, int index) {
+    private String mCodecName;
+    private MediaCodec mEncoder;
+    private Callback mCallback;
+    /**
+     * let media codec run async mode if mCallback != null
+     */
+    private MediaCodec.Callback mCodecCallback = new MediaCodec.Callback() {
+        @Override
+        public void onInputBufferAvailable(MediaCodec codec, int index) {
+            mCallback.onInputBufferAvailable(BaseEncoder.this, index);
         }
 
-        void onOutputFormatChanged(BaseEncoder encoder, MediaFormat format) {
+        @Override
+        public void onOutputBufferAvailable(MediaCodec codec, int index, MediaCodec.BufferInfo info) {
+            mCallback.onOutputBufferAvailable(BaseEncoder.this, index, info);
         }
 
-        void onOutputBufferAvailable(BaseEncoder encoder, int index, MediaCodec.BufferInfo info) {
+        @Override
+        public void onError(MediaCodec codec, MediaCodec.CodecException e) {
+            mCallback.onError(BaseEncoder.this, e);
         }
-    }
+
+        @Override
+        public void onOutputFormatChanged(MediaCodec codec, MediaFormat format) {
+            mCallback.onOutputFormatChanged(BaseEncoder.this, format);
+        }
+    };
 
     BaseEncoder(String codecName) {
         this.mCodecName = codecName;
@@ -82,7 +99,7 @@ abstract class BaseEncoder implements Encoder {
         try {
             if (this.mCallback != null) {
                 // NOTE: MediaCodec maybe crash on some devices due to null callback
-                encoder.setCallback( mCodecCallback);
+                encoder.setCallback(mCodecCallback);
             }
             encoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
             onEncoderConfigured(encoder);
@@ -181,34 +198,16 @@ abstract class BaseEncoder implements Encoder {
         }
     }
 
-    private String mCodecName;
-    private MediaCodec mEncoder;
-    private Callback mCallback;
-
-    /**
-     * let media codec run async mode if mCallback != null
-     */
-    private MediaCodec.Callback mCodecCallback = new MediaCodec.Callback() {
-        @Override
-        public void onInputBufferAvailable(MediaCodec codec, int index) {
-            mCallback.onInputBufferAvailable(BaseEncoder.this, index);
+    static abstract class Callback implements Encoder.Callback {
+        void onInputBufferAvailable(BaseEncoder encoder, int index) {
         }
 
-        @Override
-        public void onOutputBufferAvailable(MediaCodec codec, int index, MediaCodec.BufferInfo info) {
-            mCallback.onOutputBufferAvailable(BaseEncoder.this, index, info);
+        void onOutputFormatChanged(BaseEncoder encoder, MediaFormat format) {
         }
 
-        @Override
-        public void onError(MediaCodec codec, MediaCodec.CodecException e) {
-            mCallback.onError(BaseEncoder.this, e);
+        void onOutputBufferAvailable(BaseEncoder encoder, int index, MediaCodec.BufferInfo info) {
         }
-
-        @Override
-        public void onOutputFormatChanged(MediaCodec codec, MediaFormat format) {
-            mCallback.onOutputFormatChanged(BaseEncoder.this, format);
-        }
-    };
+    }
 
 
 }

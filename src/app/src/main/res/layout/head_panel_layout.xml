@@ -24,11 +24,11 @@
         android:id="@+id/back_icon"
         android:layout_width="@dimen/control_dp40"
         android:layout_height="@dimen/control_dp40"
-        android:padding="@dimen/control_dp8"
-        android:layout_marginStart="@dimen/control_dp8"
         android:layout_alignParentLeft="true"
-        android:scaleType="fitCenter"
-        android:layout_centerVertical="true" />
+        android:layout_centerVertical="true"
+        android:layout_marginStart="@dimen/control_dp8"
+        android:padding="@dimen/control_dp8"
+        android:scaleType="fitCenter" />
 
     <!--标题区域-->
     <TextView
@@ -36,8 +36,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:textSize="@dimen/textsize_20"
-        android:textColor="@android:color/white" />
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/textsize_20" />
 
     <!--右侧功能区域-->
     <LinearLayout
@@ -45,18 +45,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:layout_marginEnd="@dimen/control_dp8"
         android:layout_centerVertical="true"
+        android:layout_marginEnd="@dimen/control_dp8"
         android:gravity="center_vertical"
         android:orientation="horizontal">
 
         <ImageView
-            android:visibility="gone"
             android:id="@+id/info_icon"
             android:layout_width="@dimen/control_dp40"
             android:layout_height="@dimen/control_dp40"
             android:padding="@dimen/control_dp8"
-            android:scaleType="fitCenter" />
+            android:scaleType="fitCenter"
+            android:visibility="gone" />
 
     </LinearLayout>
 </com.alipay.hulu.ui.HeadControlPanel>

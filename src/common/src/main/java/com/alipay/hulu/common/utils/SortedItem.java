@@ -20,7 +20,7 @@ import androidx.annotation.NonNull;
 /**
  * Created by qiaoruikai on 2019/11/8 11:40 PM.
  */
-public class SortedItem<T> implements Comparable<SortedItem<T>>{
+public class SortedItem<T> implements Comparable<SortedItem<T>> {
     private T item;
     private int priority;
 

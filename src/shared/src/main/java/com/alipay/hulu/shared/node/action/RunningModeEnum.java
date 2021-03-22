@@ -15,10 +15,10 @@
  */
 package com.alipay.hulu.shared.node.action;
 
-import androidx.annotation.StringRes;
-
 import com.alipay.hulu.common.utils.StringUtil;
 import com.alipay.hulu.shared.R;
+
+import androidx.annotation.StringRes;
 
 public enum RunningModeEnum {
     ACCESSIBILITY_MODE("accessibilityMode", R.string.running_mode__accessibility_mode),
@@ -32,26 +32,27 @@ public enum RunningModeEnum {
         this.desc = desc;
     }
 
+    /**
+     * 通过code获取运行模式
+     *
+     * @param code
+     * @return
+     */
+    public static RunningModeEnum getModeByCode(String code) {
+        for (RunningModeEnum item : values()) {
+            if (StringUtil.equals(item.code, code)) {
+                return item;
+            }
+        }
+
+        return null;
+    }
+
     public String getCode() {
         return code;
     }
 
     public String getDesc() {
         return StringUtil.getString(desc);
-    }
-
-    /**
-     * 通过code获取运行模式
-     * @param code
-     * @return
-     */
-    public static RunningModeEnum getModeByCode(String code) {
-        for (RunningModeEnum item: values()) {
-            if(StringUtil.equals(item.code, code)) {
-                return item;
-            }
-        }
-
-        return null;
     }
 }

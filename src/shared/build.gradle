@@ -44,7 +44,7 @@ android {
     }
 }
 
-greendao{
+greendao {
     schemaVersion 5
     daoPackage 'com.alipay.hulu.shared.io.db'
     targetGenDir 'src/main/java'

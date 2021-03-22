@@ -15,10 +15,7 @@
  */
 package com.alipay.hulu.shared.event;
 
-import android.content.Context;
-import android.content.Intent;
-import android.provider.Settings;
-import android.widget.Toast;
+import java.lang.ref.WeakReference;
 
 import com.alipay.hulu.common.application.LauncherApplication;
 import com.alipay.hulu.common.service.base.ExportService;
@@ -27,7 +24,9 @@ import com.alipay.hulu.common.utils.PermissionUtil;
 import com.alipay.hulu.shared.event.accessibility.AccessibilityEventTracker;
 import com.alipay.hulu.shared.event.touch.TouchEventTracker;
 
-import java.lang.ref.WeakReference;
+import android.content.Context;
+import android.content.Intent;
+import android.provider.Settings;
 
 /**
  * Created by qiaoruikai on 2018/10/9 11:08 PM.

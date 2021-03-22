@@ -3,6 +3,8 @@
  */
 package com.android.permission.rom;
 
+import java.lang.reflect.Method;
+
 import android.annotation.TargetApi;
 import android.app.AppOpsManager;
 import android.content.Context;
@@ -11,8 +13,6 @@ import android.content.pm.PackageManager;
 import android.os.Binder;
 import android.os.Build;
 import android.util.Log;
-
-import java.lang.reflect.Method;
 
 public class QikuUtils {
     private static final String TAG = "QikuUtils";
@@ -36,7 +36,7 @@ public class QikuUtils {
             try {
                 Class clazz = AppOpsManager.class;
                 Method method = clazz.getDeclaredMethod("checkOp", int.class, int.class, String.class);
-                return AppOpsManager.MODE_ALLOWED == (int)method.invoke(manager, op, Binder.getCallingUid(), context.getPackageName());
+                return AppOpsManager.MODE_ALLOWED == (int) method.invoke(manager, op, Binder.getCallingUid(), context.getPackageName());
             } catch (Exception e) {
                 Log.e(TAG, Log.getStackTraceString(e));
             }

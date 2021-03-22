@@ -14,23 +14,26 @@
   ~ limitations under the License.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal" android:layout_width="wrap_content"
     style="@style/Widget.AppCompat.Button.Small"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     android:background="@drawable/primary_button_layer"
-    android:paddingTop="@dimen/control_dp6"
+    android:gravity="center_vertical"
 
+    android:minHeight="@dimen/control_dp32"
+    android:orientation="horizontal"
+    android:paddingBottom="@dimen/control_dp6"
     android:paddingLeft="@dimen/control_dp8"
     android:paddingRight="@dimen/control_dp8"
-    android:paddingBottom="@dimen/control_dp6"
-    android:minHeight="@dimen/control_dp32"
-    android:gravity="center_vertical"
-    android:layout_height="wrap_content">
+    android:paddingTop="@dimen/control_dp6">
+
     <ImageView
         android:id="@+id/case_step_edit_tag_icon"
-        android:scaleType="fitCenter"
         android:layout_width="@dimen/control_dp16"
         android:layout_height="@dimen/control_dp16"
-        android:tint="@color/white"/>
+        android:scaleType="fitCenter"
+        android:tint="@color/white" />
+
     <TextView
         android:id="@+id/case_step_edit_tag_title"
         android:layout_width="wrap_content"
@@ -38,5 +41,5 @@
         android:layout_marginLeft="@dimen/control_dp4"
         android:layout_marginRight="@dimen/control_dp4"
         android:textColor="@color/white"
-        android:textSize="@dimen/textsize_12"/>
+        android:textSize="@dimen/textsize_12" />
 </LinearLayout>

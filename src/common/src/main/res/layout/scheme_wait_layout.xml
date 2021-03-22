@@ -13,45 +13,46 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
 -->
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="#ffffff">
 
 
     <LinearLayout
-        android:layout_centerHorizontal="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="64dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="64dp"
         android:orientation="horizontal">
+
         <androidx.appcompat.widget.AppCompatImageView
             android:layout_width="64dp"
             android:layout_height="64dp"
-            android:src="@drawable/scheme_icon"
-            android:layout_gravity="center_vertical"/>
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/scheme_icon" />
+
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginLeft="8dp">
+            android:layout_marginLeft="8dp"
+            android:orientation="vertical">
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/app_name"
                 android:textColor="#212121"
-                android:textSize="24dp"/>
+                android:textSize="24dp" />
 
             <TextView
-                android:layout_marginTop="4dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
                 android:text="@string/scheme_app_desc"
                 android:textColor="#757575"
-                android:textSize="18dp"/>
+                android:textSize="18dp" />
         </LinearLayout>
     </LinearLayout>
 

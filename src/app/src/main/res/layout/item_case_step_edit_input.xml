@@ -14,44 +14,45 @@
   ~ limitations under the License.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/control_dp6"
     android:paddingLeft="@dimen/control_dp16"
     android:paddingRight="@dimen/control_dp16"
-    android:paddingTop="@dimen/control_dp6"
-    android:paddingBottom="@dimen/control_dp6">
+    android:paddingTop="@dimen/control_dp6">
+
     <TextView
         android:id="@+id/item_case_step_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/control_dp4"
-        android:textSize="@dimen/dialog_edit_title_size"
         android:textColor="@color/colorAccent"
-        />
+        android:textSize="@dimen/dialog_edit_title_size" />
 
     <EditText
-        android:paddingTop="@dimen/control_dp6"
-        android:paddingLeft="@dimen/control_dp12"
-        android:paddingRight="@dimen/control_dp12"
         android:id="@+id/item_case_step_edit"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textColor="@color/primaryText"
-        android:textSize="@dimen/dialog_edit_input_size"
-        android:text=""
         android:focusable="true"
-        android:textColorHint="@color/secondaryText"
+        android:inputType="text"
+        android:paddingLeft="@dimen/control_dp12"
+        android:paddingRight="@dimen/control_dp12"
+        android:paddingTop="@dimen/control_dp6"
+        android:text=""
+        android:textColor="@color/primaryText"
         android:textColorHighlight="@color/colorAccent"
-        android:inputType="text" />
+        android:textColorHint="@color/secondaryText"
+        android:textSize="@dimen/dialog_edit_input_size" />
+
     <TextView
         android:id="@+id/item_case_step_create_param"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="@dimen/dialog_edit_hint_size"
-        android:textColor="@color/colorAccent"
         android:layout_gravity="right"
         android:layout_marginRight="@dimen/control_dp12"
-        android:layout_marginTop="0dp"/>
+        android:layout_marginTop="0dp"
+        android:textColor="@color/colorAccent"
+        android:textSize="@dimen/dialog_edit_hint_size" />
 
 </LinearLayout>

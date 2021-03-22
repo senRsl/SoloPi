@@ -15,6 +15,16 @@
  */
 package com.alipay.hulu.screenRecord;
 
+import java.lang.reflect.Field;
+import java.util.Arrays;
+
+import com.alipay.hulu.R;
+import com.alipay.hulu.activity.BaseActivity;
+import com.alipay.hulu.common.utils.LogUtil;
+import com.alipay.hulu.common.utils.PermissionUtil;
+import com.alipay.hulu.ui.HeadControlPanel;
+import com.alipay.hulu.util.VideoUtils;
+
 import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -29,16 +39,6 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.SpinnerAdapter;
-
-import com.alipay.hulu.R;
-import com.alipay.hulu.activity.BaseActivity;
-import com.alipay.hulu.common.utils.LogUtil;
-import com.alipay.hulu.common.utils.PermissionUtil;
-import com.alipay.hulu.ui.HeadControlPanel;
-import com.alipay.hulu.util.VideoUtils;
-
-import java.lang.reflect.Field;
-import java.util.Arrays;
 
 
 @TargetApi(value = Build.VERSION_CODES.LOLLIPOP)
@@ -60,6 +60,52 @@ public class RecorderConfigActivity extends BaseActivity {
     private Button mStartBtn;
     private TextSpinner mVideoExceptDiff;
 
+    private static String[] codecInfoNames(MediaCodecInfo[] codecInfos) {
+        String[] names = new String[codecInfos.length];
+        for (int i = 0; i < codecInfos.length; i++) {
+            names[i] = codecInfos[i].getName();
+        }
+        return names;
+    }
+
+    private static void logCodecInfos(MediaCodecInfo[] codecInfos, String mimeType) {
+        for (MediaCodecInfo info : codecInfos) {
+            StringBuilder builder = new StringBuilder(512);
+            MediaCodecInfo.CodecCapabilities caps = info.getCapabilitiesForType(mimeType);
+            builder.append("Encoder '").append(info.getName()).append('\'')
+                    .append("\n  supported : ")
+                    .append(Arrays.toString(info.getSupportedTypes()));
+            MediaCodecInfo.VideoCapabilities videoCaps = caps.getVideoCapabilities();
+            if (videoCaps != null) {
+                builder.append("\n  Video capabilities:")
+                        .append("\n  Widths: ").append(videoCaps.getSupportedWidths())
+                        .append("\n  Heights: ").append(videoCaps.getSupportedHeights())
+                        .append("\n  Frame Rates: ").append(videoCaps.getSupportedFrameRates())
+                        .append("\n  Bitrate: ").append(videoCaps.getBitrateRange());
+                if (ScreenRecorder.VIDEO_AVC.equals(mimeType)) {
+                    MediaCodecInfo.CodecProfileLevel[] levels = caps.profileLevels;
+
+                    builder.append("\n  Profile-levels: ");
+                    for (MediaCodecInfo.CodecProfileLevel level : levels) {
+                        builder.append("\n  ").append(VideoUtils.avcProfileLevelToString(level));
+                    }
+                }
+                builder.append("\n  Color-formats: ");
+                for (int c : caps.colorFormats) {
+                    builder.append("\n  ").append(VideoUtils.toHumanReadable(c));
+                }
+            }
+            MediaCodecInfo.AudioCapabilities audioCaps = caps.getAudioCapabilities();
+            if (audioCaps != null) {
+                builder.append("\n Audio capabilities:")
+                        .append("\n Sample Rates: ").append(Arrays.toString(audioCaps.getSupportedSampleRates()))
+                        .append("\n Bit Rates: ").append(audioCaps.getBitrateRange())
+                        .append("\n Max channels: ").append(audioCaps.getMaxInputChannelCount());
+            }
+            LogUtil.i(TAG, builder.toString());
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,7 +126,6 @@ public class RecorderConfigActivity extends BaseActivity {
             }
         });
     }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -181,7 +226,6 @@ public class RecorderConfigActivity extends BaseActivity {
         });
     }
 
-
     private boolean checkVideoSettings() {
         String codecName = getSelectedVideoCodec();
         MediaCodecInfo codec = getVideoCodecInfo(codecName);
@@ -242,7 +286,7 @@ public class RecorderConfigActivity extends BaseActivity {
                 Field limit = MediaCodecInfo.VideoCapabilities.class.getDeclaredField("mSmallerDimensionUpperLimit");
                 Field blockWidth = MediaCodecInfo.VideoCapabilities.class.getDeclaredField("mBlockWidth");
                 Field blockHeight = MediaCodecInfo.VideoCapabilities.class.getDeclaredField("mBlockHeight");
-                Field blockCountRange =  MediaCodecInfo.VideoCapabilities.class.getDeclaredField("mBlockCountRange");
+                Field blockCountRange = MediaCodecInfo.VideoCapabilities.class.getDeclaredField("mBlockCountRange");
                 Field aspectRatioRange = MediaCodecInfo.VideoCapabilities.class.getDeclaredField("mAspectRatioRange");
                 Field blockAspectRatioRange = MediaCodecInfo.VideoCapabilities.class.getDeclaredField("mBlockAspectRatioRange");
                 Field blocksPerSecondRange = MediaCodecInfo.VideoCapabilities.class.getDeclaredField("mBlocksPerSecondRange");
@@ -280,7 +324,6 @@ public class RecorderConfigActivity extends BaseActivity {
 
         return true;
     }
-
 
     private void onResolutionChanged(int selectedPosition, String resolution) {
         String codecName = getSelectedVideoCodec();
@@ -330,7 +373,6 @@ public class RecorderConfigActivity extends BaseActivity {
         mVideoExceptDiff.setSelectedPosition(selectedPosition);
     }
 
-
     private void onFramerateChanged(int selectedPosition, String rate) {
         String codecName = getSelectedVideoCodec();
         MediaCodecInfo codec = getVideoCodecInfo(codecName);
@@ -362,7 +404,6 @@ public class RecorderConfigActivity extends BaseActivity {
         //todo
     }
 
-
     private MediaCodecInfo getVideoCodecInfo(String codecName) {
         if (codecName == null) {
             return null;
@@ -384,7 +425,6 @@ public class RecorderConfigActivity extends BaseActivity {
         return codec;
     }
 
-
     private String getSelectedVideoCodec() {
         return mVideoCodec == null ? null : (String) mVideoCodec.getSelectedItem();
     }
@@ -394,7 +434,6 @@ public class RecorderConfigActivity extends BaseActivity {
         adapter.setDropDownViewResource(R.layout.auto_size_spinner_dropdown_item);
         return adapter;
     }
-
 
     private int getSelectedFramerate() {
         if (mVideoFrameRate == null) {
@@ -419,9 +458,8 @@ public class RecorderConfigActivity extends BaseActivity {
         return Double.parseDouble(selectedItem);
     }
 
-
     private int[] getSelectedWidthHeight() {
-        if (mVideoResolution == null)  {
+        if (mVideoResolution == null) {
             throw new IllegalStateException();
         }
         String selected = mVideoResolution.getSelectedItem();
@@ -430,52 +468,6 @@ public class RecorderConfigActivity extends BaseActivity {
             throw new IllegalArgumentException();
         }
         return new int[]{Integer.parseInt(xes[0]), Integer.parseInt(xes[1])};
-    }
-
-    private static String[] codecInfoNames(MediaCodecInfo[] codecInfos) {
-        String[] names = new String[codecInfos.length];
-        for (int i = 0; i < codecInfos.length; i++) {
-            names[i] = codecInfos[i].getName();
-        }
-        return names;
-    }
-
-    private static void logCodecInfos(MediaCodecInfo[] codecInfos, String mimeType) {
-        for (MediaCodecInfo info : codecInfos) {
-            StringBuilder builder = new StringBuilder(512);
-            MediaCodecInfo.CodecCapabilities caps = info.getCapabilitiesForType(mimeType);
-            builder.append("Encoder '").append(info.getName()).append('\'')
-                    .append("\n  supported : ")
-                    .append(Arrays.toString(info.getSupportedTypes()));
-            MediaCodecInfo.VideoCapabilities videoCaps = caps.getVideoCapabilities();
-            if (videoCaps != null) {
-                builder.append("\n  Video capabilities:")
-                        .append("\n  Widths: ").append(videoCaps.getSupportedWidths())
-                        .append("\n  Heights: ").append(videoCaps.getSupportedHeights())
-                        .append("\n  Frame Rates: ").append(videoCaps.getSupportedFrameRates())
-                        .append("\n  Bitrate: ").append(videoCaps.getBitrateRange());
-                if (ScreenRecorder.VIDEO_AVC.equals(mimeType)) {
-                    MediaCodecInfo.CodecProfileLevel[] levels = caps.profileLevels;
-
-                    builder.append("\n  Profile-levels: ");
-                    for (MediaCodecInfo.CodecProfileLevel level : levels) {
-                        builder.append("\n  ").append(VideoUtils.avcProfileLevelToString(level));
-                    }
-                }
-                builder.append("\n  Color-formats: ");
-                for (int c : caps.colorFormats) {
-                    builder.append("\n  ").append(VideoUtils.toHumanReadable(c));
-                }
-            }
-            MediaCodecInfo.AudioCapabilities audioCaps = caps.getAudioCapabilities();
-            if (audioCaps != null) {
-                builder.append("\n Audio capabilities:")
-                        .append("\n Sample Rates: ").append(Arrays.toString(audioCaps.getSupportedSampleRates()))
-                        .append("\n Bit Rates: ").append(audioCaps.getBitrateRange())
-                        .append("\n Max channels: ").append(audioCaps.getMaxInputChannelCount());
-            }
-            LogUtil.i(TAG, builder.toString());
-        }
     }
 
     private void restoreSelections(TextSpinner... spinners) {

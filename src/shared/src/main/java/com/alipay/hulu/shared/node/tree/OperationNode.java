@@ -15,15 +15,6 @@
  */
 package com.alipay.hulu.shared.node.tree;
 
-import android.graphics.Rect;
-import android.os.Parcel;
-import android.os.Parcelable;
-
-import com.alipay.hulu.common.service.SPService;
-import com.alipay.hulu.common.utils.StringUtil;
-import com.alipay.hulu.shared.node.OperationService;
-import com.alipay.hulu.shared.node.action.OperationExecutor;
-
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -31,73 +22,113 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 
+import com.alipay.hulu.common.utils.StringUtil;
+import com.alipay.hulu.shared.node.OperationService;
+import com.alipay.hulu.shared.node.action.OperationExecutor;
+
+import android.graphics.Rect;
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * 操作节点信息
  * Created by cathor on 2017/12/12.
  */
 public class OperationNode implements Parcelable {
+    public static final Creator<OperationNode> CREATOR = new Creator<OperationNode>() {
+        @Override
+        public OperationNode createFromParcel(Parcel source) {
+            return new OperationNode(source);
+        }
+
+        @Override
+        public OperationNode[] newArray(int size) {
+            return new OperationNode[size];
+        }
+    };
     /**
      * 操作节点xpath
      */
     private String xpath;
-
     /**
      * 操作节点描述
      */
     private String description;
-
     /**
      * 文本
      */
     private String text;
-
     /**
      * 节点ResourceID
      */
     private String resourceId;
-
     /**
      * 节点ID
      */
     private String id;
-
     /**
      * 节点类型
      */
     private String className;
-
     /**
      * 节点包名
      */
     private String packageName;
-
     /**
      * 节点深度
      */
     private int depth;
-
     /**
      * 节点边界
      */
     private Rect nodeBound;
-
     /**
      * 协助定位子节点
      */
     private List<AssistantNode> assistantNodes = new ArrayList<>();
-
     /**
      * 透传字段
      */
     private Map<String, String> extra = new HashMap<>();
-
     /**
      * 节点类型
      */
     private String nodeType;
 
+    public OperationNode() {
+    }
+
+    public OperationNode(OperationNode old, OperationService service) {
+        if (service == null) {
+            initCopy(old);
+        } else {
+            initWithService(old, service);
+        }
+    }
+
+    /**
+     * Parcel生成
+     *
+     * @param in
+     */
+    private OperationNode(Parcel in) {
+        className = in.readString();
+        packageName = in.readString();
+        text = in.readString();
+        resourceId = in.readString();
+        description = in.readString();
+        xpath = in.readString();
+        id = in.readString();
+        depth = in.readInt();
+        nodeBound = in.readParcelable(Rect.class.getClassLoader());
+        assistantNodes = in.readArrayList(AssistantNode.class.getClassLoader());
+        extra = in.readHashMap(String.class.getClassLoader());
+        nodeType = in.readString();
+    }
+
     /**
      * 根据属性排序子节点
+     *
      * @param assistantNodes
      * @return
      */
@@ -111,7 +142,7 @@ public class OperationNode implements Parcelable {
             public int compare(AssistantNode lhs, AssistantNode rhs) {
                 int lhsP = lhs.calculatePriority();
                 int rhsP = rhs.calculatePriority();
-                return rhsP- lhsP;
+                return rhsP - lhsP;
             }
         });
         sorted.addAll(assistantNodes);
@@ -137,47 +168,6 @@ public class OperationNode implements Parcelable {
         dest.writeList(assistantNodes);
         dest.writeMap(extra);
         dest.writeString(nodeType);
-    }
-
-    public static final Creator<OperationNode> CREATOR = new Creator<OperationNode>() {
-        @Override
-        public OperationNode createFromParcel(Parcel source) {
-            return new OperationNode(source);
-        }
-
-        @Override
-        public OperationNode[] newArray(int size) {
-            return new OperationNode[size];
-        }
-    };
-
-    public OperationNode() {}
-
-    public OperationNode(OperationNode old, OperationService service) {
-        if (service == null) {
-            initCopy(old);
-        } else {
-            initWithService(old, service);
-        }
-    }
-
-    /**
-     * Parcel生成
-     * @param in
-     */
-    private OperationNode(Parcel in) {
-        className = in.readString();
-        packageName = in.readString();
-        text = in.readString();
-        resourceId = in.readString();
-        description = in.readString();
-        xpath = in.readString();
-        id = in.readString();
-        depth = in.readInt();
-        nodeBound = in.readParcelable(Rect.class.getClassLoader());
-        assistantNodes = in.readArrayList(AssistantNode.class.getClassLoader());
-        extra = in.readHashMap(String.class.getClassLoader());
-        nodeType = in.readString();
     }
 
     private void initCopy(OperationNode node) {
@@ -381,6 +371,7 @@ public class OperationNode implements Parcelable {
 
     /**
      * 判断是否包含字段
+     *
      * @param key
      * @return
      */
@@ -393,6 +384,7 @@ public class OperationNode implements Parcelable {
 
     /**
      * 获取Extra值
+     *
      * @param key
      * @return
      */
@@ -422,7 +414,7 @@ public class OperationNode implements Parcelable {
                 ", className='" + className + '\'' +
                 ", packageName='" + StringUtil.hide(packageName) + '\'' +
                 ", depth=" + depth +
-                ", nodeBound=" + (nodeBound == null? null: nodeBound.toShortString()) +
+                ", nodeBound=" + (nodeBound == null ? null : nodeBound.toShortString()) +
                 ", assistantNodes=" + assistantNodes +
                 ", extra=" + StringUtil.hide(extra) +
                 ", nodeType='" + nodeType + '\'' +
@@ -433,26 +425,33 @@ public class OperationNode implements Parcelable {
      * 协助定位子节点
      */
     public static class AssistantNode implements Parcelable {
+        public static final Creator<AssistantNode> CREATOR = new Creator<AssistantNode>() {
+            @Override
+            public AssistantNode createFromParcel(Parcel source) {
+                return new AssistantNode(source);
+            }
+
+            @Override
+            public AssistantNode[] newArray(int size) {
+                return new AssistantNode[size];
+            }
+        };
         /**
          * 子节点类名
          */
         private String className = null;
-
         /**
          * 子节点resourceId
          */
         private String resourceId = null;
-
         /**
          * 子节点text
          */
         private String text = null;
-
         /**
          * 子节点description
          */
         private String description = null;
-
         /**
          * 子节点在父节点层级
          */
@@ -461,7 +460,8 @@ public class OperationNode implements Parcelable {
         /**
          * JSON用
          */
-        public AssistantNode() {}
+        public AssistantNode() {
+        }
 
         public AssistantNode(String className, String resourceId, String text, String description, int parentHeight) {
             this.className = className;
@@ -471,18 +471,26 @@ public class OperationNode implements Parcelable {
             this.description = description;
         }
 
+
+        protected AssistantNode(Parcel in) {
+            this.className = in.readString();
+            this.resourceId = in.readString();
+            this.text = in.readString();
+            this.description = in.readString();
+            this.parentHeight = in.readInt();
+        }
+
         /**
          * 计算节点优先级
+         *
          * @return
          */
         private int calculatePriority() {
-            int text = StringUtil.isEmpty(getText())? 0: 2;
+            int text = StringUtil.isEmpty(getText()) ? 0 : 2;
             int resourceId = StringUtil.isEmpty(getResourceId()) ? 0 : 1;
-            int description = StringUtil.isEmpty(getDescription())? 0: 2;
+            int description = StringUtil.isEmpty(getDescription()) ? 0 : 2;
             return text + resourceId + description;
         }
-
-
 
         @Override
         public String toString() {
@@ -597,25 +605,5 @@ public class OperationNode implements Parcelable {
             dest.writeString(this.description);
             dest.writeInt(this.parentHeight);
         }
-
-        protected AssistantNode(Parcel in) {
-            this.className = in.readString();
-            this.resourceId = in.readString();
-            this.text = in.readString();
-            this.description = in.readString();
-            this.parentHeight = in.readInt();
-        }
-
-        public static final Creator<AssistantNode> CREATOR = new Creator<AssistantNode>() {
-            @Override
-            public AssistantNode createFromParcel(Parcel source) {
-                return new AssistantNode(source);
-            }
-
-            @Override
-            public AssistantNode[] newArray(int size) {
-                return new AssistantNode[size];
-            }
-        };
     }
 }

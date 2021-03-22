@@ -15,13 +15,13 @@
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="@dimen/control_dp8"
+    android:orientation="vertical"
     android:paddingBottom="@dimen/control_dp8"
+    android:paddingEnd="@dimen/control_dp16"
     android:paddingStart="@dimen/control_dp16"
-    android:paddingEnd="@dimen/control_dp16">
+    android:paddingTop="@dimen/control_dp8">
 
     <TextView
         android:layout_width="wrap_content"
@@ -30,14 +30,14 @@
         android:layout_centerVertical="true"
         android:text="@string/select_app__target_app"
         android:textColor="@color/primaryText"
-        android:textSize="@dimen/textsize_18"/>
+        android:textSize="@dimen/textsize_18" />
 
     <ListView
         android:id="@+id/dialog_jump_app_list"
-        android:layout_marginTop="@dimen/control_dp8"
-        android:padding="0dp"
         android:layout_width="match_parent"
-        android:background="@drawable/bg_custom_input"
         android:layout_height="@dimen/app_list_250dp"
-        tools:listitem="@layout/activity_choose_layout"/>
+        android:layout_marginTop="@dimen/control_dp8"
+        android:background="@drawable/bg_custom_input"
+        android:padding="0dp"
+        tools:listitem="@layout/activity_choose_layout" />
 </LinearLayout>

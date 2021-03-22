@@ -15,24 +15,13 @@
  */
 package com.alipay.hulu.fragment;
 
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.os.Bundle;
-import android.provider.Settings;
-import androidx.annotation.Nullable;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import androidx.appcompat.app.AlertDialog;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.TextView;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Pattern;
 
 import com.alibaba.fastjson.JSON;
 import com.alipay.hulu.R;
@@ -63,24 +52,33 @@ import com.alipay.hulu.shared.node.utils.AppUtil;
 import com.alipay.hulu.util.CaseReplayUtil;
 import com.alipay.hulu.util.DialogUtils;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.regex.Pattern;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.Bundle;
+import android.provider.Settings;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.TextView;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 /**
  * Created by lezhou.wyl on 2018/7/30.
  */
 
 public class ReplayListFragment extends BaseFragment {
+    public static final int KEY_LIST_TYPE_LOCAL = 0;
     private static final String TAG = "ReplayListFrag";
     private static final String KEY_ARG_FRAGMENT_TYPE = "KEY_ARG_FRAGMENT_TYPE";
-
-    public static final int KEY_LIST_TYPE_LOCAL = 0;
-
     private ListView mListView;
     private View mEmptyView;
     private TextView mEmptyTextView;
@@ -93,7 +91,7 @@ public class ReplayListFragment extends BaseFragment {
     }
 
     public static int[] getAvailableTypes() {
-        return new int[] { KEY_LIST_TYPE_LOCAL };
+        return new int[]{KEY_LIST_TYPE_LOCAL};
     }
 
     public static String getTypeName(int type) {
@@ -254,6 +252,7 @@ public class ReplayListFragment extends BaseFragment {
 
     /**
      * 编辑用例描述信息
+     *
      * @param position
      */
     private void editCase(int position) {
@@ -284,6 +283,7 @@ public class ReplayListFragment extends BaseFragment {
 
     /**
      * 删除用例
+     *
      * @param position
      */
     private void deleteCase(final int position) {
@@ -332,6 +332,7 @@ public class ReplayListFragment extends BaseFragment {
 
     /**
      * 导出用例
+     *
      * @param position
      */
     private void exportCase(int position) {
@@ -374,7 +375,7 @@ public class ReplayListFragment extends BaseFragment {
      * 重复次数
      */
     protected void repeatPrepare(final int position) {
-         View v = LayoutInflater.from(ContextUtil.getContextThemeWrapper(getActivity(), R.style.AppDialogTheme)).inflate(R.layout.dialog_repeat_count, null);
+        View v = LayoutInflater.from(ContextUtil.getContextThemeWrapper(getActivity(), R.style.AppDialogTheme)).inflate(R.layout.dialog_repeat_count, null);
         final EditText edit = (EditText) v.findViewById(R.id.dialog_repeat_edit);
         final CheckBox restart = (CheckBox) v.findViewById(R.id.dialog_repeat_restart);
         final Pattern textPattern;
@@ -393,7 +394,7 @@ public class ReplayListFragment extends BaseFragment {
                         // 隐藏Dialog
                         dialog.dismiss();
 
-                       playMultiTimeCase(position, repeatCount, restart.isChecked());
+                        playMultiTimeCase(position, repeatCount, restart.isChecked());
                     }
                 }).create();
 
@@ -433,6 +434,7 @@ public class ReplayListFragment extends BaseFragment {
 
     /**
      * 重复执行
+     *
      * @param position
      * @param count
      * @param prepare
@@ -462,6 +464,7 @@ public class ReplayListFragment extends BaseFragment {
 
     /**
      * 重启应用
+     *
      * @param packageName
      */
     private void startTargetApp(final String packageName) {

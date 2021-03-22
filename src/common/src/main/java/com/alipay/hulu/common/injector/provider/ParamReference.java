@@ -15,8 +15,11 @@
  */
 package com.alipay.hulu.common.injector.provider;
 
-import androidx.annotation.IntDef;
-import androidx.annotation.NonNull;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.alipay.hulu.common.injector.param.InjectParam;
 import com.alipay.hulu.common.injector.param.RunningThread;
@@ -24,49 +27,38 @@ import com.alipay.hulu.common.service.SPService;
 import com.alipay.hulu.common.utils.LogUtil;
 import com.mdit.library.Const;
 
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import androidx.annotation.IntDef;
+import androidx.annotation.NonNull;
 
 /**
  * 依赖引用列表
+ *
  * @author Cathor
  */
 public class ParamReference {
-    private static String TAG = "ParamReference";
-
     public static final String PREFIX_PERSISTENT_PARAM = "PERSISTENT_PARAM_";
-
     /**
      * 消息合法
      */
     public static final int MESSAGE_VALID = 0;
-
     /**
      * 消息重复
      */
     public static final int MESSAGE_REPEAT = 1;
-
     /**
      * 消息不合法
      */
     public static final int MESSAGE_TYPE_INVALID = 2;
-
-    @IntDef({MESSAGE_VALID, MESSAGE_REPEAT, MESSAGE_TYPE_INVALID})
-    public @interface MESSAGE_VALIDATION {}
-
+    private static String TAG = "ParamReference";
     private InjectParam targetParam;
-
     /**
      * 当前消息
      */
     private Object currentValue = null;
-
-    /** 依赖对象与注入方法 */
+    /**
+     * 依赖对象与注入方法
+     */
     private Map<WeakInjectItem, Integer> referenceItems;
-
     private volatile boolean initialized = false;
 
     public ParamReference(InjectParam targetParam) {
@@ -84,6 +76,7 @@ public class ParamReference {
 
     /**
      * 推送消息
+     *
      * @param value
      * @param force
      */
@@ -116,6 +109,7 @@ public class ParamReference {
 
     /**
      * 移除引用
+     *
      * @param target
      */
     public void removeReference(@NonNull Object target, Method method) {
@@ -125,6 +119,7 @@ public class ParamReference {
 
     /**
      * 计算引用数量
+     *
      * @return
      */
     public int countReference() {
@@ -133,11 +128,12 @@ public class ParamReference {
 
     /**
      * 添加一个引用对象
+     *
      * @param target 引用对象
      * @param method 注入方法
      * @return 是否成功添加
      */
-    public boolean addReference(Object target, Method method, RunningThread runningThread){
+    public boolean addReference(Object target, Method method, RunningThread runningThread) {
         if (target != null) {
             Class[] classes = method.getParameterTypes();
             WeakInjectItem invoke;
@@ -153,8 +149,8 @@ public class ParamReference {
                 } else {
                     return false;
                 }
-            // 对于空参数方法
-            } else if (classes.length == 0 && targetParam.getType() == Void.class){
+                // 对于空参数方法
+            } else if (classes.length == 0 && targetParam.getType() == Void.class) {
                 invoke = new WeakInjectItem(method, target, Arrays.asList(targetParam), runningThread, targetParam.getType());
             } else {
                 return false;
@@ -184,9 +180,10 @@ public class ParamReference {
 
     /**
      * 下发消息
+     *
      * @return 是否成功更新
      */
-    public boolean updateParam(Object value){
+    public boolean updateParam(Object value) {
         if (targetParam.isSticky()) {
             initialized = true;
             currentValue = value;
@@ -224,9 +221,14 @@ public class ParamReference {
 
     /**
      * 获取当前值
+     *
      * @return
      */
     public Object getCurrentValue() {
         return currentValue;
+    }
+
+    @IntDef({MESSAGE_VALID, MESSAGE_REPEAT, MESSAGE_TYPE_INVALID})
+    public @interface MESSAGE_VALIDATION {
     }
 }

@@ -15,25 +15,23 @@
  */
 package com.alipay.hulu.util;
 
-import android.os.Looper;
-
 import com.alipay.hulu.BuildConfig;
 import com.alipay.hulu.common.application.LauncherApplication;
+
+import android.os.Looper;
 
 /**
  * Created by lezhou.wyl on 2018/1/21.
  */
 public class SystemUtil {
+    private static final String TAG = "SystemUtil";
+    private static final String CURRENT_PACKAGE_NAME = LauncherApplication.getInstance().getPackageName();
     public static int VERSION_CODE = BuildConfig.VERSION_CODE;
     public static String VERSION_NAME = BuildConfig.VERSION_NAME;
-
-    private static final String TAG = "SystemUtil";
 
     public static boolean isUiThread() {
         return Looper.myLooper() == Looper.getMainLooper();
     }
-
-    private static final String CURRENT_PACKAGE_NAME = LauncherApplication.getInstance().getPackageName();
 
     public static int getAppVersionCode() {
         return VERSION_CODE;

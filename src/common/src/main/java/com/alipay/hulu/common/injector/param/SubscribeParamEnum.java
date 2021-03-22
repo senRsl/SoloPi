@@ -21,33 +21,53 @@ package com.alipay.hulu.common.injector.param;
 public class SubscribeParamEnum {
     public static final String APP = "app";
 
-    /** 应用名 */
+    /**
+     * 应用名
+     */
     public static final String APP_NAME = "appName";
 
-    /** 屏幕顶层应用包名 */
+    /**
+     * 屏幕顶层应用包名
+     */
     public static final String PACKAGE = "package";
 
-    /** 应用所有子进程包名 */
+    /**
+     * 应用所有子进程包名
+     */
     public static final String PACKAGE_CHILDREN = "packageChildren";
 
-    /** 屏幕顶层应用包名 */
+    /**
+     * 屏幕顶层应用包名
+     */
     public static final String TOP_ACTIVITY = "topActivity";
 
-    /** AccessibilityService */
+    /**
+     * AccessibilityService
+     */
     public static final String ACCESSIBILITY_SERVICE = "accessibilityService";
 
-    /** 目标进程pid */
+    /**
+     * 目标进程pid
+     */
     public static final String PID = "pid";
 
-    /** 应用所有子进程pid */
+    /**
+     * 应用所有子进程pid
+     */
     public static final String PID_CHILDREN = "pidChildren";
 
-    /** ps获取的uid */
+    /**
+     * ps获取的uid
+     */
     public static final String PUID = "puid";
 
-    /** 应用UID */
+    /**
+     * 应用UID
+     */
     public static final String UID = "uid";
 
-    /** 是否显示额外信息 */
+    /**
+     * 是否显示额外信息
+     */
     public static final String EXTRA = "extra";
 }

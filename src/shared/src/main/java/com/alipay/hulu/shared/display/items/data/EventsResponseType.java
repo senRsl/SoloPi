@@ -21,88 +21,84 @@ import android.view.accessibility.AccessibilityNodeInfo;
 
 public class EventsResponseType implements Parcelable {
 
-	AccessibilityNodeInfo node;
+    public static final Parcelable.Creator<EventsResponseType> CREATOR = new Creator<EventsResponseType>() {
 
-	String operation;
-
-	long clickDate = 0;
-	long responsDate = 0;
-	long refreshDate = 0;
-
-	
-	public static final Parcelable.Creator<EventsResponseType> CREATOR = new Creator<EventsResponseType>() {
-		  
         @Override
         public EventsResponseType[] newArray(int size) {
             return new EventsResponseType[size];
         }
-  
+
         @Override
         public EventsResponseType createFromParcel(Parcel source) {
-        	EventsResponseType result = new EventsResponseType();
-        	result.node = source.readParcelable(AccessibilityNodeInfo.class.getClassLoader());
-			result.operation = source.readString();
+            EventsResponseType result = new EventsResponseType();
+            result.node = source.readParcelable(AccessibilityNodeInfo.class.getClassLoader());
+            result.operation = source.readString();
             result.clickDate = source.readLong();
             result.responsDate = source.readLong();
             result.refreshDate = source.readLong();
             return result;
         }
     };
-	
-	
-	public AccessibilityNodeInfo getNode() {
-		return node;
-	}
+    AccessibilityNodeInfo node;
+    String operation;
+    long clickDate = 0;
+    long responsDate = 0;
+    long refreshDate = 0;
 
-	public void setNode(AccessibilityNodeInfo node) {
-		this.node = node;
-	}
+    public AccessibilityNodeInfo getNode() {
+        return node;
+    }
 
-	public long getClickDate() {
-		return clickDate;
-	}
+    public void setNode(AccessibilityNodeInfo node) {
+        this.node = node;
+    }
 
-	public void setClickDate(long clickDate) {
-		this.clickDate = clickDate;
-	}
+    public long getClickDate() {
+        return clickDate;
+    }
 
-	public long getResponsDate() {
-		return responsDate;
-	}
+    public void setClickDate(long clickDate) {
+        this.clickDate = clickDate;
+    }
 
-	public void setResponsDate(long responsDate) {
-		this.responsDate = responsDate;
-	}
+    public long getResponsDate() {
+        return responsDate;
+    }
 
-	public long getRefreshDate() {
-		return refreshDate;
-	}
+    public void setResponsDate(long responsDate) {
+        this.responsDate = responsDate;
+    }
 
-	public void setRefreshDate(long refreshDate) {
-		this.refreshDate = refreshDate;
-	}
+    public long getRefreshDate() {
+        return refreshDate;
+    }
 
-	public String getOperation() {
-		return operation;
-	}
+    public void setRefreshDate(long refreshDate) {
+        this.refreshDate = refreshDate;
+    }
 
-	public void setOperation(String operation) {
-		this.operation = operation;
-	}
+    public String getOperation() {
+        return operation;
+    }
 
-	@Override
-	public int describeContents() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
+    public void setOperation(String operation) {
+        this.operation = operation;
+    }
 
-	@Override
-	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeParcelable(node, PARCELABLE_WRITE_RETURN_VALUE);
-		dest.writeString(operation);
+    @Override
+    public int describeContents() {
+        // TODO Auto-generated method stub
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeParcelable(node, PARCELABLE_WRITE_RETURN_VALUE);
+        dest.writeString(operation);
         dest.writeLong(clickDate);
         dest.writeLong(responsDate);
-        dest.writeLong(refreshDate);;
-	}
+        dest.writeLong(refreshDate);
+        ;
+    }
 
 }

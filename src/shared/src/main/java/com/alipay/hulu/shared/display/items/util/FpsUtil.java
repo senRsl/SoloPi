@@ -15,7 +15,10 @@
  */
 package com.alipay.hulu.shared.display.items.util;
 
-import android.os.Build;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.alipay.hulu.common.application.LauncherApplication;
 import com.alipay.hulu.common.bean.ProcessInfo;
@@ -24,79 +27,29 @@ import com.alipay.hulu.common.injector.param.SubscribeParamEnum;
 import com.alipay.hulu.common.injector.param.Subscriber;
 import com.alipay.hulu.common.injector.provider.Param;
 import com.alipay.hulu.common.injector.provider.Provider;
-import com.alipay.hulu.common.service.SPService;
 import com.alipay.hulu.common.tools.CmdTools;
 import com.alipay.hulu.common.utils.LogUtil;
 import com.alipay.hulu.common.utils.StringUtil;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
+import android.os.Build;
 
 public class FpsUtil {
-    private static final String TAG = "FpsUtil";
-
     public static final String FPS_DATA_EVENT = "fpsData";
-
+    private static final String TAG = "FpsUtil";
     private static FpsUtil _instance;
-
     /**
-     * 尝试初始化
+     * 是否正在执行
      */
-    public static synchronized void initIfNotInited() {
-        if (_instance == null) {
-            _instance = new FpsUtil();
-        }
-    }
-
+    private static volatile boolean runningFlag = false;
+    /**
+     * 帧标准间隔
+     */
+    private static Double FPS_PERIOD = null;
+    /**
+     * 标准帧数
+     */
+    private static int FRAME_PER_SECOND = 60;
     private InjectorService injectorService;
-
-    /**
-     * 添加监听器
-     *
-     * @param
-     */
-    public FpsUtil() {
-        injectorService = LauncherApplication.getInstance().findServiceByName(InjectorService.class.getName());
-        injectorService.register(this);
-    }
-
-    @Provider(value = @Param(FPS_DATA_EVENT), updatePeriod = 500)
-    public List<FpsDataWrapper> provideFpsWrapper() {
-        int referenceCount = injectorService.getReferenceCount(FPS_DATA_EVENT);
-
-        // 当没有监听器，不运行
-        if (referenceCount <= 0) {
-            // 清理引用
-            if (_instance != null) {
-                injectorService.unregister(_instance);
-                _instance = null;
-            }
-
-            return null;
-        }
-
-        long startTime = System.currentTimeMillis();
-
-        // 根据监听器确定是否需要获取以往数据
-        boolean requestPrevious = false;
-
-        try {
-            List<FpsDataWrapper> fpsDataWrappers = countUnrootFPS(appName, requestPrevious);
-
-            LogUtil.d(TAG, "Fps 耗时 " + (System.currentTimeMillis() - startTime) + " 获得 " + fpsDataWrappers.size());
-            return fpsDataWrappers;
-        } catch (Exception e) {
-            LogUtil.e(TAG, "Fps 抛出异常: " + e.getMessage(), e);
-        } finally {
-            runningFlag = false;
-        }
-
-        return null;
-    }
-
-
     /**
      * 获取FPS相关数据执行器
      */
@@ -113,91 +66,37 @@ public class FpsUtil {
     private String previousProc = null;
 
     private AtomicInteger reloadCount = new AtomicInteger(-1);
-
-    /**
-     * 是否正在执行
-     */
-    private static volatile boolean runningFlag = false;
-
     /**
      * 起始时间所在列
      */
     private int startPos = -1;
-
     /**
      * 结束时间所在列
      */
     private int endPos = -1;
 
     /**
-     * 帧标准间隔
+     * 添加监听器
+     *
+     * @param
      */
-    private static Double FPS_PERIOD = null;
-
-    /**
-     * 标准帧数
-     */
-    private static int FRAME_PER_SECOND = 60;
-
-
-    @Subscriber(@Param(SubscribeParamEnum.APP))
-    public void setApp(String app) {
-        this.appName = app;
-    }
-
-    @Subscriber(@Param(SubscribeParamEnum.PID_CHILDREN))
-    public void setPids(List<ProcessInfo> children) {
-        this.childrenPids = children;
+    public FpsUtil() {
+        injectorService = LauncherApplication.getInstance().findServiceByName(InjectorService.class.getName());
+        injectorService.register(this);
     }
 
     /**
-     * 非Root环境获取Fps，jank，maxJank（也支持root环境）
-     * @param app 应用名称
-     * @return Fps,Jank,MaxJank,
+     * 尝试初始化
      */
-    private List<FpsDataWrapper> countUnrootFPS(String app, boolean requestPrevious) {
-        Long startTime = System.currentTimeMillis();
-        List<FpsDataWrapper> fpsDatas = new ArrayList<>();
-
-
-        // 获取顶层Activity
-        String[] actAndProc = getTopActivityAndProcess(app, childrenPids);
-        LogUtil.w(TAG, "Fps get top Activity cost: " + (System.currentTimeMillis() - startTime) + "ms");
-
-        String tmpActivity, tmpProcessName;
-        if (actAndProc != null && actAndProc.length == 2) {
-            tmpActivity = actAndProc[0];
-            tmpProcessName = actAndProc[1];
-        } else {
-            tmpActivity = app;
-            tmpProcessName = app;
+    public static synchronized void initIfNotInited() {
+        if (_instance == null) {
+            _instance = new FpsUtil();
         }
-
-        // 发生进程切换
-        if (!StringUtil.equals(tmpProcessName, proc)) {
-            previousProc = proc;
-            previousTopActivity = topActivity;
-            reloadCount.set(4);
-        }
-
-        proc = tmpProcessName;
-        topActivity = tmpActivity;
-
-        if (requestPrevious && reloadCount.get() > 0) {
-            LogUtil.w(TAG, "Load old content for " + StringUtil.hide(previousProc));
-            fpsDatas.add(loadFpsDataForProc(previousTopActivity, previousProc));
-
-            reloadCount.decrementAndGet();
-        }
-
-        LogUtil.w(TAG, "Load content for " + StringUtil.hide(proc));
-        fpsDatas.add(loadFpsDataForProc(topActivity, proc));
-
-        return fpsDatas;
     }
 
     /**
      * 在顶层Activity列表中查找应用的Activity
+     *
      * @param app 应用
      * @return 应用在顶层的Activity，不存在返回空字符串
      */
@@ -274,7 +173,7 @@ public class FpsUtil {
                 if (pidStr.contains(":")) {
                     pidStr = pidStr.split("\\:")[0];
                 }
-                LogUtil.i(TAG, "Get pid info：" + pidStr) ;
+                LogUtil.i(TAG, "Get pid info：" + pidStr);
                 // 记录过滤PID
                 // 确定下pid
                 int pid = Integer.parseInt(pidStr);
@@ -306,10 +205,123 @@ public class FpsUtil {
         return topActivityAndPackage;
     }
 
+    /**
+     * 加载设备屏幕信息
+     */
+    private static void loadDeviceScreenInfo() {
+        String result = CmdTools.execHighPrivilegeCmd("dumpsys SurfaceFlinger --latency com.alipay.hulu");
+        if (!StringUtil.isEmpty(result)) {
+            String firstLine = result.split("\n")[0];
+            try {
+                long frameTime = Long.parseLong(firstLine.trim());
+                FPS_PERIOD = frameTime / 1000D;
+                FRAME_PER_SECOND = (int) (1000000000 / frameTime);
+            } catch (NumberFormatException e) {
+                LogUtil.e(TAG, "Can't resolve text: " + firstLine, e);
+                FPS_PERIOD = 16666D;
+                FRAME_PER_SECOND = 60;
+            }
+        } else {
+            FPS_PERIOD = 16666D;
+            FRAME_PER_SECOND = 60;
+        }
+    }
+
+    @Provider(value = @Param(FPS_DATA_EVENT), updatePeriod = 500)
+    public List<FpsDataWrapper> provideFpsWrapper() {
+        int referenceCount = injectorService.getReferenceCount(FPS_DATA_EVENT);
+
+        // 当没有监听器，不运行
+        if (referenceCount <= 0) {
+            // 清理引用
+            if (_instance != null) {
+                injectorService.unregister(_instance);
+                _instance = null;
+            }
+
+            return null;
+        }
+
+        long startTime = System.currentTimeMillis();
+
+        // 根据监听器确定是否需要获取以往数据
+        boolean requestPrevious = false;
+
+        try {
+            List<FpsDataWrapper> fpsDataWrappers = countUnrootFPS(appName, requestPrevious);
+
+            LogUtil.d(TAG, "Fps 耗时 " + (System.currentTimeMillis() - startTime) + " 获得 " + fpsDataWrappers.size());
+            return fpsDataWrappers;
+        } catch (Exception e) {
+            LogUtil.e(TAG, "Fps 抛出异常: " + e.getMessage(), e);
+        } finally {
+            runningFlag = false;
+        }
+
+        return null;
+    }
+
+    @Subscriber(@Param(SubscribeParamEnum.APP))
+    public void setApp(String app) {
+        this.appName = app;
+    }
+
+    @Subscriber(@Param(SubscribeParamEnum.PID_CHILDREN))
+    public void setPids(List<ProcessInfo> children) {
+        this.childrenPids = children;
+    }
+
+    /**
+     * 非Root环境获取Fps，jank，maxJank（也支持root环境）
+     *
+     * @param app 应用名称
+     * @return Fps, Jank, MaxJank,
+     */
+    private List<FpsDataWrapper> countUnrootFPS(String app, boolean requestPrevious) {
+        Long startTime = System.currentTimeMillis();
+        List<FpsDataWrapper> fpsDatas = new ArrayList<>();
+
+
+        // 获取顶层Activity
+        String[] actAndProc = getTopActivityAndProcess(app, childrenPids);
+        LogUtil.w(TAG, "Fps get top Activity cost: " + (System.currentTimeMillis() - startTime) + "ms");
+
+        String tmpActivity, tmpProcessName;
+        if (actAndProc != null && actAndProc.length == 2) {
+            tmpActivity = actAndProc[0];
+            tmpProcessName = actAndProc[1];
+        } else {
+            tmpActivity = app;
+            tmpProcessName = app;
+        }
+
+        // 发生进程切换
+        if (!StringUtil.equals(tmpProcessName, proc)) {
+            previousProc = proc;
+            previousTopActivity = topActivity;
+            reloadCount.set(4);
+        }
+
+        proc = tmpProcessName;
+        topActivity = tmpActivity;
+
+        if (requestPrevious && reloadCount.get() > 0) {
+            LogUtil.w(TAG, "Load old content for " + StringUtil.hide(previousProc));
+            fpsDatas.add(loadFpsDataForProc(previousTopActivity, previousProc));
+
+            reloadCount.decrementAndGet();
+        }
+
+        LogUtil.w(TAG, "Load content for " + StringUtil.hide(proc));
+        fpsDatas.add(loadFpsDataForProc(topActivity, proc));
+
+        return fpsDatas;
+    }
 
     /**
      * 加载特定进程与Activity的fps数据
-     * @param activity 顶层Activity
+     *
+     * @param activity    顶层Activity
      * @param processName 进程名
      * @return
      */
@@ -565,31 +577,9 @@ public class FpsUtil {
             }
 
             // 可能存在只有一部分数据的情况
-            int fps = jankVsyncCount < FRAME_PER_SECOND?  FRAME_PER_SECOND - jankVsyncCount + totalCount: totalCount;
+            int fps = jankVsyncCount < FRAME_PER_SECOND ? FRAME_PER_SECOND - jankVsyncCount + totalCount : totalCount;
 
             return new FpsDataWrapper(processName, activity, fps, jankCount, (int) Math.ceil(maxJank / 1000F), jankCount / (float) totalCount * 100, startRenderTimes, endRenderTimes);
-        }
-    }
-
-    /**
-     * 加载设备屏幕信息
-     */
-    private static void loadDeviceScreenInfo() {
-        String result = CmdTools.execHighPrivilegeCmd("dumpsys SurfaceFlinger --latency com.alipay.hulu");
-        if (!StringUtil.isEmpty(result)) {
-            String firstLine = result.split("\n")[0];
-            try {
-                long frameTime = Long.parseLong(firstLine.trim());
-                FPS_PERIOD = frameTime / 1000D;
-                FRAME_PER_SECOND = (int) (1000000000 / frameTime);
-            } catch (NumberFormatException e) {
-                LogUtil.e(TAG, "Can't resolve text: " + firstLine, e);
-                FPS_PERIOD = 16666D;
-                FRAME_PER_SECOND = 60;
-            }
-        } else {
-            FPS_PERIOD = 16666D;
-            FRAME_PER_SECOND = 60;
         }
     }
 

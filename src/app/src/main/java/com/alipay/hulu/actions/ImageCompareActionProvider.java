@@ -15,16 +15,10 @@
  */
 package com.alipay.hulu.actions;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
-import android.graphics.Rect;
-import android.os.Build;
-import android.util.DisplayMetrics;
-import android.view.LayoutInflater;
-import android.view.WindowManager;
-import android.widget.LinearLayout;
+import java.io.File;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.alipay.hulu.R;
 import com.alipay.hulu.common.annotation.Enable;
@@ -45,32 +39,53 @@ import com.alipay.hulu.shared.node.action.provider.ActionProvider;
 import com.alipay.hulu.shared.node.action.provider.ViewLoadCallback;
 import com.alipay.hulu.shared.node.tree.AbstractNodeTree;
 import com.alipay.hulu.shared.node.utils.AssetsManager;
-import com.alipay.hulu.tools.HighLightService;
 import com.alipay.hulu.shared.node.utils.BitmapUtil;
+import com.alipay.hulu.tools.HighLightService;
 import com.theartofdev.edmodo.cropper.CropImageView;
 
-import java.io.File;
-import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.graphics.Rect;
+import android.util.DisplayMetrics;
+import android.view.LayoutInflater;
+import android.view.WindowManager;
+import android.widget.LinearLayout;
 
 /**
  * Created by qiaoruikai on 2019/1/25 3:47 PM.
  */
 @Enable
 public class ImageCompareActionProvider implements ActionProvider {
-    private static final String TAG = "ImgCompareActionPvd";
-
     public static final String ACTION_CLICK_BY_SCREENSHOT = "clickByScreenshot";
     public static final String ACTION_ASSERT_SCREENSHOT = "assertScreenshot";
     public static final String IMAGE_COMPARE_PATCH = "hulu_imageCompare";
-
+    public static final String KEY_TARGET_IMAGE = "targetImage";
+    private static final String TAG = "ImgCompareActionPvd";
+    private static final String KEY_ORIGIN_SCREEN = "originSize";
+    private static final String KEY_ORIGIN_POS = "originPos";
     private HighLightService highLight;
     private ScreenCaptureService captureService;
 
-    public static final String KEY_TARGET_IMAGE = "targetImage";
-    private static final String KEY_ORIGIN_SCREEN = "originSize";
-    private static final String KEY_ORIGIN_POS = "originPos";
+    private static String flatRectToString(Rect r) {
+        return r.top + "," + r.left + "," + r.bottom + "," + r.right;
+    }
+
+    private static Rect readRectFromString(String content) {
+        String[] poses = StringUtil.split(content, ",");
+        if (poses == null || poses.length != 4) {
+            return null;
+        }
+
+        try {
+            return new Rect(Integer.parseInt(poses[0]), Integer.parseInt(poses[1]),
+                    Integer.parseInt(poses[2]), Integer.parseInt(poses[3]));
+        } catch (NumberFormatException e) {
+            LogUtil.e(TAG, "Can't read rect from String %s", content);
+            return null;
+        }
+    }
 
     @Override
     public void onCreate(Context context) {
@@ -382,7 +397,8 @@ public class ImageCompareActionProvider implements ActionProvider {
 
     /**
      * 根据query图像查找目标Rect
-     * @param rs 插件
+     *
+     * @param rs    插件
      * @param query query图像
      * @return
      */
@@ -484,7 +500,7 @@ public class ImageCompareActionProvider implements ActionProvider {
             float widthRadio = targetWidth / query.getWidth();
             float heightRadio = targetHeight / query.getHeight();
 
-            LogUtil.d(TAG, "原尺寸: %s, 查找尺寸: %s" , query.getWidth() + "x" + query.getHeight(), targetWidth + "x" + targetHeight);
+            LogUtil.d(TAG, "原尺寸: %s, 查找尺寸: %s", query.getWidth() + "x" + query.getHeight(), targetWidth + "x" + targetHeight);
 
             // 差别过大，说明找错了，当做没找到
             if (widthRadio < 0.4 || widthRadio > 2 || heightRadio < 0.4 || heightRadio > 2) {
@@ -500,25 +516,6 @@ public class ImageCompareActionProvider implements ActionProvider {
             if (target.exists()) {
                 FileUtils.deleteFile(target);
             }
-        }
-    }
-
-    private static String flatRectToString(Rect r) {
-        return r.top + "," + r.left + "," + r.bottom + "," + r.right;
-    }
-
-    private static Rect readRectFromString(String content) {
-        String[] poses = StringUtil.split(content, ",");
-        if (poses == null || poses.length != 4) {
-            return null;
-        }
-
-        try {
-            return new Rect(Integer.parseInt(poses[0]), Integer.parseInt(poses[1]),
-                    Integer.parseInt(poses[2]), Integer.parseInt(poses[3]));
-        } catch (NumberFormatException e) {
-            LogUtil.e(TAG, "Can't read rect from String %s", content);
-            return null;
         }
     }
 }

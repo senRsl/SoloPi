@@ -15,12 +15,10 @@
  */
 package com.alipay.hulu.common.scheme;
 
-import android.app.Activity;
-import android.content.Intent;
-import android.content.pm.ResolveInfo;
-import android.net.Uri;
-
-import androidx.annotation.Nullable;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import com.alipay.hulu.common.R;
 import com.alipay.hulu.common.application.LauncherApplication;
@@ -29,10 +27,10 @@ import com.alipay.hulu.common.utils.LogUtil;
 import com.alipay.hulu.common.utils.MiscUtil;
 import com.alipay.hulu.common.utils.SortedList;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import android.app.Activity;
+import android.content.Intent;
+import android.content.pm.ResolveInfo;
+import android.net.Uri;
 
 /**
  * Created by qiaoruikai on 2019/11/8 10:51 PM.
@@ -67,7 +65,7 @@ public class SchemeActivity extends Activity {
         final String realAction = segments.get(0);
         Set<String> names = data.getQueryParameterNames();
         final Map<String, String> params = new HashMap<>(names.size() + 1);
-        for (String name: names) {
+        for (String name : names) {
             params.put(name, data.getQueryParameter(name));
         }
 
@@ -91,6 +89,7 @@ public class SchemeActivity extends Activity {
 
     /**
      * 实际跳转
+     *
      * @param resolvers
      * @param action
      * @param params
@@ -102,7 +101,7 @@ public class SchemeActivity extends Activity {
         }
 
         SortedList<SchemeActionResolver> resolverList = resolvers.get(action);
-        for (SchemeActionResolver realResolver: resolverList) {
+        for (SchemeActionResolver realResolver : resolverList) {
             if (realResolver.processScheme(this, params)) {
                 finish();
                 return;

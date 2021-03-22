@@ -15,6 +15,14 @@
  */
 package com.alipay.hulu.screenRecord;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.LinkedList;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import com.alipay.hulu.BuildConfig;
+import com.alipay.hulu.common.utils.LogUtil;
+
 import android.annotation.TargetApi;
 import android.hardware.display.DisplayManager;
 import android.hardware.display.VirtualDisplay;
@@ -28,51 +36,44 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 
-import com.alipay.hulu.BuildConfig;
-import com.alipay.hulu.common.utils.LogUtil;
-
-import java.io.IOException;
-import java.nio.ByteBuffer;
-import java.util.LinkedList;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 /**
  * @author Yrom
  */
 @TargetApi(value = Build.VERSION_CODES.LOLLIPOP)
 public class ScreenRecorder {
+    public static final String VIDEO_AVC = MediaFormat.MIMETYPE_VIDEO_AVC; // H.264 Advanced Video Coding
     private static final String TAG = "ScreenRecorder";
     private static final boolean VERBOSE = BuildConfig.DEBUG;
     private static final int INVALID_INDEX = -1;
-    public static final String VIDEO_AVC = MediaFormat.MIMETYPE_VIDEO_AVC; // H.264 Advanced Video Coding
+    private static final int MSG_START = 0;
+    private static final int MSG_STOP = 1;
+    private static final int MSG_ERROR = 2;
+    private static final int STOP_WITH_EOS = 1;
     private int mWidth;
     private int mHeight;
     private int mDpi;
     private String mDstPath;
     private MediaProjection mMediaProjection;
     private VideoEncoder mVideoEncoder;
-
     private MediaFormat mVideoOutputFormat = null;
     private int mVideoTrackIndex = INVALID_INDEX;
     private MediaMuxer mMuxer;
     private boolean mMuxerStarted = false;
-
     private AtomicBoolean mForceQuit = new AtomicBoolean(false);
     private AtomicBoolean mIsRunning = new AtomicBoolean(false);
     private VirtualDisplay mVirtualDisplay;
+    private HandlerThread mWorker;
+    private CallbackHandler mHandler;
     private MediaProjection.Callback mProjectionCallback = new MediaProjection.Callback() {
         @Override
         public void onStop() {
             quit();
         }
     };
-
-    private HandlerThread mWorker;
-    private CallbackHandler mHandler;
-
     private Callback mCallback;
     private LinkedList<Integer> mPendingVideoEncoderBufferIndices = new LinkedList<>();
     private LinkedList<MediaCodec.BufferInfo> mPendingVideoEncoderBufferInfos = new LinkedList<>();
+    private long mVideoPtsOffset;
 
     /**
      * @param dpi for {@link VirtualDisplay}
@@ -121,50 +122,6 @@ public class ScreenRecorder {
 
     public String getSavedPath() {
         return mDstPath;
-    }
-
-    interface Callback {
-        void onStop(Throwable error);
-
-        void onStart();
-
-        void onRecording(long presentationTimeUs);
-    }
-
-    private static final int MSG_START = 0;
-    private static final int MSG_STOP = 1;
-    private static final int MSG_ERROR = 2;
-    private static final int STOP_WITH_EOS = 1;
-
-    private class CallbackHandler extends Handler {
-        CallbackHandler(Looper looper) {
-            super(looper);
-        }
-
-        @Override
-        public void handleMessage(Message msg) {
-            switch (msg.what) {
-                case MSG_START:
-                    try {
-                        record();
-                        if (mCallback != null) {
-                            mCallback.onStart();
-                        }
-                        break;
-                    } catch (Exception e) {
-                        msg.obj = e;
-                    }
-                case MSG_STOP:
-                case MSG_ERROR:
-                    stopEncoders();
-                    if (msg.arg1 != STOP_WITH_EOS) signalEndOfStream();
-                    if (mCallback != null) {
-                        mCallback.onStop((Throwable) msg.obj);
-                    }
-                    release();
-                    break;
-            }
-        }
     }
 
     private void signalEndOfStream() {
@@ -225,9 +182,6 @@ public class ScreenRecorder {
         }
     }
 
-
-
-
     private void writeSampleData(int track, MediaCodec.BufferInfo buffer, ByteBuffer encodedData) {
         if ((buffer.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) {
             // The codec config data was pulled out and fed to the muxer when we got
@@ -264,9 +218,6 @@ public class ScreenRecorder {
         }
     }
 
-    private long mVideoPtsOffset;
-
-
     private void resetVideoPts(MediaCodec.BufferInfo buffer) {
         if (mVideoPtsOffset == 0) {
             mVideoPtsOffset = buffer.presentationTimeUs;
@@ -288,7 +239,7 @@ public class ScreenRecorder {
 
     private void resetAudioOutputFormat(MediaFormat newFormat) {
         // should happen before receiving buffers, and should only happen once
-        if ( mMuxerStarted) {
+        if (mMuxerStarted) {
             throw new IllegalStateException("output format already changed!");
         }
         if (VERBOSE)
@@ -298,7 +249,7 @@ public class ScreenRecorder {
 
     private void startMuxerIfReady() {
         if (mMuxerStarted || mVideoOutputFormat == null
-                ) {
+        ) {
             return;
         }
 
@@ -319,8 +270,6 @@ public class ScreenRecorder {
 
         if (VERBOSE) LogUtil.i(TAG, "Mux pending video output buffers done.");
     }
-
-
 
     // @WorkerThread
     private void prepareVideoEncoder() throws IOException {
@@ -418,6 +367,45 @@ public class ScreenRecorder {
         if (mMediaProjection != null) {
             LogUtil.e(TAG, "release() not called!");
             release();
+        }
+    }
+
+    interface Callback {
+        void onStop(Throwable error);
+
+        void onStart();
+
+        void onRecording(long presentationTimeUs);
+    }
+
+    private class CallbackHandler extends Handler {
+        CallbackHandler(Looper looper) {
+            super(looper);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case MSG_START:
+                    try {
+                        record();
+                        if (mCallback != null) {
+                            mCallback.onStart();
+                        }
+                        break;
+                    } catch (Exception e) {
+                        msg.obj = e;
+                    }
+                case MSG_STOP:
+                case MSG_ERROR:
+                    stopEncoders();
+                    if (msg.arg1 != STOP_WITH_EOS) signalEndOfStream();
+                    if (mCallback != null) {
+                        mCallback.onStop((Throwable) msg.obj);
+                    }
+                    release();
+                    break;
+            }
         }
     }
 

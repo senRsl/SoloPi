@@ -15,7 +15,8 @@
  */
 package com.alipay.hulu.replay;
 
-import androidx.annotation.NonNull;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.alipay.hulu.bean.ReplayResultBean;
 import com.alipay.hulu.bean.ReplayStepInfoBean;
@@ -24,32 +25,20 @@ import com.alipay.hulu.shared.node.action.OperationMethod;
 import com.alipay.hulu.shared.node.action.PerformActionEnum;
 import com.alipay.hulu.shared.node.tree.export.bean.OperationStep;
 
-import java.util.ArrayList;
-import java.util.List;
+import androidx.annotation.NonNull;
 
 /**
  * Created by qiaoruikai on 2018/10/29 11:06 AM.
  */
 public class RepeatStepProvider extends AbstractStepProvider {
     private static final String TAG = "RepeatStepProvider";
-
-    private RecordCaseInfo recordCase;
-
-    private OperationStep prepareStep;
-
-    private boolean prepare;
-
-    private int currentIdx;
     private final int repeatCount;
-
     OperationStepProvider currentStepProvider;
-
     List<ReplayResultBean> resultBeans;
-
-    @Override
-    public void prepare() {
-        loadStep();
-    }
+    private RecordCaseInfo recordCase;
+    private OperationStep prepareStep;
+    private boolean prepare;
+    private int currentIdx;
 
     public RepeatStepProvider(@NonNull RecordCaseInfo recordCase, int repeatCount, boolean prepare) {
         this.recordCase = recordCase;
@@ -59,6 +48,11 @@ public class RepeatStepProvider extends AbstractStepProvider {
         this.prepare = prepare;
 
         resultBeans = new ArrayList<>(repeatCount + 1);
+    }
+
+    @Override
+    public void prepare() {
+        loadStep();
     }
 
     private void loadStep() {
@@ -84,7 +78,7 @@ public class RepeatStepProvider extends AbstractStepProvider {
             prepareStep = null;
             return step;
         }
-        return currentStepProvider == null? null: currentStepProvider.provideStep();
+        return currentStepProvider == null ? null : currentStepProvider.provideStep();
     }
 
     @Override

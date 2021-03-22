@@ -15,18 +15,14 @@
  */
 package com.alipay.hulu.service;
 
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
-import android.os.IBinder;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
+import java.io.File;
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import com.alipay.hulu.R;
 import com.alipay.hulu.adapter.FloatWinAdapter;
@@ -44,14 +40,18 @@ import com.alipay.hulu.shared.display.items.base.RecordPattern;
 import com.alipay.hulu.ui.RecycleViewDivider;
 import com.alipay.hulu.util.RecordUtil;
 
-import java.io.File;
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.IBinder;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * 性能工具加载服务
@@ -60,22 +60,24 @@ import java.util.concurrent.TimeUnit;
 @Provider(@Param(value = DisplayManager.STOP_DISPLAY))
 public class DisplayManager {
 
-    private static final String TAG = "DisplayManager";
-
     public static final String STOP_DISPLAY = "stopDisplay";
-
+    private static final String TAG = "DisplayManager";
+    private static DisplayManager instance;
     private DisplayProvider provider;
-
     private List<DisplayItemInfo> currentDisplayInfo = new ArrayList<>();
     private List<String> displayMessages = new ArrayList<>();
-
     private FloatWinAdapter floatWinAdapter;
-
     private int runningMode;
     private volatile boolean runningFlag = true;
-
     private FloatWinService.FloatBinder binder;
     private FloatWinService.OnRunListener runListener;
+    private ScheduledExecutorService executorService;
+
+    private InjectorService injectorService;
+
+    private RecyclerView floatWinList;
+
+    private DisplayConnection connection;
     private FloatWinService.OnStopListener stopListener = new FloatWinService.OnStopListener() {
         @Override
         public boolean onStopClick() {
@@ -84,18 +86,15 @@ public class DisplayManager {
         }
     };
 
-    private ScheduledExecutorService executorService;
-
-    private InjectorService injectorService;
-
-    private RecyclerView floatWinList;
-
-    private DisplayConnection connection;
-
-    private static DisplayManager instance;
+    private DisplayManager() {
+        provider = LauncherApplication.getInstance().findServiceByName(DisplayProvider.class.getName());
+        executorService = Executors.newSingleThreadScheduledExecutor();
+        runListener = new MyRunningListener(this);
+    }
 
     /**
      * 获取显示控制实例
+     *
      * @return
      */
     public static DisplayManager getInstance() {
@@ -103,12 +102,6 @@ public class DisplayManager {
             instance = new DisplayManager();
         }
         return instance;
-    }
-
-    private DisplayManager() {
-        provider = LauncherApplication.getInstance().findServiceByName(DisplayProvider.class.getName());
-        executorService = Executors.newSingleThreadScheduledExecutor();
-        runListener = new MyRunningListener(this);
     }
 
     /**
@@ -230,6 +223,7 @@ public class DisplayManager {
 
     /**
      * 触发显示项
+     *
      * @param info
      */
     public void triggerInfo(DisplayItemInfo info) {
@@ -255,7 +249,7 @@ public class DisplayManager {
 
         binder.provideDisplayView(provideMainView(binder.loadServiceContext()),
                 new LinearLayout.LayoutParams(binder.loadServiceContext().getResources().getDimensionPixelSize(R.dimen.control_float_title_width),
-                ViewGroup.LayoutParams.WRAP_CONTENT));
+                        ViewGroup.LayoutParams.WRAP_CONTENT));
 
         final String uploadUrl = SPService.getString(SPService.KEY_PERFORMANCE_UPLOAD, null);
         BackgroundExecutor.execute(new Runnable() {
@@ -266,10 +260,10 @@ public class DisplayManager {
                     File folder = RecordUtil.saveToFile(result);
 
                     // 显示提示框
-                    LauncherApplication.getInstance().showDialog(binder.loadServiceContext(), StringUtil.getString(R.string.performance__record_save, folder.getPath()) , StringUtil.getString(R.string.constant__confirm), null);
+                    LauncherApplication.getInstance().showDialog(binder.loadServiceContext(), StringUtil.getString(R.string.performance__record_save, folder.getPath()), StringUtil.getString(R.string.constant__confirm), null);
                 } else {
                     String response = RecordUtil.uploadData(uploadUrl, result);
-                    LauncherApplication.getInstance().showDialog(binder.loadServiceContext(), StringUtil.getString(R.string.performance__record_upload,  uploadUrl, response), StringUtil.getString(R.string.constant__confirm), null);
+                    LauncherApplication.getInstance().showDialog(binder.loadServiceContext(), StringUtil.getString(R.string.performance__record_upload, uploadUrl, response), StringUtil.getString(R.string.constant__confirm), null);
                 }
             }
         });
@@ -277,6 +271,7 @@ public class DisplayManager {
 
     /**
      * 提供主界面
+     *
      * @param context
      * @return
      */
@@ -372,7 +367,7 @@ public class DisplayManager {
         @Override
         public int onRunClick() {
             if (managerRef.get() == null) {
-                LogUtil.e(TAG, "Manager被回收？" );
+                LogUtil.e(TAG, "Manager被回收？");
                 return 0;
             }
 

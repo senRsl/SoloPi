@@ -14,14 +14,16 @@
   ~ limitations under the License.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:padding="@dimen/control_dp8"
-    android:layout_height="wrap_content">
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="@dimen/control_dp8">
+
     <TextView
+        android:id="@+id/record_time_select_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="@dimen/textsize_14"
+        android:layout_gravity="center_horizontal"
         android:textColor="@color/black"
-        android:id="@+id/record_time_select_title"
-        android:layout_gravity="center_horizontal"/>
+        android:textSize="@dimen/textsize_14" />
 </LinearLayout>

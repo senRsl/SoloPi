@@ -14,22 +14,23 @@
   ~ limitations under the License.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <include layout="@layout/head_panel_layout"
-             android:id="@+id/head_layout"/>
+    <include
+        android:id="@+id/head_layout"
+        layout="@layout/head_panel_layout" />
 
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/control_dp12"
         android:paddingLeft="@dimen/control_dp16"
         android:paddingRight="@dimen/control_dp16"
         android:text="@string/batch_result__replay_summary"
         android:textColor="@color/primaryText"
-        android:layout_marginTop="@dimen/control_dp12"
-        android:textSize="@dimen/textsize_20"/>
+        android:textSize="@dimen/textsize_20" />
 
     <TextView
         android:id="@+id/total_num"
@@ -39,7 +40,7 @@
         android:paddingLeft="@dimen/control_dp16"
         android:paddingRight="@dimen/control_dp16"
         android:textColor="@color/subFont"
-        android:textSize="@dimen/textsize_14"/>
+        android:textSize="@dimen/textsize_14" />
 
     <TextView
         android:id="@+id/success_num"
@@ -49,7 +50,7 @@
         android:paddingLeft="@dimen/control_dp16"
         android:paddingRight="@dimen/control_dp16"
         android:textColor="@color/subFont"
-        android:textSize="@dimen/textsize_14"/>
+        android:textSize="@dimen/textsize_14" />
 
     <TextView
         android:id="@+id/fail_num"
@@ -59,19 +60,18 @@
         android:paddingLeft="@dimen/control_dp16"
         android:paddingRight="@dimen/control_dp16"
         android:textColor="@color/subFont"
-        android:textSize="@dimen/textsize_14"/>
+        android:textSize="@dimen/textsize_14" />
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:layout_marginTop="5dp"
-        android:background="@color/light_gray"/>
+        android:background="@color/light_gray" />
 
     <ListView
         android:id="@+id/result_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="none">
-    </ListView>
+        android:scrollbars="none"></ListView>
 
 </LinearLayout>

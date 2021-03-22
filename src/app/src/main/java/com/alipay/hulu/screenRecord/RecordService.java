@@ -15,31 +15,14 @@
  */
 package com.alipay.hulu.screenRecord;
 
-import android.annotation.TargetApi;
-import android.app.Notification;
-import android.app.Service;
-import android.content.Context;
-import android.content.Intent;
-import android.graphics.Rect;
-import android.media.MediaCodecInfo;
-import android.media.projection.MediaProjection;
-import android.media.projection.MediaProjectionManager;
-import android.os.Build;
-import android.os.Handler;
-import android.os.IBinder;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import android.view.Gravity;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewConfiguration;
-import android.view.WindowManager;
-import android.widget.AdapterView;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.SimpleAdapter;
-import android.widget.TextView;
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import com.alipay.hulu.R;
 import com.alipay.hulu.activity.MyApplication;
@@ -58,35 +41,50 @@ import com.alipay.hulu.shared.event.EventService;
 import com.alipay.hulu.shared.event.bean.UniversalEventBean;
 import com.alipay.hulu.shared.event.constant.Constant;
 
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import android.annotation.TargetApi;
+import android.app.Notification;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Rect;
+import android.media.MediaCodecInfo;
+import android.media.projection.MediaProjection;
+import android.media.projection.MediaProjectionManager;
+import android.os.Build;
+import android.os.Handler;
+import android.os.IBinder;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewConfiguration;
+import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
+import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 @TargetApi(value = Build.VERSION_CODES.LOLLIPOP)
 public class RecordService extends BaseService {
     public static final int RECORD_SERVICE_NOTIFICATION_ID = 26543;
 
-    public static final String INTENT_RESULT_CODE =  "INTENT_RESULT_CODE";
-    public static final String INTENT_VIDEO_CODEC =  "INTENT_VIDEO_CODEC";
-    public static final String INTENT_WIDTH =  "INTENT_WIDTH";
-    public static final String INTENT_HEIGHT =  "INTENT_HEIGHT";
-    public static final String INTENT_FRAME_RATE =  "INTENT_FRAME_RATE";
-    public static final String INTENT_VIDEO_BITRATE =  "INTENT_VIDEO_BITRATE";
-    public static final String INTENT_EXCEPT_DIFF =  "INTENT_EXCEPT_DIFF";
+    public static final String INTENT_RESULT_CODE = "INTENT_RESULT_CODE";
+    public static final String INTENT_VIDEO_CODEC = "INTENT_VIDEO_CODEC";
+    public static final String INTENT_WIDTH = "INTENT_WIDTH";
+    public static final String INTENT_HEIGHT = "INTENT_HEIGHT";
+    public static final String INTENT_FRAME_RATE = "INTENT_FRAME_RATE";
+    public static final String INTENT_VIDEO_BITRATE = "INTENT_VIDEO_BITRATE";
+    public static final String INTENT_EXCEPT_DIFF = "INTENT_EXCEPT_DIFF";
 
     public static final String ACTION_INIT = "ACTION_INIT";
 
     private static final String TAG = RecordService.class.getSimpleName();
     private static final String VIDEO_DIR = "ScreenCaptures";
-
+    int state, lastState;
     private WindowManager wm = null;
     private WindowManager.LayoutParams wmParams = null;
-
     private View view;
     private TextView recordBtn;
     private View closeBtn;
@@ -94,12 +92,10 @@ public class RecordService extends BaseService {
     private TextView killCurrent;
     private SimpleAdapter adapter;
     private ImageView resultHide;
-
     private float mTouchStartX;
     private float mTouchStartY;
     private float x;
     private float y;
-    int state, lastState;
     private int statusBarHeight = 0;
 
     private long lastMotionDownTime;
@@ -149,7 +145,7 @@ public class RecordService extends BaseService {
         startForeground(RECORD_SERVICE_NOTIFICATION_ID, notification);
 
 
-        mMediaProjectionManager = (MediaProjectionManager)getSystemService(Context.MEDIA_PROJECTION_SERVICE);
+        mMediaProjectionManager = (MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
         mNotifications = new Notifications(getApplicationContext());
         mHandler = new Handler();
         injectorService = LauncherApplication.getInstance().findServiceByName(InjectorService.class.getName());
@@ -174,10 +170,10 @@ public class RecordService extends BaseService {
         closeBtn = view.findViewById(R.id.close_btn);
         resultList = (ListView) view.findViewById(R.id.record_session_result);
         killCurrent = (TextView) view.findViewById(R.id.record_kill_current);
-        resultHide  = (ImageView) view.findViewById(R.id.record_session_hide);
+        resultHide = (ImageView) view.findViewById(R.id.record_session_hide);
 
         displayDataSource = new ArrayList<>();
-        adapter = new SimpleAdapter(this, displayDataSource, R.layout.item_screen_result, new String[] {"title", "value"}, new int[] {R.id.screen_result_title, R.id.screen_result_value});
+        adapter = new SimpleAdapter(this, displayDataSource, R.layout.item_screen_result, new String[]{"title", "value"}, new int[]{R.id.screen_result_title, R.id.screen_result_value});
         resultList.setAdapter(adapter);
         resultList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -247,7 +243,7 @@ public class RecordService extends BaseService {
         }
 
         wm = (WindowManager) getApplicationContext().getSystemService(WINDOW_SERVICE);
-        wmParams = ((MyApplication)getApplication()).getFloatWinParams();
+        wmParams = ((MyApplication) getApplication()).getFloatWinParams();
         wmParams.type = com.alipay.hulu.common.constant.Constant.TYPE_ALERT;
         wmParams.flags |= 8;
         wmParams.gravity = Gravity.LEFT | Gravity.TOP; // 调整悬浮窗口至左上角
@@ -303,12 +299,12 @@ public class RecordService extends BaseService {
                             float curX = event.getX();
                             float curY = event.getY();
 
-                            if (closeRect.contains((int)curX, (int)curY)
-                                    && closeRect.contains((int)mTouchStartX, (int)mTouchStartY)) {
+                            if (closeRect.contains((int) curX, (int) curY)
+                                    && closeRect.contains((int) mTouchStartX, (int) mTouchStartY)) {
                                 LogUtil.i(TAG, "Click Close Btn");
                                 onCloseBtnClicked();
-                            } else if (recordRect.contains((int)curX, (int)curY)
-                                    && recordRect.contains((int)mTouchStartX, (int)mTouchStartY)) {
+                            } else if (recordRect.contains((int) curX, (int) curY)
+                                    && recordRect.contains((int) mTouchStartX, (int) mTouchStartY)) {
                                 LogUtil.i(TAG, "Click Record Btn");
                                 onRecordBtnClicked();
                             }
@@ -454,6 +450,7 @@ public class RecordService extends BaseService {
 
     /**
      * 增加结果列
+     *
      * @param result
      */
     private void addResultValue(long result) {
@@ -553,6 +550,7 @@ public class RecordService extends BaseService {
                 1, mediaProjection, output.getAbsolutePath());
         r.setCallback(new ScreenRecorder.Callback() {
             long startTime = 0;
+
             @Override
             public void onStop(Throwable error) {
                 mHandler.post(new Runnable() {
@@ -567,7 +565,7 @@ public class RecordService extends BaseService {
                 BackgroundExecutor.execute(new Runnable() {
                     @Override
                     public void run() {
-                        VideoAnalyzer.getInstance().doAnalyze(lastCalculateT1,video.exceptDiff
+                        VideoAnalyzer.getInstance().doAnalyze(lastCalculateT1, video.exceptDiff
                                 , lastVideoPath, new VideoAnalyzer.AnalyzeListener() {
                                     @Override
                                     public void onAnalyzeFinished(final long result) {
@@ -662,7 +660,7 @@ public class RecordService extends BaseService {
         MediaCodecInfo.CodecProfileLevel profileLevel = null;
 
         return new VideoEncodeConfig(width, height, bitrate,
-                framerate, iframe, codec, ScreenRecorder.VIDEO_AVC, profileLevel,exceptDiff);
+                framerate, iframe, codec, ScreenRecorder.VIDEO_AVC, profileLevel, exceptDiff);
     }
 
 

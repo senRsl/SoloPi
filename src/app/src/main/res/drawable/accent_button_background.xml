@@ -14,16 +14,17 @@
   ~ limitations under the License.
 -->
 <inset xmlns:android="http://schemas.android.com/apk/res/android"
+    android:insetBottom="6dp"
     android:insetLeft="4dp"
-    android:insetTop="6dp"
     android:insetRight="4dp"
-    android:insetBottom="6dp">
+    android:insetTop="6dp">
     <shape android:shape="rectangle">
         <corners android:radius="2dp" />
         <solid android:color="@color/colorAccentSecond" />
-        <padding android:left="8dp"
-            android:top="4dp"
+        <padding
+            android:bottom="4dp"
+            android:left="8dp"
             android:right="8dp"
-            android:bottom="4dp" />
+            android:top="4dp" />
     </shape>
 </inset>

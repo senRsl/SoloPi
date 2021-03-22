@@ -15,6 +15,13 @@
  */
 package com.alipay.hulu.common.injector.cache;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import com.alipay.hulu.common.injector.param.InjectParam;
 import com.alipay.hulu.common.injector.param.Subscriber;
 import com.alipay.hulu.common.injector.provider.Param;
@@ -23,13 +30,6 @@ import com.alipay.hulu.common.utils.ClassUtil;
 import com.alipay.hulu.common.utils.LogUtil;
 import com.alipay.hulu.common.utils.StringUtil;
 import com.mdit.library.Const;
-
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by qiaoruikai on 2018/10/12 6:15 PM.
@@ -40,6 +40,7 @@ public class ClassInfoCache {
 
     /**
      * 读取并缓存类信息
+     *
      * @param type
      * @return
      */
@@ -55,6 +56,7 @@ public class ClassInfoCache {
 
     /**
      * 加载类信息
+     *
      * @param clazz
      * @return
      */
@@ -70,7 +72,7 @@ public class ClassInfoCache {
         }
 
         // 查找依赖注入方法
-        for (Method method: allMethods) {
+        for (Method method : allMethods) {
             Subscriber param = method.getAnnotation(Subscriber.class);
             if (param != null) {
                 List<InjectParam> types = loadParamType(param, method);
@@ -79,7 +81,7 @@ public class ClassInfoCache {
                 }
 
                 // 分别添加
-                for (InjectParam type: types) {
+                for (InjectParam type : types) {
                     injectInfoMetas.add(new InjectParamMeta(method, type, param.thread()));
                 }
             }
@@ -104,6 +106,7 @@ public class ClassInfoCache {
 
     /**
      * 设置提供的类型
+     *
      * @param provider
      * @return
      */
@@ -137,7 +140,7 @@ public class ClassInfoCache {
         if (provider.value().length > 0) {
             List<Param> provideList = Arrays.asList(provider.value());
 
-            for (Param provide: provideList) {
+            for (Param provide : provideList) {
                 if (provide.type() != Void.class) {
                     if (realParam != null && !provide.type().isAssignableFrom(realParam)) {
                         LogUtil.e(TAG, "Param参数与方法参数不一致，无法注册Param【%s】, Method【%s】", provide, method);
@@ -180,6 +183,7 @@ public class ClassInfoCache {
 
     /**
      * 加载参数类型
+     *
      * @param subscriber
      * @param method
      * @return
@@ -206,7 +210,7 @@ public class ClassInfoCache {
             } else {
                 return null;
             }
-        } else{
+        } else {
             realParam = defineParams[0];
             if (realParam.isPrimitive()) {
                 realParam = Const.getPackedType(realParam);
@@ -214,7 +218,7 @@ public class ClassInfoCache {
         }
 
         List<InjectParam> paramTypes = new ArrayList<>();
-        for (Param param: params) {
+        for (Param param : params) {
             // 如果是自定义参数
             if (param.type() != Void.class) {
                 if (realParam != null && !realParam.isAssignableFrom(param.type())) {

@@ -15,11 +15,6 @@
  */
 package com.alipay.hulu.common.tools;
 
-import com.alipay.hulu.common.utils.LogUtil;
-import com.cgutman.adblib.AdbStream;
-import com.cgutman.adblib.ByteQueueInputStream;
-import com.codebutler.android_websockets.WrapSocket;
-
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,6 +27,11 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
+
+import com.alipay.hulu.common.utils.LogUtil;
+import com.cgutman.adblib.AdbStream;
+import com.cgutman.adblib.ByteQueueInputStream;
+import com.codebutler.android_websockets.WrapSocket;
 
 /**
  * 命令行操作包装
@@ -263,6 +263,7 @@ public class CmdLine implements AbstCmdLine, WrapSocket {
 
     /**
      * 获取命令行读取器
+     *
      * @return
      */
     public CmdLineReader getReader() {
@@ -277,6 +278,7 @@ public class CmdLine implements AbstCmdLine, WrapSocket {
         private CmdLine cmdLine;
         private Queue<String> outputQueue;
         private int curPos;
+
         private CmdLineReader(CmdLine cmdLine) {
             this.cmdLine = cmdLine;
             outputQueue = new LinkedList<>();

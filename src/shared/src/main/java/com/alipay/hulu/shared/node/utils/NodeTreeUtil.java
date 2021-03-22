@@ -15,7 +15,7 @@
  */
 package com.alipay.hulu.shared.node.utils;
 
-import android.widget.Toast;
+import java.util.List;
 
 import com.alipay.hulu.common.application.LauncherApplication;
 import com.alipay.hulu.common.utils.LogUtil;
@@ -25,8 +25,6 @@ import com.alipay.hulu.shared.node.action.Constant;
 import com.alipay.hulu.shared.node.action.OperationExecutor;
 import com.alipay.hulu.shared.node.action.OperationMethod;
 import com.alipay.hulu.shared.node.tree.AbstractNodeTree;
-
-import java.util.List;
 
 public class NodeTreeUtil {
     private static final String TAG = "NodeTreeUtil";
@@ -83,6 +81,7 @@ public class NodeTreeUtil {
 
     /**
      * 断言操作
+     *
      * @param node
      * @param method
      */
@@ -99,7 +98,6 @@ public class NodeTreeUtil {
     }
 
     /**
-     *
      * @param matchTxt
      * @param method
      * @return

@@ -15,12 +15,7 @@
  */
 package com.alipay.hulu.shared.node.tree.capture;
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Matrix;
-import android.util.DisplayMetrics;
-import android.view.WindowManager;
+import java.io.File;
 
 import com.alipay.hulu.common.application.LauncherApplication;
 import com.alipay.hulu.common.service.SPService;
@@ -34,7 +29,12 @@ import com.alipay.hulu.shared.node.tree.annotation.NodeProvider;
 import com.alipay.hulu.shared.node.utils.BitmapUtil;
 import com.alipay.hulu.shared.node.utils.NodeContext;
 
-import java.io.File;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.util.DisplayMetrics;
+import android.view.WindowManager;
 
 /**
  * Created by qiaoruikai on 2019-04-25 16:13.

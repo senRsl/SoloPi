@@ -15,6 +15,25 @@
  */
 package com.alipay.hulu.ui;
 
+import java.io.IOException;
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import com.alipay.hulu.ui.scan.Orientation;
+import com.alipay.hulu.ui.scan.QRToViewPointTransformer;
+import com.alipay.hulu.ui.scan.camera.CameraManager;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.BinaryBitmap;
+import com.google.zxing.DecodeHintType;
+import com.google.zxing.MultiFormatReader;
+import com.google.zxing.NotFoundException;
+import com.google.zxing.PlanarYUVLuminanceSource;
+import com.google.zxing.Result;
+import com.google.zxing.ResultPoint;
+import com.google.zxing.common.HybridBinarizer;
+
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Point;
@@ -31,25 +50,6 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.WindowManager;
 
-import com.alipay.hulu.ui.scan.Orientation;
-import com.alipay.hulu.ui.scan.QRToViewPointTransformer;
-import com.alipay.hulu.ui.scan.camera.CameraManager;
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.BinaryBitmap;
-import com.google.zxing.DecodeHintType;
-import com.google.zxing.MultiFormatReader;
-import com.google.zxing.NotFoundException;
-import com.google.zxing.PlanarYUVLuminanceSource;
-import com.google.zxing.Result;
-import com.google.zxing.ResultPoint;
-import com.google.zxing.common.HybridBinarizer;
-
-import java.io.IOException;
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import static android.hardware.Camera.getCameraInfo;
 
 /**
@@ -61,15 +61,8 @@ import static android.hardware.Camera.getCameraInfo;
 public class AnyCodeReaderView extends SurfaceView
         implements SurfaceHolder.Callback, Camera.PreviewCallback {
 
-    public interface OnCodeReadListener {
-
-        void onCodeRead(BarcodeFormat format, String text, PointF[] points);
-    }
-
-    private OnCodeReadListener mOnCodeReadListener;
-
     private static final String TAG = AnyCodeReaderView.class.getName();
-
+    private OnCodeReadListener mOnCodeReadListener;
     private MultiFormatReader mCodeReader;
     private int mPreviewWidth;
     private int mPreviewHeight;
@@ -77,6 +70,7 @@ public class AnyCodeReaderView extends SurfaceView
     private boolean mQrDecodingEnabled = true;
     private DecodeFrameTask decodeFrameTask;
     private Map<DecodeHintType, Object> decodeHints;
+    private float oldDist = 1f;
 
     public AnyCodeReaderView(Context context) {
         this(context, null);
@@ -97,6 +91,75 @@ public class AnyCodeReaderView extends SurfaceView
         } else {
             throw new RuntimeException("Error: Camera not found");
         }
+    }
+
+    private static void handleFocusMetering(MotionEvent event, Camera camera) {
+        Log.e("Camera", "进入handleFocusMetering");
+        Camera.Parameters params = camera.getParameters();
+
+        Camera.Size previewSize = params.getPreviewSize();
+        Rect focusRect = calculateTapArea(event.getX(), event.getY(), 1f, previewSize);
+        Rect meteringRect = calculateTapArea(event.getX(), event.getY(), 1.5f, previewSize);
+
+        camera.cancelAutoFocus();
+
+        if (params.getMaxNumFocusAreas() > 0) {
+            List<Camera.Area> focusAreas = new ArrayList<>();
+            focusAreas.add(new Camera.Area(focusRect, 800));
+            params.setFocusAreas(focusAreas);
+        } else {
+            Log.i(TAG, "focus areas not supported");
+        }
+        if (params.getMaxNumMeteringAreas() > 0) {
+            List<Camera.Area> meteringAreas = new ArrayList<>();
+            meteringAreas.add(new Camera.Area(meteringRect, 800));
+            params.setMeteringAreas(meteringAreas);
+        } else {
+            Log.i(TAG, "metering areas not supported");
+        }
+        final String currentFocusMode = params.getFocusMode();
+        params.setFocusMode(Camera.Parameters.FOCUS_MODE_MACRO);
+        camera.setParameters(params);
+
+        camera.autoFocus(new Camera.AutoFocusCallback() {
+            @Override
+            public void onAutoFocus(boolean success, Camera camera) {
+                Camera.Parameters params = camera.getParameters();
+                params.setFocusMode(currentFocusMode);
+                camera.setParameters(params);
+            }
+        });
+    }
+
+    private static float getFingerSpacing(MotionEvent event) {
+        float x = event.getX(0) - event.getX(1);
+        float y = event.getY(0) - event.getY(1);
+        Log.e("Camera", "getFingerSpacing ，计算距离 = " + (float) Math.sqrt(x * x + y * y));
+        return (float) Math.sqrt(x * x + y * y);
+    }
+
+    private static Rect calculateTapArea(float x, float y, float coefficient, Camera.Size previewSize) {
+        float focusAreaSize = 300;
+        int areaSize = Float.valueOf(focusAreaSize * coefficient).intValue();
+        int centerX = (int) (x / previewSize.width - 1000);
+        int centerY = (int) (y / previewSize.height - 1000);
+
+        int left = clamp(centerX - areaSize / 2, -1000, 1000);
+        int top = clamp(centerY - areaSize / 2, -1000, 1000);
+
+        RectF rectF = new RectF(left, top, left + areaSize, top + areaSize);
+
+        return new Rect(Math.round(rectF.left), Math.round(rectF.top), Math.round(rectF.right), Math.round(rectF.bottom));
+    }
+
+    private static int clamp(int x, int min, int max) {
+        if (x > max) {
+            return max;
+        }
+        if (x < min) {
+            return min;
+        }
+        return x;
     }
 
     /**
@@ -198,8 +261,6 @@ public class AnyCodeReaderView extends SurfaceView
         setPreviewCameraId(Camera.CameraInfo.CAMERA_FACING_FRONT);
     }
 
-    private float oldDist = 1f;
-
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         Camera camera = mCameraManager.getOpenCamera().getCamera();
@@ -213,10 +274,10 @@ public class AnyCodeReaderView extends SurfaceView
                 case MotionEvent.ACTION_MOVE:
                     float newDist = getFingerSpacing(event);
                     if (newDist > oldDist) {
-                        Log.e("Camera","进入放大手势");
+                        Log.e("Camera", "进入放大手势");
                         handleZoom(true, camera);
                     } else if (newDist < oldDist) {
-                        Log.e("Camera","进入缩小手势");
+                        Log.e("Camera", "进入缩小手势");
                         handleZoom(false, camera);
                     }
                     oldDist = newDist;
@@ -227,16 +288,16 @@ public class AnyCodeReaderView extends SurfaceView
     }
 
     private void handleZoom(boolean isZoomIn, Camera camera) {
-        Log.e("Camera","进入缩小放大方法");
+        Log.e("Camera", "进入缩小放大方法");
         Camera.Parameters params = camera.getParameters();
         if (params.isZoomSupported()) {
             int maxZoom = params.getMaxZoom();
             int zoom = params.getZoom();
             if (isZoomIn && zoom < maxZoom) {
-                Log.e("Camera","进入放大方法zoom="+zoom);
+                Log.e("Camera", "进入放大方法zoom=" + zoom);
                 zoom++;
             } else if (zoom > 0) {
-                Log.e("Camera","进入缩小方法zoom="+zoom);
+                Log.e("Camera", "进入缩小方法zoom=" + zoom);
                 zoom--;
             }
             params.setZoom(zoom);
@@ -246,76 +307,8 @@ public class AnyCodeReaderView extends SurfaceView
         }
     }
 
-    private static void handleFocusMetering(MotionEvent event, Camera camera) {
-        Log.e("Camera","进入handleFocusMetering");
-        Camera.Parameters params = camera.getParameters();
-
-        Camera.Size previewSize = params.getPreviewSize();
-        Rect focusRect = calculateTapArea(event.getX(), event.getY(), 1f, previewSize);
-        Rect meteringRect = calculateTapArea(event.getX(), event.getY(), 1.5f, previewSize);
-
-        camera.cancelAutoFocus();
-
-        if (params.getMaxNumFocusAreas() > 0) {
-            List<Camera.Area> focusAreas = new ArrayList<>();
-            focusAreas.add(new Camera.Area(focusRect, 800));
-            params.setFocusAreas(focusAreas);
-        } else {
-            Log.i(TAG, "focus areas not supported");
-        }
-        if (params.getMaxNumMeteringAreas() > 0) {
-            List<Camera.Area> meteringAreas = new ArrayList<>();
-            meteringAreas.add(new Camera.Area(meteringRect, 800));
-            params.setMeteringAreas(meteringAreas);
-        } else {
-            Log.i(TAG, "metering areas not supported");
-        }
-        final String currentFocusMode = params.getFocusMode();
-        params.setFocusMode(Camera.Parameters.FOCUS_MODE_MACRO);
-        camera.setParameters(params);
-
-        camera.autoFocus(new Camera.AutoFocusCallback() {
-            @Override
-            public void onAutoFocus(boolean success, Camera camera) {
-                Camera.Parameters params = camera.getParameters();
-                params.setFocusMode(currentFocusMode);
-                camera.setParameters(params);
-            }
-        });
-    }
-
-    private static float getFingerSpacing(MotionEvent event) {
-        float x = event.getX(0) - event.getX(1);
-        float y = event.getY(0) - event.getY(1);
-        Log.e("Camera","getFingerSpacing ，计算距离 = " + (float) Math.sqrt(x * x + y * y));
-        return (float) Math.sqrt(x * x + y * y);
-    }
-
-    private static Rect calculateTapArea(float x, float y, float coefficient, Camera.Size previewSize) {
-        float focusAreaSize = 300;
-        int areaSize = Float.valueOf(focusAreaSize * coefficient).intValue();
-        int centerX = (int) (x / previewSize.width - 1000);
-        int centerY = (int) (y / previewSize.height - 1000);
-
-        int left = clamp(centerX - areaSize / 2, -1000, 1000);
-        int top = clamp(centerY - areaSize / 2, -1000, 1000);
-
-        RectF rectF = new RectF(left, top, left + areaSize, top + areaSize);
-
-        return new Rect(Math.round(rectF.left), Math.round(rectF.top), Math.round(rectF.right), Math.round(rectF.bottom));
-    }
-
-    private static int clamp(int x, int min, int max) {
-        if (x > max) {
-            return max;
-        }
-        if (x < min) {
-            return min;
-        }
-        return x;
-    }
-
-    @Override public void onDetachedFromWindow() {
+    @Override
+    public void onDetachedFromWindow() {
         super.onDetachedFromWindow();
 
         if (decodeFrameTask != null) {
@@ -328,7 +321,8 @@ public class AnyCodeReaderView extends SurfaceView
      * SurfaceHolder.Callback,Camera.PreviewCallback
      ****************************************************/
 
-    @Override public void surfaceCreated(SurfaceHolder holder) {
+    @Override
+    public void surfaceCreated(SurfaceHolder holder) {
         Log.d(TAG, "surfaceCreated");
 
         try {
@@ -348,7 +342,8 @@ public class AnyCodeReaderView extends SurfaceView
         }
     }
 
-    @Override public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+    @Override
+    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
         Log.d(TAG, "surfaceChanged");
 
         if (holder.getSurface() == null) {
@@ -373,7 +368,8 @@ public class AnyCodeReaderView extends SurfaceView
         mCameraManager.startPreview();
     }
 
-    @Override public void surfaceDestroyed(SurfaceHolder holder) {
+    @Override
+    public void surfaceDestroyed(SurfaceHolder holder) {
         Log.d(TAG, "surfaceDestroyed");
 
         mCameraManager.setPreviewCallback(null);
@@ -382,7 +378,8 @@ public class AnyCodeReaderView extends SurfaceView
     }
 
     // Called when camera take a frame
-    @Override public void onPreviewFrame(byte[] data, Camera camera) {
+    @Override
+    public void onPreviewFrame(byte[] data, Camera camera) {
         if (!mQrDecodingEnabled || decodeFrameTask != null
                 && (decodeFrameTask.getStatus() == AsyncTask.Status.RUNNING
                 || decodeFrameTask.getStatus() == AsyncTask.Status.PENDING)) {
@@ -393,7 +390,9 @@ public class AnyCodeReaderView extends SurfaceView
         decodeFrameTask.execute(data);
     }
 
-    /** Check if this device has a camera */
+    /**
+     * Check if this device has a camera
+     */
     private boolean checkCameraHardware() {
         if (getContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA)) {
             // this device has a camera
@@ -411,7 +410,8 @@ public class AnyCodeReaderView extends SurfaceView
     /**
      * Fix for the camera Sensor on some devices (ex.: Nexus 5x)
      */
-    @SuppressWarnings("deprecation") private int getCameraDisplayOrientation() {
+    @SuppressWarnings("deprecation")
+    private int getCameraDisplayOrientation() {
         if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.GINGERBREAD) {
             return 90;
         }
@@ -449,6 +449,11 @@ public class AnyCodeReaderView extends SurfaceView
         return result;
     }
 
+    public interface OnCodeReadListener {
+
+        void onCodeRead(BarcodeFormat format, String text, PointF[] points);
+    }
+
     private static class DecodeFrameTask extends AsyncTask<byte[], Void, Result> {
 
         private final WeakReference<AnyCodeReaderView> viewRef;
@@ -461,7 +466,8 @@ public class AnyCodeReaderView extends SurfaceView
             hintsRef = new WeakReference<>(hints);
         }
 
-        @Override protected Result doInBackground(byte[]... params) {
+        @Override
+        protected Result doInBackground(byte[]... params) {
             final AnyCodeReaderView view = viewRef.get();
             if (view == null) {
                 return null;
@@ -485,7 +491,8 @@ public class AnyCodeReaderView extends SurfaceView
             return null;
         }
 
-        @Override protected void onPostExecute(Result result) {
+        @Override
+        protected void onPostExecute(Result result) {
             super.onPostExecute(result);
 
             final AnyCodeReaderView view = viewRef.get();
@@ -501,7 +508,7 @@ public class AnyCodeReaderView extends SurfaceView
 
         /**
          * Transform result to surfaceView coordinates
-         *
+         * <p>
          * This method is needed because coordinates are given in landscape camera coordinates when
          * device is in portrait mode and different coordinates otherwise.
          *

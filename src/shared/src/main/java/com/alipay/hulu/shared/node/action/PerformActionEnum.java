@@ -16,17 +16,36 @@
 package com.alipay.hulu.shared.node.action;
 
 
-import androidx.annotation.IntDef;
-
-import com.alipay.hulu.common.utils.StringUtil;
-import com.alipay.hulu.shared.R;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import static com.alipay.hulu.shared.node.action.PerformActionMethodMaps.*;
+
+import com.alipay.hulu.common.utils.StringUtil;
+import com.alipay.hulu.shared.R;
+
+import androidx.annotation.IntDef;
+
+import static com.alipay.hulu.shared.node.action.PerformActionMethodMaps.ASSERT_PARAMS;
+import static com.alipay.hulu.shared.node.action.PerformActionMethodMaps.CHANGE_MODE_PARAMS;
+import static com.alipay.hulu.shared.node.action.PerformActionMethodMaps.CHECK_PARAMS;
+import static com.alipay.hulu.shared.node.action.PerformActionMethodMaps.GESTURE_PARAMS;
+import static com.alipay.hulu.shared.node.action.PerformActionMethodMaps.INPUT_PARAMS;
+import static com.alipay.hulu.shared.node.action.PerformActionMethodMaps.JUMP_PAGE_PARAMS;
+import static com.alipay.hulu.shared.node.action.PerformActionMethodMaps.LET_PARAMS;
+import static com.alipay.hulu.shared.node.action.PerformActionMethodMaps.LOAD_PARAM_PARAMS;
+import static com.alipay.hulu.shared.node.action.PerformActionMethodMaps.LOGIC_PARAMS;
+import static com.alipay.hulu.shared.node.action.PerformActionMethodMaps.LONG_CLICK_PARAMS;
+import static com.alipay.hulu.shared.node.action.PerformActionMethodMaps.MULTICLICK_PARAMS;
+import static com.alipay.hulu.shared.node.action.PerformActionMethodMaps.OTHER_PARAMS;
+import static com.alipay.hulu.shared.node.action.PerformActionMethodMaps.QR_CODE_PARAMS;
+import static com.alipay.hulu.shared.node.action.PerformActionMethodMaps.SCREENSHOT_PARAMS;
+import static com.alipay.hulu.shared.node.action.PerformActionMethodMaps.SCROLL_PARAMS;
+import static com.alipay.hulu.shared.node.action.PerformActionMethodMaps.SEARCH_PARAMS;
+import static com.alipay.hulu.shared.node.action.PerformActionMethodMaps.SHELL_PARAMS;
+import static com.alipay.hulu.shared.node.action.PerformActionMethodMaps.SLEEP_PARAMS;
+import static com.alipay.hulu.shared.node.action.PerformActionMethodMaps.SLEEP_UNTIL_PARAMS;
 
 /**
  * AccessibilityNodeInfo 操作Enum
@@ -161,7 +180,6 @@ public enum PerformActionEnum {
     public static final int CATEGORY_CASE_OPERATION = -3;
 
 
-
     /**
      * 基础操作
      */
@@ -219,27 +237,6 @@ public enum PerformActionEnum {
         this.icon = icon;
         this.actionParams = methods;
     }
-
-    @IntDef({
-            CATEGORY_INVALID_OPERATION,
-            CATEGORY_NODE_OPERATION,
-            CATEGORY_APP_OPERATION,
-            CATEGORY_DEVICE_OPERATION,
-            CATEGORY_CONTROL_OPERATION,
-            CATEGORY_INTERNAL_NODE_OPERATION,
-            CATEGORY_INTERNAL_OPERATION,
-            CATEGORY_CASE_OPERATION
-    })
-    @Retention(RetentionPolicy.SOURCE)
-    private  @interface CATEGORY {}
-
-    @IntDef({
-            ACTION_TYPE_BASE,
-            ACTION_TYPE_REPLAY,
-            ACTION_TYPE_REMOTE,
-    })
-    @Retention(RetentionPolicy.SOURCE)
-    private  @interface ACTION_TYPE {}
 
     /**
      * 根据状态码返回操作Enum
@@ -360,5 +357,28 @@ public enum PerformActionEnum {
 
     public Map<String, Integer> getActionParams() {
         return actionParams;
+    }
+
+    @IntDef({
+            CATEGORY_INVALID_OPERATION,
+            CATEGORY_NODE_OPERATION,
+            CATEGORY_APP_OPERATION,
+            CATEGORY_DEVICE_OPERATION,
+            CATEGORY_CONTROL_OPERATION,
+            CATEGORY_INTERNAL_NODE_OPERATION,
+            CATEGORY_INTERNAL_OPERATION,
+            CATEGORY_CASE_OPERATION
+    })
+    @Retention(RetentionPolicy.SOURCE)
+    private @interface CATEGORY {
+    }
+
+    @IntDef({
+            ACTION_TYPE_BASE,
+            ACTION_TYPE_REPLAY,
+            ACTION_TYPE_REMOTE,
+    })
+    @Retention(RetentionPolicy.SOURCE)
+    private @interface ACTION_TYPE {
     }
 }

@@ -15,15 +15,8 @@
  */
 package com.alipay.hulu.common.utils;
 
-import android.content.Context;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.Priority;
@@ -38,8 +31,15 @@ import com.bumptech.glide.load.model.MultiModelLoaderFactory;
 import com.bumptech.glide.module.AppGlideModule;
 import com.bumptech.glide.signature.ObjectKey;
 
-import java.io.ByteArrayOutputStream;
-import java.nio.ByteBuffer;
+import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  * Created by qiaoruikai on 2018/12/25 11:07 PM.
@@ -49,17 +49,17 @@ public class AppIconGlideModule extends AppGlideModule {
     @Override
     public void registerComponents(@NonNull Context context, @NonNull Glide glide, @NonNull Registry registry) {
         super.registerComponents(context, glide, registry);
-        registry.prepend(String.class, ByteBuffer.class,new ApkModelLoaderFactory(context));
+        registry.prepend(String.class, ByteBuffer.class, new ApkModelLoaderFactory(context));
     }
 
     /**
      * Apk图标加载器
      */
     private static class ApkIconFetcher implements DataFetcher<ByteBuffer> {
-        private String pkgName;
         private final PackageManager packageManager;
+        private String pkgName;
 
-        public ApkIconFetcher(Context context, String pkgName){
+        public ApkIconFetcher(Context context, String pkgName) {
             this.pkgName = pkgName;
             packageManager = context.getPackageManager();
         }
@@ -97,6 +97,7 @@ public class AppIconGlideModule extends AppGlideModule {
 
         /**
          * 使用ByteBuffer处理
+         *
          * @param bm
          * @return
          */
@@ -105,6 +106,7 @@ public class AppIconGlideModule extends AppGlideModule {
             bm.compress(Bitmap.CompressFormat.PNG, 100, baos);
             return ByteBuffer.wrap(baos.toByteArray());
         }
+
         @Override
         public void cleanup() {
 
@@ -131,9 +133,10 @@ public class AppIconGlideModule extends AppGlideModule {
     /**
      * 图标加载器
      */
-    public class ApkIconModelLoader implements ModelLoader<String,ByteBuffer> {
+    public class ApkIconModelLoader implements ModelLoader<String, ByteBuffer> {
         private Context context;
-        public ApkIconModelLoader(Context context){
+
+        public ApkIconModelLoader(Context context) {
             this.context = context;
 
         }
@@ -141,7 +144,7 @@ public class AppIconGlideModule extends AppGlideModule {
         @Nullable
         @Override
         public LoadData<ByteBuffer> buildLoadData(@NonNull String origin, int width, int height, @NonNull Options options) {
-            return new LoadData<>(new ObjectKey(origin),new ApkIconFetcher(context, origin.substring(8)));
+            return new LoadData<>(new ObjectKey(origin), new ApkIconFetcher(context, origin.substring(8)));
         }
 
         @Override

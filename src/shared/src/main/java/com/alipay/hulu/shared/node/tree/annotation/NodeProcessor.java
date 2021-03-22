@@ -28,12 +28,14 @@ import java.lang.annotation.Target;
 public @interface NodeProcessor {
     /**
      * 调用顺序，越大越先调用
+     *
      * @return
      */
     int level() default 1;
 
     /**
      * 可处理的元数据类型
+     *
      * @return
      */
     Class[] acceptNodes();

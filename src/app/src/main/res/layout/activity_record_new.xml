@@ -13,11 +13,11 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
 -->
-<androidx.drawerlayout.widget.DrawerLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
     <FrameLayout
         android:id="@+id/content_frame"
         android:layout_width="match_parent"
@@ -27,11 +27,12 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:background="@null">
+            android:background="@null"
+            android:orientation="vertical">
 
-            <include layout="@layout/head_panel_layout"
-                     android:id="@+id/head_layout"/>
+            <include
+                android:id="@+id/head_layout"
+                layout="@layout/head_panel_layout" />
 
 
             <ScrollView
@@ -42,11 +43,11 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:gravity="center_horizontal"
-                    android:focusableInTouchMode="true"
+                    android:descendantFocusability="beforeDescendants"
                     android:focusable="true"
-                    android:descendantFocusability="beforeDescendants">
+                    android:focusableInTouchMode="true"
+                    android:gravity="center_horizontal"
+                    android:orientation="vertical">
 
                     <RelativeLayout
                         android:layout_width="match_parent"
@@ -62,94 +63,97 @@
                             android:layout_centerVertical="true"
                             android:text="@string/record__test_app"
                             android:textColor="@color/mainFont"
-                            android:textSize="@dimen/textsize_16"/>
+                            android:textSize="@dimen/textsize_16" />
 
                         <LinearLayout
                             android:id="@+id/switch_app"
                             android:layout_width="wrap_content"
                             android:layout_height="@dimen/control_dp24"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical"
                             android:layout_alignParentRight="true"
                             android:layout_centerVertical="true"
-                            android:background="@drawable/bg_round_corner">
+                            android:background="@drawable/bg_round_corner"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
                             <ImageView
                                 android:layout_width="@dimen/control_dp12"
                                 android:layout_height="@dimen/control_dp12"
                                 android:layout_marginLeft="@dimen/control_dp6"
                                 android:layout_marginRight="@dimen/control_dp6"
                                 android:scaleType="centerInside"
-                                android:src="@drawable/swap"/>
+                                android:src="@drawable/swap" />
+
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="@string/record__switch_app"
-                                android:textSize="@dimen/textsize_12"
                                 android:layout_marginRight="@dimen/control_dp6"
-                                android:textColor="@color/mainBlue"/>
+                                android:text="@string/record__switch_app"
+                                android:textColor="@color/mainBlue"
+                                android:textSize="@dimen/textsize_12" />
                         </LinearLayout>
                     </RelativeLayout>
 
                     <ImageView
                         android:id="@+id/test_app_icon"
-                        android:layout_marginTop="@dimen/control_dp12"
                         android:layout_width="@dimen/control_dp64"
-                        android:layout_height="@dimen/control_dp64"/>
+                        android:layout_height="@dimen/control_dp64"
+                        android:layout_marginTop="@dimen/control_dp12" />
+
                     <TextView
                         android:id="@+id/test_app_label"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/control_dp8"
                         android:textColor="@color/mainFont"
-                        android:textSize="@dimen/textsize_20"/>
+                        android:textSize="@dimen/textsize_20" />
+
                     <TextView
                         android:id="@+id/test_app_pkg_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/control_dp4"
                         android:textColor="@color/subFont"
-                        android:textSize="@dimen/textsize_12"/>
+                        android:textSize="@dimen/textsize_12" />
 
                     <EditText
                         android:id="@+id/case_name"
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/control_dp40"
-                        android:padding="@dimen/control_dp6"
-                        android:textSize="@dimen/textsize_16"
-                        android:background="@drawable/bg_custom_input"
-                        android:textColorHint="#aaaaaa"
-                        android:hint="@string/record__input_case_name"
                         android:layout_marginLeft="@dimen/control_dp16"
                         android:layout_marginRight="@dimen/control_dp16"
                         android:layout_marginTop="@dimen/control_dp20"
-                        android:textCursorDrawable="@null"/>
+                        android:background="@drawable/bg_custom_input"
+                        android:hint="@string/record__input_case_name"
+                        android:padding="@dimen/control_dp6"
+                        android:textColorHint="#aaaaaa"
+                        android:textCursorDrawable="@null"
+                        android:textSize="@dimen/textsize_16" />
 
                     <EditText
                         android:id="@+id/case_desc"
                         android:layout_width="match_parent"
                         android:layout_height="@dimen/control_dp40"
-                        android:padding="@dimen/control_dp6"
-                        android:textSize="@dimen/textsize_16"
-                        android:background="@drawable/bg_custom_input"
-                        android:textColorHint="#aaaaaa"
-                        android:hint="@string/record__input_case_desc"
                         android:layout_marginLeft="@dimen/control_dp16"
                         android:layout_marginRight="@dimen/control_dp16"
                         android:layout_marginTop="@dimen/control_dp20"
-                        android:textCursorDrawable="@null"/>
-
+                        android:background="@drawable/bg_custom_input"
+                        android:hint="@string/record__input_case_desc"
+                        android:padding="@dimen/control_dp6"
+                        android:textColorHint="#aaaaaa"
+                        android:textCursorDrawable="@null"
+                        android:textSize="@dimen/textsize_16" />
 
 
                     <Button
                         android:id="@+id/start_record"
                         android:layout_width="@dimen/start_record_btn_width"
                         android:layout_height="@dimen/dp_48"
+                        android:layout_marginBottom="@dimen/control_dp20"
                         android:layout_marginTop="@dimen/control_dp30"
-                        android:textSize="@dimen/textsize_16"
+                        android:background="@drawable/bg_solid_round_btn"
                         android:text="@string/constant__start_execution"
                         android:textColor="@color/white"
-                        android:background="@drawable/bg_solid_round_btn"
-                        android:layout_marginBottom="@dimen/control_dp20"/>
+                        android:textSize="@dimen/textsize_16" />
 
                     <LinearLayout
                         android:id="@+id/recent_case_wrapper"
@@ -160,7 +164,7 @@
                         <View
                             android:layout_width="match_parent"
                             android:layout_height="@dimen/control_dp12"
-                            android:background="@color/default_background_color"/>
+                            android:background="@color/default_background_color" />
 
                         <RelativeLayout
                             android:layout_width="match_parent"
@@ -171,30 +175,30 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textSize="@dimen/textsize_16"
-                                android:textColor="@color/mainFont"
-                                android:text="@string/record__recent_record"
                                 android:layout_alignParentLeft="true"
-                                android:layout_centerVertical="true"/>
+                                android:layout_centerVertical="true"
+                                android:text="@string/record__recent_record"
+                                android:textColor="@color/mainFont"
+                                android:textSize="@dimen/textsize_16" />
 
                             <TextView
                                 android:id="@+id/check_all_cases"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textSize="@dimen/textsize_14"
-                                android:textColor="@color/colorPrimary"
-                                android:text="@string/record__all_cases"
                                 android:layout_alignParentRight="true"
-                                android:layout_centerVertical="true"/>
+                                android:layout_centerVertical="true"
+                                android:text="@string/record__all_cases"
+                                android:textColor="@color/colorPrimary"
+                                android:textSize="@dimen/textsize_14" />
 
                         </RelativeLayout>
 
                         <View
                             android:layout_width="match_parent"
                             android:layout_height="@dimen/control_dp2"
-                            android:layout_marginRight="@dimen/control_dp16"
                             android:layout_marginLeft="@dimen/control_dp16"
-                            android:background="#f6f6f6"/>
+                            android:layout_marginRight="@dimen/control_dp16"
+                            android:background="#f6f6f6" />
 
                         <FrameLayout
                             android:layout_width="match_parent"
@@ -204,17 +208,17 @@
                                 android:id="@+id/recent_case_list"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:divider="@null"/>
+                                android:divider="@null" />
 
                             <TextView
                                 android:id="@+id/empty_hint"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:textSize="@dimen/textsize_12"
                                 android:layout_gravity="center_horizontal"
-                                android:layout_marginTop="@dimen/control_dp12"
                                 android:layout_marginBottom="@dimen/control_dp12"
-                                android:text="@string/record__no_local_case"/>
+                                android:layout_marginTop="@dimen/control_dp12"
+                                android:text="@string/record__no_local_case"
+                                android:textSize="@dimen/textsize_12" />
 
                         </FrameLayout>
 
@@ -231,28 +235,27 @@
         android:layout_width="@dimen/app_list_drawer_width"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:orientation="vertical"
-        android:background="@color/white">
+        android:background="@color/white"
+        android:orientation="vertical">
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/control_dp24"
             android:layout_marginLeft="@dimen/control_dp24"
+            android:layout_marginTop="@dimen/control_dp24"
             android:text="@string/record__switch_app"
-            android:textSize="@dimen/textsize_20"
-            android:textColor="@color/mainFont"/>
+            android:textColor="@color/mainFont"
+            android:textSize="@dimen/textsize_20" />
 
         <ListView
             android:id="@+id/app_list"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_marginTop="@dimen/control_dp16"
-            android:scrollbars="none"
-            android:overScrollMode="never"
             android:divider="@android:color/transparent"
-            android:dividerHeight="0dp">
-        </ListView>
+            android:dividerHeight="0dp"
+            android:overScrollMode="never"
+            android:scrollbars="none"></ListView>
 
     </LinearLayout>
 

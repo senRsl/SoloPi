@@ -15,14 +15,13 @@
  */
 package com.alipay.hulu.service;
 
+import com.alipay.hulu.activity.MyApplication;
+import com.alipay.hulu.common.utils.LogUtil;
+import com.alipay.hulu.common.utils.StringUtil;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-
-import com.alipay.hulu.activity.MyApplication;
-import com.alipay.hulu.common.service.SPService;
-import com.alipay.hulu.common.utils.LogUtil;
-import com.alipay.hulu.common.utils.StringUtil;
 
 /**
  * 安装事件接受服务
@@ -30,13 +29,14 @@ import com.alipay.hulu.common.utils.StringUtil;
  */
 public class InstallReceiver extends BroadcastReceiver {
     private static final String TAG = "InstallReceiver";
+
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent == null) {
             return;
         }
 
-        if ("android.intent.action.PACKAGE_ADDED".equals(intent.getAction())) {		// install
+        if ("android.intent.action.PACKAGE_ADDED".equals(intent.getAction())) {        // install
             String packageName = intent.getDataString();
 
             LogUtil.i(TAG, "安装了 :" + StringUtil.hide(packageName));
@@ -45,7 +45,7 @@ public class InstallReceiver extends BroadcastReceiver {
             MyApplication.getInstance().notifyAppChangeEvent();
         }
 
-        if ("android.intent.action.PACKAGE_REMOVED".equals(intent.getAction())) {	// uninstall
+        if ("android.intent.action.PACKAGE_REMOVED".equals(intent.getAction())) {    // uninstall
             String packageName = intent.getDataString();
 
             LogUtil.i(TAG, "卸载了 :" + StringUtil.hide(packageName));

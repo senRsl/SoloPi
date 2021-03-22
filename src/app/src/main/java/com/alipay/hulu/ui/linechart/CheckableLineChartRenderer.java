@@ -19,7 +19,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-
 import lecho.lib.hellocharts.model.Line;
 import lecho.lib.hellocharts.model.PointValue;
 import lecho.lib.hellocharts.model.SelectedValue;
@@ -57,7 +56,7 @@ public class CheckableLineChartRenderer extends LineChartRenderer {
     }
 
     private void drawChecked(Canvas canvas) {
-        if (checkedValue == null){
+        if (checkedValue == null) {
             return;
         }
         int lineIndex = checkedValue.getFirstIndex();

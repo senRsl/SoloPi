@@ -1,0 +1,3 @@
+/Users/senrsl/temp/SoloPi/src/shared/.cxx/cmake/debug/armeabi-v7a/CMakeFiles/rebuild_cache.dir
+/Users/senrsl/temp/SoloPi/src/shared/.cxx/cmake/debug/armeabi-v7a/CMakeFiles/edit_cache.dir
+/Users/senrsl/temp/SoloPi/src/shared/.cxx/cmake/debug/armeabi-v7a/CMakeFiles/nativeModule.dir

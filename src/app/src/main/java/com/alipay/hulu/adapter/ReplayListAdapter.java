@@ -15,6 +15,15 @@
  */
 package com.alipay.hulu.adapter;
 
+import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import com.alipay.hulu.R;
+import com.alipay.hulu.common.utils.StringUtil;
+import com.alipay.hulu.shared.io.bean.RecordCaseInfo;
+
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,25 +33,15 @@ import android.widget.BaseAdapter;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.alipay.hulu.R;
-import com.alipay.hulu.common.utils.StringUtil;
-import com.alipay.hulu.shared.io.bean.RecordCaseInfo;
-
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 /**
  * Created by lezhou.wyl on 2018/1/30.
  */
 
 public class ReplayListAdapter extends BaseAdapter implements View.OnClickListener {
 
+    private static Date sDate = new Date();
     private Context mContext;
     private List<RecordCaseInfo> mData = new ArrayList<>();
-    private static Date sDate = new Date();
-
     private AdapterView.OnItemClickListener onItemClickListener;
 
     public ReplayListAdapter(Context context) {

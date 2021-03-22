@@ -16,15 +16,16 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
+
     <LinearLayout
         android:id="@+id/dialog_content"
-        android:paddingLeft="@dimen/control_dp12"
-        android:orientation="vertical"
-        android:paddingRight="@dimen/control_dp12"
-        android:paddingTop="@dimen/control_dp20"
-        android:paddingBottom="@dimen/control_dp20"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/control_dp20"
+        android:paddingLeft="@dimen/control_dp12"
+        android:paddingRight="@dimen/control_dp12"
+        android:paddingTop="@dimen/control_dp20">
 
     </LinearLayout>
 

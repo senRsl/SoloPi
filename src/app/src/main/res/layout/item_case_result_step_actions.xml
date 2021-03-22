@@ -14,191 +14,204 @@
   ~ limitations under the License.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    >
+    android:orientation="horizontal">
+
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="match_parent">
+
         <View
-            android:layout_alignParentLeft="true"
             android:layout_width="@dimen/control_dp2"
             android:layout_height="match_parent"
-            android:layout_alignParentTop="true"
             android:layout_alignParentBottom="true"
-            android:background="#fc6b3f"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
             android:layout_marginLeft="@dimen/dp_19"
-            />
+            android:background="#fc6b3f" />
 
 
         <ImageView
             android:layout_width="@dimen/control_dp24"
             android:layout_height="@dimen/control_dp24"
-            android:layout_marginLeft="@dimen/control_dp8"
             android:layout_centerVertical="true"
-            android:src="@drawable/case_result_item_toggle"/>
+            android:layout_marginLeft="@dimen/control_dp8"
+            android:src="@drawable/case_result_item_toggle" />
 
     </RelativeLayout>
 
     <LinearLayout
-        android:orientation="vertical"
+        android:id="@+id/layout_case_result_wrapper"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/minus_dp32"
+        android:orientation="vertical"
         android:paddingRight="@dimen/control_dp8"
-        android:id="@+id/layout_case_result_wrapper"
         android:paddingTop="@dimen/control_dp8">
 
         <TextView
             android:id="@+id/text_case_result_step_title"
-            android:layout_marginLeft="@dimen/control_dp40"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/control_dp40"
             android:textColor="@color/primaryText"
-            android:textSize="@dimen/textsize_18"/>
+            android:textSize="@dimen/textsize_18" />
+
         <TableLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="@dimen/control_dp8"
-            android:layout_marginLeft="@dimen/control_dp40"
             android:layout_marginBottom="@dimen/control_dp8"
-            >
+            android:layout_marginLeft="@dimen/control_dp40"
+            android:layout_marginTop="@dimen/control_dp8"
+            android:orientation="vertical">
+
             <TableRow
-                android:paddingTop="@dimen/control_dp2"
-                android:paddingBottom="@dimen/control_dp2"
                 android:id="@+id/row_case_result_step_param"
-                >
+                android:paddingBottom="@dimen/control_dp2"
+                android:paddingTop="@dimen/control_dp2">
+
                 <TextView
-                    android:text="@string/step_result__replay_param"
-                    android:gravity="center"
-                    android:layout_gravity="right|center_vertical"
-                    android:textColor="@color/primaryText"
-                    android:textSize="@dimen/textsize_14"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right|center_vertical"
+                    android:gravity="center"
+                    android:text="@string/step_result__replay_param"
+                    android:textColor="@color/primaryText"
+                    android:textSize="@dimen/textsize_14" />
+
                 <TextView
-                    android:padding="@dimen/control_dp4"
+                    android:id="@+id/text_case_result_step_param"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:layout_marginLeft="@dimen/control_dp8"
                     android:layout_weight="4"
-                    android:id="@+id/text_case_result_step_param"
-                    android:textColor="@color/secondaryText"
-                    android:textSize="@dimen/textsize_14"
+                    android:padding="@dimen/control_dp4"
                     android:text=""
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:textColor="@color/secondaryText"
+                    android:textSize="@dimen/textsize_14" />
             </TableRow>
+
             <TableRow
-                android:paddingTop="@dimen/control_dp2"
-                android:paddingBottom="@dimen/control_dp2"
                 android:id="@+id/row_case_result_step_capture"
-                >
+                android:paddingBottom="@dimen/control_dp2"
+                android:paddingTop="@dimen/control_dp2">
+
                 <TextView
-                    android:text="@string/step_result__screenshot"
-                    android:gravity="center"
-                    android:layout_gravity="right|center_vertical"
-                    android:textColor="@color/primaryText"
-                    android:textSize="@dimen/textsize_14"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right|center_vertical"
+                    android:gravity="center"
+                    android:text="@string/step_result__screenshot"
+                    android:textColor="@color/primaryText"
+                    android:textSize="@dimen/textsize_14" />
+
                 <LinearLayout
-                    android:layout_weight="1"
                     android:layout_width="wrap_content"
                     android:layout_height="@dimen/dp_50"
                     android:layout_marginLeft="@dimen/control_dp8"
+                    android:layout_weight="1"
                     android:orientation="horizontal">
+
                     <ImageView
-                        android:layout_weight="1"
+                        android:id="@+id/img_case_result_target"
                         android:layout_width="0dp"
                         android:layout_height="@dimen/dp_50"
-                        android:scaleType="fitCenter"
-                        android:id="@+id/img_case_result_target"/>
-                    <ImageView
-                        android:layout_marginLeft="@dimen/control_dp8"
                         android:layout_weight="1"
+                        android:scaleType="fitCenter" />
+
+                    <ImageView
                         android:id="@+id/img_case_result_find"
                         android:layout_width="0dp"
-                        android:scaleType="fitCenter"
-                        android:layout_height="@dimen/dp_50" />
+                        android:layout_height="@dimen/dp_50"
+                        android:layout_marginLeft="@dimen/control_dp8"
+                        android:layout_weight="1"
+                        android:scaleType="fitCenter" />
                 </LinearLayout>
             </TableRow>
+
             <TableRow
-                android:paddingTop="@dimen/control_dp2"
                 android:paddingBottom="@dimen/control_dp2"
-                >
+                android:paddingTop="@dimen/control_dp2">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/primaryText"
-                    android:gravity="center"
                     android:layout_gravity="right|center_vertical"
-                    android:textSize="@dimen/textsize_14"
-                    android:text="@string/step_result__status"/>
+                    android:gravity="center"
+                    android:text="@string/step_result__status"
+                    android:textColor="@color/primaryText"
+                    android:textSize="@dimen/textsize_14" />
+
                 <TextView
+                    android:id="@+id/text_case_result_step_status"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/control_dp8"
                     android:layout_weight="4"
                     android:padding="@dimen/control_dp4"
-                    android:layout_marginLeft="@dimen/control_dp8"
-                    android:id="@+id/text_case_result_step_status"
-                    android:textColor="@color/secondaryText"
-                    android:textSize="@dimen/textsize_14"
                     android:text=""
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:textColor="@color/secondaryText"
+                    android:textSize="@dimen/textsize_14" />
             </TableRow>
+
             <TableRow
                 android:id="@+id/row_case_result_step_prepare"
-                android:paddingTop="@dimen/control_dp2"
                 android:paddingBottom="@dimen/control_dp2"
-                >
+                android:paddingTop="@dimen/control_dp2">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/primaryText"
-                    android:gravity="center"
                     android:layout_gravity="right|center_vertical"
-                    android:textSize="@dimen/textsize_14"
-                    android:text="@string/step_result__prepare_actions"/>
+                    android:gravity="center"
+                    android:text="@string/step_result__prepare_actions"
+                    android:textColor="@color/primaryText"
+                    android:textSize="@dimen/textsize_14" />
+
                 <TextView
+                    android:id="@+id/text_case_result_step_prepare"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/control_dp8"
                     android:layout_weight="4"
                     android:padding="@dimen/control_dp4"
-                    android:layout_marginLeft="@dimen/control_dp8"
-                    android:id="@+id/text_case_result_step_prepare"
-                    android:textColor="@color/secondaryText"
-                    android:textSize="@dimen/textsize_14"
                     android:text=""
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
+                    android:textColor="@color/secondaryText"
+                    android:textSize="@dimen/textsize_14" />
             </TableRow>
+
             <TableRow
                 android:id="@+id/row_case_result_step_node"
-                android:paddingTop="@dimen/control_dp2"
                 android:paddingBottom="@dimen/control_dp2"
-                >
+                android:paddingTop="@dimen/control_dp2">
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/primaryText"
                     android:layout_gravity="right|center_vertical"
                     android:gravity="center"
-                    android:textSize="@dimen/textsize_14"
-                    android:text="@string/step_result__node_info"/>
+                    android:text="@string/step_result__node_info"
+                    android:textColor="@color/primaryText"
+                    android:textSize="@dimen/textsize_14" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="4"
                     android:layout_marginLeft="@dimen/control_dp8"
+                    android:layout_weight="4"
                     android:orientation="horizontal">
 
                     <RelativeLayout
+                        android:id="@+id/text_case_result_step_target_node"
                         android:layout_width="wrap_content"
-                        android:paddingTop="@dimen/control_dp4"
+                        android:layout_height="wrap_content"
+                        android:background="?android:attr/selectableItemBackground"
                         android:paddingBottom="@dimen/control_dp4"
                         android:paddingLeft="@dimen/control_dp8"
                         android:paddingRight="@dimen/control_dp8"
-                        android:background="?android:attr/selectableItemBackground"
-                        android:id="@+id/text_case_result_step_target_node"
-                        android:layout_height="wrap_content">
+                        android:paddingTop="@dimen/control_dp4">
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -208,15 +221,16 @@
                     </RelativeLayout>
 
                     <RelativeLayout
+                        android:id="@+id/text_case_result_step_find_node"
                         android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:layout_marginLeft="@dimen/control_dp16"
-                        android:paddingTop="@dimen/control_dp4"
+                        android:background="?android:attr/selectableItemBackground"
                         android:paddingBottom="@dimen/control_dp4"
                         android:paddingLeft="@dimen/control_dp8"
                         android:paddingRight="@dimen/control_dp8"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/text_case_result_step_find_node"
-                        android:background="?android:attr/selectableItemBackground">
+                        android:paddingTop="@dimen/control_dp4">
+
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -232,8 +246,8 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1px"
-            android:background="@color/divider_color"
             android:layout_alignParentBottom="true"
-            android:layout_marginLeft="@dimen/dp_21"/>
+            android:layout_marginLeft="@dimen/dp_21"
+            android:background="@color/divider_color" />
     </LinearLayout>
 </LinearLayout>

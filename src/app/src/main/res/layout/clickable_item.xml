@@ -13,48 +13,46 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
 -->
-<LinearLayout
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/perf_list_main"
     android:layout_width="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:foreground="?attr/selectableItemBackground"
     android:layout_height="@dimen/dp_44"
-    android:paddingLeft="@dimen/control_dp16"
-    android:paddingRight="@dimen/control_dp8"
+    android:foreground="?attr/selectableItemBackground"
     android:gravity="center_vertical"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:paddingLeft="@dimen/control_dp16"
+    android:paddingRight="@dimen/control_dp8">
 
     <TextView
         android:id="@+id/title"
-        android:layout_height="wrap_content"
         android:layout_width="0dp"
-        android:textSize="@dimen/textsize_20"
-        android:textColor="@color/primaryText"
+        android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
-        android:text="@string/performance__view_record"
         android:layout_weight="1"
-        />
+        android:text="@string/performance__view_record"
+        android:textColor="@color/primaryText"
+        android:textSize="@dimen/textsize_20" />
 
     <ImageView
         android:id="@+id/img"
-        android:scaleType="fitCenter"
         android:layout_width="@dimen/control_dp24"
         android:layout_height="@dimen/control_dp24"
-        android:src="@drawable/recording"
-        android:tint="@color/red"
+        android:layout_gravity="center_vertical"
         android:layout_marginRight="@dimen/control_dp8"
-        android:layout_gravity="center_vertical" />
+        android:scaleType="fitCenter"
+        android:src="@drawable/recording"
+        android:tint="@color/red" />
 
     <ImageView
         android:id="@+id/arrow"
-        android:layout_marginEnd="@dimen/control_dp8"
         android:layout_width="@dimen/control_dp16"
         android:layout_height="@dimen/control_dp16"
         android:layout_gravity="center_vertical"
-        android:scaleType="centerInside"
-        android:src="@drawable/angel"
-        android:rotation="-90"
+        android:layout_marginEnd="@dimen/control_dp8"
         android:clickable="false"
         android:focusable="false"
-        android:focusableInTouchMode="false" />
+        android:focusableInTouchMode="false"
+        android:rotation="-90"
+        android:scaleType="centerInside"
+        android:src="@drawable/angel" />
 </LinearLayout>

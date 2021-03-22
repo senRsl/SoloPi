@@ -15,60 +15,64 @@
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <include layout="@layout/head_panel_layout"
-        android:id="@+id/head_layout"/>
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include
+        android:id="@+id/head_layout"
+        layout="@layout/head_panel_layout" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:paddingBottom="8dp"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp">
+        android:paddingTop="8dp">
+
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:id="@+id/case_param_edit_name"
-            android:textSize="20dp"
-            android:textColor="@color/primaryText"
-            />
-        <TextView
-            android:layout_marginTop="8dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textColor="@color/primaryText"
+            android:textSize="20dp" />
+
+        <TextView
             android:id="@+id/case_param_edit_desc"
-            android:textSize="18dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:textColor="@color/secondaryText"
-            />
+            android:textSize="18dp" />
     </LinearLayout>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1px"
-        android:background="#bebebe"/>
+        android:background="#bebebe" />
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/case_param_tab_layout"
         android:layout_width="match_parent"
         android:layout_height="@dimen/control_dp48"
-        app:tabTextAppearance="@style/TabLayoutTextStyle"
-        app:tabPaddingTop="@dimen/control_dp8"
-        app:tabPaddingBottom="@dimen/control_dp8"
-        app:tabPaddingStart="@dimen/control_dp16"
-        app:tabPaddingEnd="@dimen/control_dp16"
         app:tabGravity="fill"
+        app:tabMaxWidth="0dp"
         app:tabMode="fixed"
-        app:tabMaxWidth="0dp"/>
+        app:tabPaddingBottom="@dimen/control_dp8"
+        app:tabPaddingEnd="@dimen/control_dp16"
+        app:tabPaddingStart="@dimen/control_dp16"
+        app:tabPaddingTop="@dimen/control_dp8"
+        app:tabTextAppearance="@style/TabLayoutTextStyle" />
+
     <View
         android:layout_width="match_parent"
         android:layout_height="1px"
-        android:background="#bebebe"/>
+        android:background="#bebebe" />
+
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/case_param_pager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    </androidx.viewpager.widget.ViewPager>
+        android:layout_height="match_parent"></androidx.viewpager.widget.ViewPager>
 </LinearLayout>

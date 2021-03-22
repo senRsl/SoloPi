@@ -13,85 +13,95 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
 -->
-<LinearLayout android:orientation="vertical"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    android:orientation="vertical">
 
     <include
         android:id="@+id/head_layout"
-        layout="@layout/head_panel_layout"/>
+        layout="@layout/head_panel_layout" />
 
     <TextView
-        android:background="@color/default_background_color"
         android:layout_width="match_parent"
         android:layout_height="@dimen/control_dp30"
-        android:text="@string/record_chart__select_data"
-        android:textSize="@dimen/textsize_14"
-        android:paddingLeft="@dimen/control_dp8"
-        android:paddingBottom="@dimen/control_dp2"
+        android:background="@color/default_background_color"
         android:gravity="bottom"
-        android:textColor="#a3a3a3"/>
+        android:paddingBottom="@dimen/control_dp2"
+        android:paddingLeft="@dimen/control_dp8"
+        android:text="@string/record_chart__select_data"
+        android:textColor="#a3a3a3"
+        android:textSize="@dimen/textsize_14" />
+
     <include layout="@layout/divider" />
+
     <LinearLayout
-        android:background="@color/white"
         android:layout_width="match_parent"
-        android:paddingLeft="@dimen/control_dp16"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:background="@color/white"
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/control_dp16">
+
         <androidx.appcompat.widget.AppCompatSpinner
-            android:layout_margin="@dimen/control_dp6"
-            android:spinnerMode="dialog"
+            android:id="@+id/record_spinner"
             android:layout_width="match_parent"
             android:layout_height="@dimen/dp_44"
-            android:id="@+id/record_spinner"/>
-        <include layout="@layout/divider" />
-        <androidx.appcompat.widget.AppCompatSpinner
             android:layout_margin="@dimen/control_dp6"
+            android:spinnerMode="dialog" />
+
+        <include layout="@layout/divider" />
+
+        <androidx.appcompat.widget.AppCompatSpinner
             android:id="@+id/record_item_spinner"
             android:layout_width="match_parent"
-            android:layout_height="@dimen/dp_44"/>
+            android:layout_height="@dimen/dp_44"
+            android:layout_margin="@dimen/control_dp6" />
     </LinearLayout>
+
     <include layout="@layout/divider" />
 
     <TextView
+        android:layout_width="match_parent"
         android:layout_height="@dimen/control_dp36"
-        android:layout_width="match_parent"
-        android:background="@color/default_background_color"
-        android:text="@string/record_chart__data_display"
-        android:textSize="@dimen/textsize_14"
-        android:gravity="bottom"
-        android:paddingLeft="@dimen/control_dp8"
-        android:paddingBottom="@dimen/control_dp2"
         android:layout_gravity="bottom"
-        android:textColor="#a3a3a3"/>
+        android:background="@color/default_background_color"
+        android:gravity="bottom"
+        android:paddingBottom="@dimen/control_dp2"
+        android:paddingLeft="@dimen/control_dp8"
+        android:text="@string/record_chart__data_display"
+        android:textColor="#a3a3a3"
+        android:textSize="@dimen/textsize_14" />
+
     <include layout="@layout/divider" />
+
     <LinearLayout
-        android:background="@color/white"
         android:layout_width="match_parent"
-        android:padding="@dimen/control_dp8"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:background="@color/white"
+        android:orientation="vertical"
+        android:padding="@dimen/control_dp8">
+
         <TextView
+            android:id="@+id/record_summary"
             android:layout_width="match_parent"
-            android:layout_marginStart="@dimen/control_dp16"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/textsize_14"
+            android:layout_marginStart="@dimen/control_dp16"
             android:minLines="2"
             android:textColor="@color/colorAccent"
-            android:id="@+id/record_summary"
-            />
+            android:textSize="@dimen/textsize_14" />
+
         <TextView
-            android:layout_width="match_parent"
-            android:layout_marginStart="@dimen/control_dp16"
-            android:layout_height="wrap_content"
-            android:textSize="@dimen/textsize_14"
-            android:textColor="@color/colorAccent"
             android:id="@+id/record_label"
-            android:textAlignment="center"/>
-        <com.alipay.hulu.ui.linechart.CheckableLineChartView
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/record_chart"/>
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/control_dp16"
+            android:textAlignment="center"
+            android:textColor="@color/colorAccent"
+            android:textSize="@dimen/textsize_14" />
+
+        <com.alipay.hulu.ui.linechart.CheckableLineChartView
+            android:id="@+id/record_chart"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
     </LinearLayout>
 </LinearLayout>

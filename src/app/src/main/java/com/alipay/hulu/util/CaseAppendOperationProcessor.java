@@ -15,9 +15,8 @@
  */
 package com.alipay.hulu.util;
 
-import android.content.Context;
-import android.content.Intent;
-import androidx.annotation.NonNull;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.alibaba.fastjson.JSON;
 import com.alipay.hulu.activity.CaseEditActivity;
@@ -29,8 +28,9 @@ import com.alipay.hulu.shared.io.bean.RecordCaseInfo;
 import com.alipay.hulu.shared.io.util.OperationStepUtil;
 import com.alipay.hulu.shared.node.tree.export.bean.OperationStep;
 
-import java.util.ArrayList;
-import java.util.List;
+import android.content.Context;
+import android.content.Intent;
+import androidx.annotation.NonNull;
 
 /**
  * Created by qiaoruikai on 2019-08-06 15:31.

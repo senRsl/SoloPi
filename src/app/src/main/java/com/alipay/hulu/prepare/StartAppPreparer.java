@@ -15,6 +15,8 @@
  */
 package com.alipay.hulu.prepare;
 
+import java.util.concurrent.CountDownLatch;
+
 import com.alipay.hulu.R;
 import com.alipay.hulu.common.application.LauncherApplication;
 import com.alipay.hulu.common.service.SPService;
@@ -22,22 +24,19 @@ import com.alipay.hulu.common.utils.LogUtil;
 import com.alipay.hulu.common.utils.StringUtil;
 import com.alipay.hulu.shared.node.OperationService;
 import com.alipay.hulu.shared.node.action.OperationContext;
-import com.alipay.hulu.shared.node.action.OperationExecutor;
 import com.alipay.hulu.shared.node.action.OperationMethod;
 import com.alipay.hulu.shared.node.action.PerformActionEnum;
 import com.alipay.hulu.shared.node.utils.AppUtil;
 import com.alipay.hulu.shared.node.utils.PrepareUtil;
 import com.alipay.hulu.shared.node.utils.prepare.PrepareWorker;
 
-import java.util.concurrent.CountDownLatch;
-
 /**
  * Created by qiaoruikai on 2019/10/9 9:34 PM.
  */
 @PrepareWorker.PrepareTool(priority = 0)
 public class StartAppPreparer implements PrepareWorker {
-    private static final String TAG = "StartAppPreparer";
     public static final String KEY_PREPARED_APP_ALERT = "K_preparedAppAlert";
+    private static final String TAG = "StartAppPreparer";
 
     @Override
     public boolean doPrepareWork(String targetApp, PrepareUtil.PrepareStatus status) {
@@ -47,7 +46,7 @@ public class StartAppPreparer implements PrepareWorker {
         if (status != null) {
             status.currentStatus(100, 100, StringUtil.getString(R.string.prepare__restart_app), true);
         }
-        
+
         AppUtil.startApp(targetApp);
 
         OperationService service = LauncherApplication.service(OperationService.class);

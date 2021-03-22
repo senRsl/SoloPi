@@ -1,24 +1,24 @@
 package com.alipay.hulu.shared.node.action;
 
-import com.alipay.hulu.common.utils.LogUtil;
-
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import com.alipay.hulu.common.utils.LogUtil;
 
 /**
  * 操作执行各类参数
  * Created by qiaoruikai on 2018/10/30 5:19 PM.
  */
 public class OperationContext {
-    private AtomicBoolean notifyStatus = new AtomicBoolean(false);
     public CmdExecutor executor;
-    private OperationListener listener;
     public OperationExecutor opExecutor;
-
     public int screenWidth;
     public int screenHeight;
+    private AtomicBoolean notifyStatus = new AtomicBoolean(false);
+    private OperationListener listener;
 
     /**
      * 后台执行并通知完成
+     *
      * @param runnable 待执行任务
      */
     public void notifyOnFinish(final Runnable runnable) {

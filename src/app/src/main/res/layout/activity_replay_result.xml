@@ -15,10 +15,13 @@
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <include layout="@layout/head_panel_layout" android:id="@+id/head_replay_list" />
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include
+        android:id="@+id/head_replay_list"
+        layout="@layout/head_panel_layout" />
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/replay_result_tab"
@@ -26,16 +29,18 @@
         android:layout_height="@dimen/control_dp48"
         app:tabGravity="fill"
         app:tabMaxWidth="0dp"
-        app:tabTextAppearance="@style/TabLayoutTextStyle"
-        app:tabPaddingTop="@dimen/control_dp8"
+        app:tabMode="fixed"
         app:tabPaddingBottom="@dimen/control_dp8"
-        app:tabPaddingStart="@dimen/control_dp16"
         app:tabPaddingEnd="@dimen/control_dp16"
-        app:tabMode="fixed"/>
+        app:tabPaddingStart="@dimen/control_dp16"
+        app:tabPaddingTop="@dimen/control_dp8"
+        app:tabTextAppearance="@style/TabLayoutTextStyle" />
+
     <View
         android:layout_width="match_parent"
         android:layout_height="1px"
-        android:background="#bebebe"/>
+        android:background="#bebebe" />
+
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/replay_result_list_pager"
         android:layout_width="match_parent"

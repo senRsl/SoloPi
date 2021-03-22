@@ -1,5 +1,7 @@
 package com.alipay.hulu.shared.node.utils;
 
+import java.util.regex.Pattern;
+
 import com.alipay.hulu.common.application.LauncherApplication;
 import com.alipay.hulu.common.utils.LogUtil;
 import com.alipay.hulu.common.utils.StringUtil;
@@ -8,56 +10,44 @@ import com.alipay.hulu.shared.node.action.OperationMethod;
 import com.alipay.hulu.shared.node.action.PerformActionEnum;
 import com.alipay.hulu.shared.node.tree.AbstractNodeTree;
 
-import java.util.regex.Pattern;
-
 /**
  * Created by qiaoruikai on 2019/2/13 4:08 PM.
  */
 public class LogicUtil {
 
-    private static final String TAG = "LogicUtil";
     /**
      * if字段
      */
     public static final String CHECK_PARAM = "check";
-
     public static final String LOOP_PREFIX = "loop::";
-
     public static final String ASSERT_ACTION_PREFIX = "assert::";
-
     /**
      * 声明字段
      */
     public static final String ALLOC_KEY_PARAM = "allocKey";
-
     /**
      * 声明类型
      * 包含 字符串类型声明{@link #ALLOC_TYPE_STRING} 与 整数类型声明 {@link #ALLOC_TYPE_INTEGER}
      */
     public static final String ALLOC_TYPE = "allocType";
-
     /**
      * 整数类型声明
      */
     public static final int ALLOC_TYPE_INTEGER = 0;
-
     /**
      * 字符串类型声明
      */
     public static final int ALLOC_TYPE_STRING = 1;
-
     /**
      * 声明值
      */
     public static final String ALLOC_VALUE_PARAM = "allocValue";
-
     /**
      * if、where执行范围
      */
     public static final String SCOPE = "scope";
-
     public static final String NODE_NAME = "node";
-
+    private static final String TAG = "LogicUtil";
     /**
      * ${xxx}格式
      */
@@ -65,6 +55,7 @@ public class LogicUtil {
 
     /**
      * check判断
+     *
      * @param method
      * @return
      */
@@ -99,6 +90,7 @@ public class LogicUtil {
 
     /**
      * 赋值语句
+     *
      * @param method
      * @param node
      * @param service
@@ -128,6 +120,7 @@ public class LogicUtil {
 
     /**
      * 计算值
+     *
      * @param constant
      * @param targetNode
      * @param evalType
@@ -201,6 +194,7 @@ public class LogicUtil {
 
     /**
      * 将当期运行时变量映射到字符串中
+     *
      * @param origin
      * @param service
      * @return
@@ -257,6 +251,7 @@ public class LogicUtil {
 
     /**
      * 计算check
+     *
      * @param content
      * @return
      */
@@ -324,6 +319,7 @@ public class LogicUtil {
 
     /**
      * 解析字符串
+     *
      * @param statement
      * @return
      */
@@ -334,7 +330,7 @@ public class LogicUtil {
 
         String[] result = statement.split("\\+");
         StringBuilder sb = new StringBuilder();
-        for (String part: result) {
+        for (String part : result) {
             sb.append(StringUtil.trim(part));
         }
 
@@ -343,6 +339,7 @@ public class LogicUtil {
 
     /**
      * 解析int表述
+     *
      * @param statement
      * @return
      */
@@ -358,7 +355,7 @@ public class LogicUtil {
             }
 
             int result = 0;
-            for (String part: groups) {
+            for (String part : groups) {
                 result += evalInt(StringUtil.trim(part));
             }
 
@@ -370,7 +367,7 @@ public class LogicUtil {
             }
 
             int result = 1;
-            for (String part: groups) {
+            for (String part : groups) {
                 result *= evalInt(StringUtil.trim(part));
             }
 

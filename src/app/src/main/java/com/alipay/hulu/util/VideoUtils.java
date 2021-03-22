@@ -15,6 +15,11 @@
  */
 package com.alipay.hulu.util;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.List;
+
 import android.annotation.TargetApi;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
@@ -22,35 +27,13 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.util.SparseArray;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.List;
-
 @TargetApi(value = Build.VERSION_CODES.LOLLIPOP)
 public class VideoUtils {
 
-    public interface Callback {
-        void onResult(MediaCodecInfo[] infos);
-    }
-
-    public static final class EncoderFinder extends AsyncTask<String, Void, MediaCodecInfo[]> {
-        private Callback func;
-
-        EncoderFinder(Callback func) {
-            this.func = func;
-        }
-
-        @Override
-        protected MediaCodecInfo[] doInBackground(String... mimeTypes) {
-            return findEncodersByType(mimeTypes[0]);
-        }
-
-        @Override
-        protected void onPostExecute(MediaCodecInfo[] mediaCodecInfos) {
-            func.onResult(mediaCodecInfos);
-        }
-    }
+    public static SparseArray<String> sColorFormats = new SparseArray<>();
+    private static SparseArray<String> sAACProfiles = new SparseArray<>();
+    private static SparseArray<String> sAVCProfiles = new SparseArray<>();
+    private static SparseArray<String> sAVCLevels = new SparseArray<>();
 
     public static void findEncodersByTypeAsync(String mimeType, Callback callback) {
         new EncoderFinder(callback).execute(mimeType);
@@ -80,11 +63,6 @@ public class VideoUtils {
 
         return infos.toArray(new MediaCodecInfo[infos.size()]);
     }
-
-    private static SparseArray<String> sAACProfiles = new SparseArray<>();
-    private static SparseArray<String> sAVCProfiles = new SparseArray<>();
-    private static SparseArray<String> sAVCLevels = new SparseArray<>();
-
 
     /**
      * @param avcProfileLevel AVC CodecProfileLevel
@@ -200,9 +178,6 @@ public class VideoUtils {
         }
     }
 
-
-    public static SparseArray<String> sColorFormats = new SparseArray<>();
-
     public static String toHumanReadable(int colorFormat) {
         if (sColorFormats.size() == 0) {
             initColorFormatFields();
@@ -242,5 +217,27 @@ public class VideoUtils {
             }
         }
 
+    }
+
+    public interface Callback {
+        void onResult(MediaCodecInfo[] infos);
+    }
+
+    public static final class EncoderFinder extends AsyncTask<String, Void, MediaCodecInfo[]> {
+        private Callback func;
+
+        EncoderFinder(Callback func) {
+            this.func = func;
+        }
+
+        @Override
+        protected MediaCodecInfo[] doInBackground(String... mimeTypes) {
+            return findEncodersByType(mimeTypes[0]);
+        }
+
+        @Override
+        protected void onPostExecute(MediaCodecInfo[] mediaCodecInfos) {
+            func.onResult(mediaCodecInfos);
+        }
     }
 }

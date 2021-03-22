@@ -15,8 +15,6 @@
  */
 package com.alipay.hulu.util;
 
-import com.alipay.hulu.common.utils.LogUtil;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -24,6 +22,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
+
+import com.alipay.hulu.common.utils.LogUtil;
 
 /**
  * Use code from <a href="http://blog.sina.com.cn/s/blog_600ff0750100x61j.html">Android Zip格式压缩和解压缩(ZipUtil.java)</a>
@@ -33,6 +33,7 @@ public class ZipUtil {
 
     /**
      * 打zip包
+     *
      * @param files
      * @param dest
      */
@@ -46,7 +47,7 @@ public class ZipUtil {
 
             out = new ZipOutputStream(new FileOutputStream(dest));
             //如果此文件是一个文件，否则为false。
-            for (File f: files) {
+            for (File f : files) {
                 zipFileOrDirectory(out, f, "");
             }
 
@@ -71,6 +72,7 @@ public class ZipUtil {
 
     /**
      * 压缩文件
+     *
      * @param out
      * @param fileOrDirectory
      * @param curPath

@@ -15,9 +15,9 @@
  */
 package com.alipay.hulu.common.utils.patch;
 
-import com.alibaba.fastjson.annotation.JSONField;
-
 import java.util.List;
+
+import com.alibaba.fastjson.annotation.JSONField;
 
 /**
  * Created by qiaoruikai on 2018/12/18 10:44 PM.

@@ -1,6 +1,6 @@
 package com.alipay.hulu.scheme;
 
-import android.content.Context;
+import java.util.Map;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -10,9 +10,19 @@ import com.alipay.hulu.common.service.SPService;
 import com.alipay.hulu.common.utils.LogUtil;
 import com.alipay.hulu.common.utils.StringUtil;
 
-import java.util.Map;
+import android.content.Context;
 
-import static com.alipay.hulu.common.service.SPService.*;
+import static com.alipay.hulu.common.service.SPService.KEY_ADB_SERVER;
+import static com.alipay.hulu.common.service.SPService.KEY_AUTO_CLEAR_FILES_DAYS;
+import static com.alipay.hulu.common.service.SPService.KEY_DISPLAY_SYSTEM_APP;
+import static com.alipay.hulu.common.service.SPService.KEY_GLOBAL_SETTINGS;
+import static com.alipay.hulu.common.service.SPService.KEY_HIGHLIGHT_REPLAY_NODE;
+import static com.alipay.hulu.common.service.SPService.KEY_PATCH_URL;
+import static com.alipay.hulu.common.service.SPService.KEY_PERFORMANCE_UPLOAD;
+import static com.alipay.hulu.common.service.SPService.KEY_REPLAY_AUTO_START;
+import static com.alipay.hulu.common.service.SPService.KEY_SCREENSHOT_RESOLUTION;
+import static com.alipay.hulu.common.service.SPService.KEY_SCREEN_FACTOR_ROTATION;
+import static com.alipay.hulu.common.service.SPService.KEY_SCREEN_ROTATION;
 
 @SchemeResolver("config")
 public class ConfigSchemeResolver implements SchemeActionResolver {
@@ -34,6 +44,7 @@ public class ConfigSchemeResolver implements SchemeActionResolver {
 
     /**
      * 分别处理不同类型设置项
+     *
      * @param key
      * @param value
      * @return
@@ -80,6 +91,7 @@ public class ConfigSchemeResolver implements SchemeActionResolver {
 
     /**
      * 处理数字
+     *
      * @param key
      * @param value
      * @param max

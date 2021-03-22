@@ -3,19 +3,8 @@
  */
 package com.android.permission;
 
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.graphics.PixelFormat;
-import android.graphics.Point;
-import android.net.Uri;
-import android.os.Build;
-import android.provider.Settings;
-import android.util.Log;
-import android.view.Gravity;
-import android.view.WindowManager;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 import com.android.floatwindowpermission.R;
 import com.android.permission.rom.HuaweiUtils;
@@ -26,8 +15,15 @@ import com.android.permission.rom.QikuUtils;
 import com.android.permission.rom.RomUtils;
 import com.android.permission.rom.VivoUtils;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
+import android.provider.Settings;
+import android.util.Log;
 
 /**
  * Description:
@@ -51,6 +47,16 @@ public class FloatWindowManager {
             }
         }
         return instance;
+    }
+
+    public static void commonROMPermissionApplyInternal(Context context) throws NoSuchFieldException, IllegalAccessException {
+        Class clazz = Settings.class;
+        Field field = clazz.getDeclaredField("ACTION_MANAGE_OVERLAY_PERMISSION");
+
+        Intent intent = new Intent(field.get(null).toString());
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setData(Uri.parse("package:" + context.getPackageName()));
+        context.startActivity(intent);
     }
 
     public boolean checkFloatPermission(Context context) {
@@ -111,10 +117,10 @@ public class FloatWindowManager {
         //最新发现魅族6.0的系统这种方式不好用，天杀的，只有你是奇葩，没办法，单独适配一下
         if (RomUtils.checkIsMeizuRom()) {
             return meizuPermissionCheck(context);
-        // VIVO的i管家比较厉害
+            // VIVO的i管家比较厉害
         } else if (RomUtils.isVivoSystem()) {
             return vivoPermissionCheck(context);
-        }else {
+        } else {
             Boolean result = true;
             if (Build.VERSION.SDK_INT >= 23) {
                 try {
@@ -149,6 +155,7 @@ public class FloatWindowManager {
 
     /**
      * 直接去申请权限
+     *
      * @param context
      */
     public void applyPermissionDirect(Context context) {
@@ -276,16 +283,6 @@ public class FloatWindowManager {
                 });
             }
         }
-    }
-
-    public static void commonROMPermissionApplyInternal(Context context) throws NoSuchFieldException, IllegalAccessException {
-        Class clazz = Settings.class;
-        Field field = clazz.getDeclaredField("ACTION_MANAGE_OVERLAY_PERMISSION");
-
-        Intent intent = new Intent(field.get(null).toString());
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.setData(Uri.parse("package:" + context.getPackageName()));
-        context.startActivity(intent);
     }
 
     private void showConfirmDialog(Context context, OnConfirmResult result) {

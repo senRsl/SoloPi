@@ -15,9 +15,9 @@
  */
 package com.alipay.hulu.bean;
 
-import com.alibaba.fastjson.JSONObject;
-
 import java.util.List;
+
+import com.alibaba.fastjson.JSONObject;
 
 /**
  * Created by qiaoruikai on 2019-08-19 21:05.

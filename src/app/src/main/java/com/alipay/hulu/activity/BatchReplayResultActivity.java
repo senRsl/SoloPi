@@ -15,10 +15,18 @@
  */
 package com.alipay.hulu.activity;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.alipay.hulu.R;
+import com.alipay.hulu.bean.CaseStepHolder;
+import com.alipay.hulu.bean.ReplayResultBean;
+import com.alipay.hulu.ui.HeadControlPanel;
+import com.alipay.hulu.util.LargeObjectHolder;
+
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import androidx.annotation.Nullable;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,15 +35,7 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import com.alipay.hulu.R;
-import com.alipay.hulu.bean.CaseStepHolder;
-import com.alipay.hulu.bean.ReplayResultBean;
-import com.alipay.hulu.ui.HeadControlPanel;
-import com.alipay.hulu.util.LargeObjectHolder;
-
-import java.util.ArrayList;
-import java.util.List;
+import androidx.annotation.Nullable;
 
 
 /**
@@ -158,7 +158,7 @@ public class BatchReplayResultActivity extends BaseActivity {
                 holder.caseName = (TextView) convertView.findViewById(R.id.case_name);
                 holder.result = (TextView) convertView.findViewById(R.id.result);
                 convertView.setTag(holder);
-            } else  {
+            } else {
                 holder = (ViewHolder) convertView.getTag();
             }
 
@@ -181,7 +181,6 @@ public class BatchReplayResultActivity extends BaseActivity {
             TextView result;
         }
     }
-
 
 
 }

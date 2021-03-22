@@ -15,6 +15,25 @@
  */
 package com.alipay.hulu.util;
 
+import java.io.File;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+
+import com.alipay.hulu.R;
+import com.alipay.hulu.common.application.LauncherApplication;
+import com.alipay.hulu.common.utils.ContextUtil;
+import com.alipay.hulu.common.utils.GlideApp;
+import com.alipay.hulu.common.utils.LogUtil;
+import com.alipay.hulu.common.utils.StringUtil;
+import com.alipay.hulu.shared.node.action.PerformActionEnum;
+import com.alipay.hulu.ui.TwoLevelSelectLayout;
+import com.bumptech.glide.RequestBuilder;
+import com.bumptech.glide.RequestManager;
+import com.bumptech.glide.request.RequestOptions;
+
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -24,8 +43,6 @@ import android.database.DataSetObserver;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Pair;
@@ -42,25 +59,8 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ScrollView;
 import android.widget.TextView;
-
-import com.alipay.hulu.R;
-import com.alipay.hulu.common.application.LauncherApplication;
-import com.alipay.hulu.common.utils.ContextUtil;
-import com.alipay.hulu.common.utils.GlideApp;
-import com.alipay.hulu.common.utils.LogUtil;
-import com.alipay.hulu.common.utils.StringUtil;
-import com.alipay.hulu.shared.node.action.PerformActionEnum;
-import com.alipay.hulu.ui.TwoLevelSelectLayout;
-import com.bumptech.glide.RequestBuilder;
-import com.bumptech.glide.RequestManager;
-import com.bumptech.glide.request.RequestOptions;
-
-import java.io.File;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CountDownLatch;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 
 /**
  * Created by ruyao.yry on 2018/3/24.
@@ -68,95 +68,10 @@ import java.util.concurrent.CountDownLatch;
 public class DialogUtils {
     private static final String TAG = "DialogUtil";
 
-    public static class DialogInfo {
-        private int mResourceId;
-        private String mNegativeButtonText;
-        private String mPositiveButtonText;
-        private String mShowContent;
-        private String mTitle;
-        private boolean mCancelable;
-
-        private DialogInfo(Builder builder) {
-            mResourceId = builder.mResourceId;
-            mNegativeButtonText = builder.mNegativeButtonText;
-            mPositiveButtonText = builder.mPositiveButtonText;
-            mShowContent = builder.mShowContent;
-            mTitle = builder.mTitle;
-            mCancelable = builder.mCancelable;
-        }
-
-        public int getResourceId() {
-            return mResourceId;
-        }
-
-        public String getNegativeButtonText() {
-            return mNegativeButtonText;
-        }
-
-        public String getPositiveButtonText() {
-            return mPositiveButtonText;
-        }
-
-        public String getShowContent() {
-            return mShowContent;
-        }
-
-        public String getTitle() {
-            return mTitle;
-        }
-
-        public boolean isCancelable() {
-            return mCancelable;
-        }
-
-        public static class Builder {
-            private String mNegativeButtonText;
-            private String mPositiveButtonText;
-            private String mShowContent;
-            private String mTitle;
-            private boolean mCancelable;
-            private int mResourceId;
-
-            public Builder setResourceId(int id) {
-                mResourceId = id;
-                return this;
-            }
-
-            public Builder setNegativeButtonText(String text) {
-                mNegativeButtonText = text;
-                return this;
-            }
-
-            public Builder setPositiveButtonText(String text) {
-                mPositiveButtonText = text;
-                return this;
-            }
-
-            public Builder setShowContent(String text) {
-                mShowContent = text;
-                return this;
-            }
-
-            public Builder setTitle(String text) {
-                mTitle = text;
-                return this;
-            }
-
-            public Builder setCancelable(boolean cancelable) {
-                mCancelable = cancelable;
-                return this;
-            }
-
-            public DialogInfo build() {
-                return new DialogInfo(this);
-            }
-        }
-    }
-
-    public static AlertDialog createDialog(@NonNull  Activity activity, @NonNull DialogInfo dialogInfo,
+    public static AlertDialog createDialog(@NonNull Activity activity, @NonNull DialogInfo dialogInfo,
                                            @NonNull DialogInterface.OnClickListener onClickListener) {
 
-        AlertDialog.Builder alertDialogBuilder = dialogInfo.getResourceId() == 0?
+        AlertDialog.Builder alertDialogBuilder = dialogInfo.getResourceId() == 0 ?
                 new AlertDialog.Builder(activity) :
                 new AlertDialog.Builder(activity, dialogInfo.getResourceId());
 
@@ -219,12 +134,13 @@ public class DialogUtils {
 
     /**
      * 展示单选界面
+     *
      * @param context
-     * @param names 名称列表
-     * @param icons 图标列表
+     * @param names    名称列表
+     * @param icons    图标列表
      * @param callback 选择回调
      */
-    public static void showSingleItemCheckDialog(final Context context,final String[] names
+    public static void showSingleItemCheckDialog(final Context context, final String[] names
             , final int[] icons, final ItemCheckCallback callback) {
         if (callback == null) {
             return;
@@ -362,11 +278,12 @@ public class DialogUtils {
 
     /**
      * 展示功能界面
+     *
      * @param context
      * @param actionEnums
      * @param callback
      */
-    public static void showFunctionView(final Context context,final List<PerformActionEnum> actionEnums
+    public static void showFunctionView(final Context context, final List<PerformActionEnum> actionEnums
             , final FunctionViewCallback<PerformActionEnum> callback) {
         if (callback == null) {
             return;
@@ -405,6 +322,7 @@ public class DialogUtils {
 
     /**
      * 显示自定义页面
+     *
      * @param context
      * @param content
      * @param confirm
@@ -460,6 +378,7 @@ public class DialogUtils {
 
     /**
      * 展示分层菜单项
+     *
      * @param context
      * @param keys
      * @param icons
@@ -467,28 +386,28 @@ public class DialogUtils {
      * @param callback
      */
     public static void showLeveledFunctionView(final Context context, final List<Integer> keys,
-                                        final List<Integer> icons,
-                                        final Map<Integer, List<TwoLevelSelectLayout.SubMenuItem>> secondLevels,
-                                        final FunctionViewCallback<TwoLevelSelectLayout.SubMenuItem> callback) {
+                                               final List<Integer> icons,
+                                               final Map<Integer, List<TwoLevelSelectLayout.SubMenuItem>> secondLevels,
+                                               final FunctionViewCallback<TwoLevelSelectLayout.SubMenuItem> callback) {
         if (callback == null) {
-            LogUtil.e(TAG,"回调函数为空");
+            LogUtil.e(TAG, "回调函数为空");
             return;
         }
 
         // 校验各个参数
         if (icons == null || keys == null || secondLevels == null) {
-            LogUtil.e(TAG,"参数存在空情况");
+            LogUtil.e(TAG, "参数存在空情况");
             return;
         }
 
         // 校验长度
         if (icons.size() != keys.size()) {
-            LogUtil.e(TAG,"图标与key不对应");
+            LogUtil.e(TAG, "图标与key不对应");
             return;
         }
 
         // 校验各个key都有对应子菜单
-        for (Integer key: keys) {
+        for (Integer key : keys) {
             if (!secondLevels.containsKey(key)) {
                 LogUtil.e(TAG, "菜单%s不包含对应子菜单", key);
                 return;
@@ -554,10 +473,6 @@ public class DialogUtils {
         });
     }
 
-    public interface OnDialogResultListener {
-        void onDialogPositive(List<String> data);
-    }
-
     /**
      * 为多个字段配置输入框
      *
@@ -565,7 +480,7 @@ public class DialogUtils {
      * @param data
      */
     public static void showMultipleEditDialog(Context context, final OnDialogResultListener listener, String title, List<Pair<String, String>> data) {
-        LayoutInflater inflater =  LayoutInflater.from(ContextUtil.getContextThemeWrapper(
+        LayoutInflater inflater = LayoutInflater.from(ContextUtil.getContextThemeWrapper(
                 context, R.style.AppDialogTheme));
 
         ScrollView v = (ScrollView) inflater.inflate(R.layout.dialog_setting, null);
@@ -625,6 +540,7 @@ public class DialogUtils {
 
     /**
      * 显示图像Dialog
+     *
      * @param context
      * @param targetFile
      */
@@ -635,8 +551,9 @@ public class DialogUtils {
 
     /**
      * 显示图像Dialog
+     *
      * @param context
-     * @param id resId
+     * @param id      resId
      */
     public static void showImageDialog(Context context, int id) {
         ImageDialog dialog = new ImageDialog(context, id);
@@ -645,8 +562,9 @@ public class DialogUtils {
 
     /**
      * 显示图像Dialog
+     *
      * @param context
-     * @param path 路径
+     * @param path    路径
      */
     public static void showImageDialog(Context context, String path) {
         ImageDialog dialog = new ImageDialog(context, path);
@@ -655,6 +573,7 @@ public class DialogUtils {
 
     /**
      * 显示图像Dialog
+     *
      * @param context
      * @param content uri
      */
@@ -665,6 +584,7 @@ public class DialogUtils {
 
     /**
      * 显示图像Dialog
+     *
      * @param context
      * @param content uri
      */
@@ -675,6 +595,7 @@ public class DialogUtils {
 
     /**
      * 显示图像Dialog
+     *
      * @param context
      * @param bitmap
      */
@@ -685,12 +606,118 @@ public class DialogUtils {
 
     /**
      * 显示图像Dialog
+     *
      * @param context
      * @param data
      */
     public static void showImageDialog(Context context, byte[] data) {
         ImageDialog dialog = new ImageDialog(context, data);
         dialog.show();
+    }
+
+    public interface OnDialogResultListener {
+        void onDialogPositive(List<String> data);
+    }
+
+    public interface FunctionViewCallback<T> {
+        void onExecute(DialogInterface dialog, T action);
+
+        void onCancel(DialogInterface dialog);
+
+        void onDismiss(DialogInterface dialog);
+    }
+
+    public interface ItemCheckCallback {
+        void onExecute(DialogInterface dialog, int idx);
+
+        void onCancel(DialogInterface dialog);
+
+        void onDismiss(DialogInterface dialog);
+    }
+
+    public static class DialogInfo {
+        private int mResourceId;
+        private String mNegativeButtonText;
+        private String mPositiveButtonText;
+        private String mShowContent;
+        private String mTitle;
+        private boolean mCancelable;
+
+        private DialogInfo(Builder builder) {
+            mResourceId = builder.mResourceId;
+            mNegativeButtonText = builder.mNegativeButtonText;
+            mPositiveButtonText = builder.mPositiveButtonText;
+            mShowContent = builder.mShowContent;
+            mTitle = builder.mTitle;
+            mCancelable = builder.mCancelable;
+        }
+
+        public int getResourceId() {
+            return mResourceId;
+        }
+
+        public String getNegativeButtonText() {
+            return mNegativeButtonText;
+        }
+
+        public String getPositiveButtonText() {
+            return mPositiveButtonText;
+        }
+
+        public String getShowContent() {
+            return mShowContent;
+        }
+
+        public String getTitle() {
+            return mTitle;
+        }
+
+        public boolean isCancelable() {
+            return mCancelable;
+        }
+
+        public static class Builder {
+            private String mNegativeButtonText;
+            private String mPositiveButtonText;
+            private String mShowContent;
+            private String mTitle;
+            private boolean mCancelable;
+            private int mResourceId;
+
+            public Builder setResourceId(int id) {
+                mResourceId = id;
+                return this;
+            }
+
+            public Builder setNegativeButtonText(String text) {
+                mNegativeButtonText = text;
+                return this;
+            }
+
+            public Builder setPositiveButtonText(String text) {
+                mPositiveButtonText = text;
+                return this;
+            }
+
+            public Builder setShowContent(String text) {
+                mShowContent = text;
+                return this;
+            }
+
+            public Builder setTitle(String text) {
+                mTitle = text;
+                return this;
+            }
+
+            public Builder setCancelable(boolean cancelable) {
+                mCancelable = cancelable;
+                return this;
+            }
+
+            public DialogInfo build() {
+                return new DialogInfo(this);
+            }
+        }
     }
 
     private static class ImageDialog extends Dialog {
@@ -788,9 +815,9 @@ public class DialogUtils {
                 request = manager.load(uri);
             } else if (url != null) {
                 request = manager.load(url);
-            } else if (bitmap != null){
+            } else if (bitmap != null) {
                 request = manager.load(bitmap);
-            } else if (data != null){
+            } else if (data != null) {
                 request = manager.load(data);
             } else {
                 return;
@@ -798,17 +825,5 @@ public class DialogUtils {
 
             request.apply(RequestOptions.fitCenterTransform()).into(img);
         }
-    }
-
-    public interface FunctionViewCallback<T> {
-        void onExecute(DialogInterface dialog, T action);
-        void onCancel(DialogInterface dialog);
-        void onDismiss(DialogInterface dialog);
-    }
-
-    public interface ItemCheckCallback {
-        void onExecute(DialogInterface dialog, int idx);
-        void onCancel(DialogInterface dialog);
-        void onDismiss(DialogInterface dialog);
     }
 }

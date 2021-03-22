@@ -26,13 +26,13 @@
         android:id="@+id/tools_grid"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:clipToPadding="false"
         android:gravity="center"
         android:horizontalSpacing="@dimen/control_dp20"
         android:numColumns="2"
+        android:overScrollMode="never"
         android:padding="@dimen/control_dp12"
-        android:clipToPadding="false"
         android:scrollbars="none"
         android:verticalScrollbarPosition="right"
-        android:verticalSpacing="@dimen/control_dp12"
-        android:overScrollMode="never"/>
+        android:verticalSpacing="@dimen/control_dp12" />
 </LinearLayout>

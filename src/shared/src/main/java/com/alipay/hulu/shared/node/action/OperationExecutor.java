@@ -15,17 +15,17 @@
  */
 package com.alipay.hulu.shared.node.action;
 
-import android.accessibilityservice.AccessibilityService;
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.PointF;
-import android.graphics.Rect;
-import android.os.Build;
-import android.os.Environment;
-import android.util.DisplayMetrics;
-import android.view.WindowManager;
-import android.view.accessibility.AccessibilityNodeInfo;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Pattern;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONException;
@@ -62,18 +62,17 @@ import com.alipay.hulu.shared.scan.ScanCodeType;
 import com.android.permission.rom.RomUtils;
 import com.google.zxing.BarcodeFormat;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.regex.Pattern;
-
+import android.accessibilityservice.AccessibilityService;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.PointF;
+import android.graphics.Rect;
+import android.os.Build;
+import android.os.Environment;
+import android.util.DisplayMetrics;
+import android.view.WindowManager;
+import android.view.accessibility.AccessibilityNodeInfo;
 import androidx.annotation.NonNull;
 
 /**
@@ -81,8 +80,6 @@ import androidx.annotation.NonNull;
  */
 @Provider(@Param(type = UIOperationMessage.class, sticky = false))
 public class OperationExecutor {
-    private static final String TAG = "OperationExecutor";
-
     public static final String INPUT_TEXT_KEY = "text";
     public static final String SCHEME_KEY = "scheme";
     public static final String APP_URL_KEY = "appUrl";
@@ -97,24 +94,17 @@ public class OperationExecutor {
     public static final String GESTURE_PATH = "gesturePath";
     public static final String GESTURE_FILTER = "gestureFilter";
     public static final String GENERATE_CODE_TYPE = "codeType";
-
-
     public static final String SCROLL_DISTANCE = "scrollDistance";
     public static final String SCROLL_TIME = "ScrollTime";
-
     /**
      * 点击操作类型
      */
     public static final String EVENT_CLICK_TYPE = "clickType";
-
     public static final int CLICK_TYPE_ADB_TAP = 0;
     public static final int CLICK_TYPE_SEND_EVENT = 1;
-
-    private int currentClickType = CLICK_TYPE_ADB_TAP;
-
-
+    private static final String TAG = "OperationExecutor";
     private static final Pattern FILED_CALL_PATTERN = Pattern.compile("\\$\\{[^}\\s]+\\.?[^}\\s]*\\}");
-
+    private int currentClickType = CLICK_TYPE_ADB_TAP;
     private AtomicInteger handleFlag = new AtomicInteger(0);
 
     private WeakReference<AccessibilityService> serviceRef = new WeakReference<>(null);
@@ -127,7 +117,7 @@ public class OperationExecutor {
     private OperationMethod.ParamProcessor paramReplacer = new OperationMethod.ParamProcessor() {
         @Override
         public String filterParam(String key, String value, PerformActionEnum action) {
-            return getMappedContent(value, operationManagerRef != null? operationManagerRef.get(): null);
+            return getMappedContent(value, operationManagerRef != null ? operationManagerRef.get() : null);
         }
     };
 
@@ -136,6 +126,7 @@ public class OperationExecutor {
     private String currentApp;
 
     private CmdExecutor executor;
+    private AtomicBoolean softHideFlag = new AtomicBoolean(false);
 
     public OperationExecutor(OperationService manager) {
         this.executor = new CmdExecutor();
@@ -147,96 +138,6 @@ public class OperationExecutor {
 
         this.operationManagerRef = new WeakReference<>(manager);
     }
-
-    @Subscriber(@Param(SubscribeParamEnum.ACCESSIBILITY_SERVICE))
-    public void setService(AccessibilityService service) {
-        this.serviceRef = new WeakReference<>(service);
-    }
-
-    @Subscriber(@Param(SubscribeParamEnum.APP))
-    public void setApp(String app) {
-        this.currentApp = app;
-    }
-
-    public int getCurrentClickType() {
-        return currentClickType;
-    }
-
-    // 触摸相关
-    @Subscriber(@Param(EVENT_CLICK_TYPE))
-    public void setCurrentClickType(int currentClickType) {
-        this.currentClickType = currentClickType;
-        executor.setClickType(currentClickType);
-    }
-
-    @Subscriber(@Param(com.alipay.hulu.shared.event.constant.Constant.EVENT_TOUCH_DEVICE))
-    public void updateTouchDevice(String device) {
-        executor.setTouchDevice(device);
-    }
-
-    @Subscriber(@Param(com.alipay.hulu.shared.event.constant.Constant.EVENT_TOUCH_DEVICE_FACTOR_X))
-    public void updateDeviceXFactor(float xFactor) {
-        executor.setFactorX(xFactor);
-    }
-
-    @Subscriber(@Param(com.alipay.hulu.shared.event.constant.Constant.EVENT_TOUCH_DEVICE_FACTOR_Y))
-    public void updateDeviceYFactor(float yFactor) {
-        executor.setFactorY(yFactor);
-    }
-
-    /**
-     * 内部调用
-     * @param node
-     * @param method
-     * @return
-     */
-    private boolean performAction(AbstractNodeTree node, OperationMethod method) {
-        return performAction(node, method, null);
-    }
-
-    /**
-     * 执行动作
-     * @param node 操作节点
-     * @param operationMethod 操作方法
-     */
-    public boolean performAction(final AbstractNodeTree node, OperationMethod operationMethod, OperationContext.OperationListener listener) {
-        PerformActionEnum actionEnum = operationMethod.getActionEnum();
-
-        // 广播下要执行的操作
-        injectorService.pushMessage(Constant.ACTION_OPERATION_STEP, actionEnum);
-
-        // 设置替换参数工具
-        operationMethod.setSuffixProcessor(paramReplacer);
-        OperationContext opContext = wrapOpContext(listener);
-        LogUtil.i(TAG, "开始执行操作： %s", actionEnum.getDesc());
-
-        // 如果是外部操作，由actionMng处理
-        if (actionEnum == PerformActionEnum.OTHER_GLOBAL || actionEnum == PerformActionEnum.OTHER_NODE) {
-            return operationManagerRef.get().getActionProviderMng()
-                    .processAction(node, operationMethod, opContext);
-        }
-
-        // 操作结果记录
-        switch (actionEnum.getCategory()) {
-            // node操作处理
-            case PerformActionEnum.CATEGORY_NODE_OPERATION:
-                return executeNodeAction(operationMethod, node, opContext);
-            case PerformActionEnum.CATEGORY_APP_OPERATION:
-                return executeAppAction(operationMethod, opContext);
-            case PerformActionEnum.CATEGORY_DEVICE_OPERATION:
-                return executeDeviceAction(operationMethod, opContext);
-            // 流程控制
-            case PerformActionEnum.CATEGORY_CONTROL_OPERATION:
-                return executeControlAction(operationMethod, opContext);
-            case PerformActionEnum.CATEGORY_INTERNAL_OPERATION:
-                return executeInternalAction(operationMethod, opContext);
-        }
-
-        // 通知完成
-        opContext.notifyOperationFinish();
-        return false;
-    }
-
 
     /**
      * 将当期运行时变量映射到字符串中
@@ -299,8 +200,100 @@ public class OperationExecutor {
         });
     }
 
+    @Subscriber(@Param(SubscribeParamEnum.ACCESSIBILITY_SERVICE))
+    public void setService(AccessibilityService service) {
+        this.serviceRef = new WeakReference<>(service);
+    }
+
+    @Subscriber(@Param(SubscribeParamEnum.APP))
+    public void setApp(String app) {
+        this.currentApp = app;
+    }
+
+    public int getCurrentClickType() {
+        return currentClickType;
+    }
+
+    // 触摸相关
+    @Subscriber(@Param(EVENT_CLICK_TYPE))
+    public void setCurrentClickType(int currentClickType) {
+        this.currentClickType = currentClickType;
+        executor.setClickType(currentClickType);
+    }
+
+    @Subscriber(@Param(com.alipay.hulu.shared.event.constant.Constant.EVENT_TOUCH_DEVICE))
+    public void updateTouchDevice(String device) {
+        executor.setTouchDevice(device);
+    }
+
+    @Subscriber(@Param(com.alipay.hulu.shared.event.constant.Constant.EVENT_TOUCH_DEVICE_FACTOR_X))
+    public void updateDeviceXFactor(float xFactor) {
+        executor.setFactorX(xFactor);
+    }
+
+    @Subscriber(@Param(com.alipay.hulu.shared.event.constant.Constant.EVENT_TOUCH_DEVICE_FACTOR_Y))
+    public void updateDeviceYFactor(float yFactor) {
+        executor.setFactorY(yFactor);
+    }
+
+    /**
+     * 内部调用
+     *
+     * @param node
+     * @param method
+     * @return
+     */
+    private boolean performAction(AbstractNodeTree node, OperationMethod method) {
+        return performAction(node, method, null);
+    }
+
+    /**
+     * 执行动作
+     *
+     * @param node            操作节点
+     * @param operationMethod 操作方法
+     */
+    public boolean performAction(final AbstractNodeTree node, OperationMethod operationMethod, OperationContext.OperationListener listener) {
+        PerformActionEnum actionEnum = operationMethod.getActionEnum();
+
+        // 广播下要执行的操作
+        injectorService.pushMessage(Constant.ACTION_OPERATION_STEP, actionEnum);
+
+        // 设置替换参数工具
+        operationMethod.setSuffixProcessor(paramReplacer);
+        OperationContext opContext = wrapOpContext(listener);
+        LogUtil.i(TAG, "开始执行操作： %s", actionEnum.getDesc());
+
+        // 如果是外部操作，由actionMng处理
+        if (actionEnum == PerformActionEnum.OTHER_GLOBAL || actionEnum == PerformActionEnum.OTHER_NODE) {
+            return operationManagerRef.get().getActionProviderMng()
+                    .processAction(node, operationMethod, opContext);
+        }
+
+        // 操作结果记录
+        switch (actionEnum.getCategory()) {
+            // node操作处理
+            case PerformActionEnum.CATEGORY_NODE_OPERATION:
+                return executeNodeAction(operationMethod, node, opContext);
+            case PerformActionEnum.CATEGORY_APP_OPERATION:
+                return executeAppAction(operationMethod, opContext);
+            case PerformActionEnum.CATEGORY_DEVICE_OPERATION:
+                return executeDeviceAction(operationMethod, opContext);
+            // 流程控制
+            case PerformActionEnum.CATEGORY_CONTROL_OPERATION:
+                return executeControlAction(operationMethod, opContext);
+            case PerformActionEnum.CATEGORY_INTERNAL_OPERATION:
+                return executeInternalAction(operationMethod, opContext);
+        }
+
+        // 通知完成
+        opContext.notifyOperationFinish();
+        return false;
+    }
+
     /**
      * 包装OperationContext
+     *
      * @param listener
      * @return
      */
@@ -322,8 +315,9 @@ public class OperationExecutor {
 
     /**
      * 执行节点操作
+     *
      * @param method 方法
-     * @param node 操作节点
+     * @param node   操作节点
      */
     private boolean executeNodeAction(OperationMethod method, AbstractNodeTree node, final OperationContext opContext) {
         if (node == null) {
@@ -393,7 +387,7 @@ public class OperationExecutor {
         }
 
         // 看看子节点能不能处理
-        for (AbstractNodeTree nodeTree: targetNode){
+        for (AbstractNodeTree nodeTree : targetNode) {
             if (nodeTree.canDoAction(actionEnum)) {
                 targetNode = nodeTree;
                 operationFlag = true;
@@ -433,6 +427,7 @@ public class OperationExecutor {
 
     /**
      * 兜底执行
+     *
      * @param method 方法
      * @param node
      * @return
@@ -448,6 +443,7 @@ public class OperationExecutor {
 
     /**
      * 执行手势操作
+     *
      * @param method
      * @param r
      * @param opContext
@@ -487,6 +483,7 @@ public class OperationExecutor {
 
     /**
      * 向指定位置强制输入文字
+     *
      * @param text
      * @param rect
      */
@@ -726,13 +723,13 @@ public class OperationExecutor {
                 return true;
             case GOTO_INDEX:
                 opContext.notifyOnFinish(new Runnable() {
-                        @Override
-                        public void run() {
-                            // 先杀进程，再启动应用
-                            AppUtil.forceStopApp(currentApp);
-                            MiscUtil.sleep(1000);
-                            AppUtil.startApp(currentApp);
-                            operationManagerRef.get().invalidRoot();
+                    @Override
+                    public void run() {
+                        // 先杀进程，再启动应用
+                        AppUtil.forceStopApp(currentApp);
+                        MiscUtil.sleep(1000);
+                        AppUtil.startApp(currentApp);
+                        operationManagerRef.get().invalidRoot();
                     }
                 });
                 return true;
@@ -892,6 +889,7 @@ public class OperationExecutor {
 
     /**
      * 处理流程控制动作
+     *
      * @param method
      */
     private boolean executeControlAction(OperationMethod method, OperationContext opContext) {
@@ -946,7 +944,7 @@ public class OperationExecutor {
 
                             // 存放到顶层参数map
                             Map<String, String> realParams = new HashMap<>(params.size() + 1);
-                            for (String key: params.keySet()) {
+                            for (String key : params.keySet()) {
                                 realParams.put(key, params.getString(key));
                             }
 
@@ -1028,7 +1026,7 @@ public class OperationExecutor {
 
                     // 查找允许
                     if (findNodes != null && findNodes.size() > 0) {
-                        for (AccessibilityNodeInfo targetInfo: findNodes) {
+                        for (AccessibilityNodeInfo targetInfo : findNodes) {
                             if (StringUtil.equals(targetInfo.getText(), "始终允许")
                                     || StringUtil.equals("允许", targetInfo.getText())
                                     || StringUtil.equals("总是允许", targetInfo.getText())) {
@@ -1045,7 +1043,7 @@ public class OperationExecutor {
                     // 查找好的
                     findNodes = nodeInfo.findAccessibilityNodeInfosByText("好的");
                     if (findNodes != null && findNodes.size() > 0) {
-                        for (AccessibilityNodeInfo targetInfo: findNodes) {
+                        for (AccessibilityNodeInfo targetInfo : findNodes) {
                             if (StringUtil.equals(targetInfo.getText(), "好的")) {
                                 Rect node = new Rect();
                                 targetInfo.getBoundsInScreen(node);
@@ -1118,6 +1116,7 @@ public class OperationExecutor {
 
     /**
      * 查找允许权限按钮
+     *
      * @return
      */
     private AbstractNodeTree findAllowPermissionBtn() {
@@ -1160,11 +1159,8 @@ public class OperationExecutor {
         }
     }
 
-    private AtomicBoolean softHideFlag = new AtomicBoolean(false);
-
     /**
      * 用back键隐藏输入法框，基本上好用
-     *
      */
     public void hideSoftInput() {
         if (softHideFlag.compareAndSet(false, true)) {

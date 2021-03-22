@@ -15,35 +15,11 @@
  */
 package com.alipay.hulu.util;
 
-import android.content.Context;
-import android.content.DialogInterface;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.PointF;
-import android.graphics.Rect;
-import android.graphics.drawable.BitmapDrawable;
-
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.AppCompatSpinner;
-import android.text.Editable;
-import android.text.InputType;
-import android.text.TextUtils;
-import android.text.TextWatcher;
-import android.util.DisplayMetrics;
-import android.util.Pair;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.LinearLayout;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
-import android.widget.ScrollView;
-import android.widget.TextView;
+import java.io.File;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 import com.alibaba.fastjson.JSON;
 import com.alipay.hulu.R;
@@ -74,19 +50,42 @@ import com.alipay.hulu.ui.FlowRadioGroup;
 import com.alipay.hulu.ui.GesturePadView;
 import com.alipay.hulu.ui.TwoLevelSelectLayout;
 
-import java.io.File;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.PointF;
+import android.graphics.Rect;
+import android.graphics.drawable.BitmapDrawable;
+import android.text.Editable;
+import android.text.InputType;
+import android.text.TextUtils;
+import android.text.TextWatcher;
+import android.util.DisplayMetrics;
+import android.util.Pair;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.ScrollView;
+import android.widget.TextView;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.AppCompatSpinner;
 
 /**
  * 操作选择界面
  * Created by qiaoruikai on 2019/2/22 8:18 PM.
  */
 public class FunctionSelectUtil {
-    private static final String TAG = "FunctionSelect";
     public static final String ACTION_EXTRA = "ACTION_EXTRA";
+    private static final String TAG = "FunctionSelect";
 
     /**
      * 展示操作界面
@@ -94,11 +93,11 @@ public class FunctionSelectUtil {
      * @param node
      */
     public static void showFunctionView(final Context context, final AbstractNodeTree node,
-                                  final List<Integer> keys, final List<Integer> icons,
-                                  final Map<Integer,List<TwoLevelSelectLayout.SubMenuItem>> secondLevel,
-                                  final HighLightService highLightService,
-                                  final OperationService operationService,
-                                  final Pair<Float, Float> localClickPos,
+                                        final List<Integer> keys, final List<Integer> icons,
+                                        final Map<Integer, List<TwoLevelSelectLayout.SubMenuItem>> secondLevel,
+                                        final HighLightService highLightService,
+                                        final OperationService operationService,
+                                        final Pair<Float, Float> localClickPos,
                                         final FunctionListener listener) {
         // 没有操作
         DialogUtils.showLeveledFunctionView(context, keys, icons, secondLevel, new DialogUtils.FunctionViewCallback<TwoLevelSelectLayout.SubMenuItem>() {
@@ -125,7 +124,7 @@ public class FunctionSelectUtil {
                     dialog.dismiss();
                     // 隐藏高亮
                     if (highLightService != null) {
-                       highLightService.removeHightLightSync();
+                        highLightService.removeHightLightSync();
                     }
 
                     method.putParam(ActionProviderManager.KEY_TARGET_ACTION_DESC, action.name);
@@ -222,8 +221,8 @@ public class FunctionSelectUtil {
      * @return
      */
     protected static boolean processAction(OperationMethod method, AbstractNodeTree node,
-                                    final Context context, OperationService operationService,
-                                    FunctionListener listener) {
+                                           final Context context, OperationService operationService,
+                                           FunctionListener listener) {
         PerformActionEnum action = method.getActionEnum();
         if (action == PerformActionEnum.INPUT
                 || action == PerformActionEnum.INPUT_SEARCH
@@ -331,11 +330,12 @@ public class FunctionSelectUtil {
 
     /**
      * 展示滑动控制
+     *
      * @param context
      */
     private static void showScrollControlView(final OperationMethod method, Context context, final FunctionListener listener) {
         try {
-            LayoutInflater inflater =  LayoutInflater.from(ContextUtil.getContextThemeWrapper(
+            LayoutInflater inflater = LayoutInflater.from(ContextUtil.getContextThemeWrapper(
                     context, R.style.AppDialogTheme));
 
             ScrollView v = (ScrollView) inflater.inflate(R.layout.dialog_setting, null);
@@ -393,12 +393,12 @@ public class FunctionSelectUtil {
                             listener.onProcessFunction(method, null);
                         }
                     }).setNegativeButton(R.string.constant__cancel, new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.dismiss();
-                    listener.onCancel();
-                }
-            }).create();
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            listener.onCancel();
+                        }
+                    }).create();
 
             dialog.getWindow().setType(com.alipay.hulu.common.constant.Constant.TYPE_ALERT);
             dialog.setCanceledOnTouchOutside(false);
@@ -413,11 +413,12 @@ public class FunctionSelectUtil {
 
     /**
      * 展示选择框
+     *
      * @param method
      * @param context
      */
     private static void showSelectView(final OperationMethod method, final Context context,
-                                final FunctionListener listener) {
+                                       final FunctionListener listener) {
         try {
             final PerformActionEnum actionEnum = method.getActionEnum();
             View customView = LayoutInflater.from(context).inflate(R.layout.dialog_select_view, null);
@@ -445,8 +446,8 @@ public class FunctionSelectUtil {
                 @Override
                 public void onClick(View v) {
                     if (actionEnum == PerformActionEnum.JUMP_TO_PAGE
-                        || actionEnum == PerformActionEnum.GENERATE_QR_CODE
-                        || actionEnum == PerformActionEnum.GENERATE_BAR_CODE) {
+                            || actionEnum == PerformActionEnum.GENERATE_QR_CODE
+                            || actionEnum == PerformActionEnum.GENERATE_BAR_CODE) {
                         if (v.getId() == R.id.item_scan) {
                             method.putParam("scan", "1");
                             listener.onProcessFunction(method, null);
@@ -484,12 +485,13 @@ public class FunctionSelectUtil {
 
     /**
      * URL编辑框
+     *
      * @param method
      * @param context
      * @param listener
      */
     private static void showUrlEditView(final OperationMethod method, Context context,
-                                 final FunctionListener listener) {
+                                        final FunctionListener listener) {
         final PerformActionEnum actionEnum = method.getActionEnum();
         View v = LayoutInflater.from(ContextUtil.getContextThemeWrapper(context, R.style.AppDialogTheme)).inflate(R.layout.dialog_record_name, null);
         final EditText edit = (EditText) v.findViewById(R.id.dialog_record_edit);
@@ -500,7 +502,7 @@ public class FunctionSelectUtil {
         }
 
         int title = (actionEnum == PerformActionEnum.GENERATE_QR_CODE
-                || actionEnum == PerformActionEnum.GENERATE_BAR_CODE)? R.string.function__input_qr_code: R.string.function__input_url;
+                || actionEnum == PerformActionEnum.GENERATE_BAR_CODE) ? R.string.function__input_qr_code : R.string.function__input_url;
 
         AlertDialog dialog = new AlertDialog.Builder(context, R.style.AppDialogTheme)
                 .setTitle(title)
@@ -514,8 +516,8 @@ public class FunctionSelectUtil {
                         dialog.dismiss();
 
                         if (actionEnum == PerformActionEnum.JUMP_TO_PAGE
-                            || actionEnum == PerformActionEnum.GENERATE_QR_CODE
-                            || actionEnum == PerformActionEnum.GENERATE_BAR_CODE) {
+                                || actionEnum == PerformActionEnum.GENERATE_QR_CODE
+                                || actionEnum == PerformActionEnum.GENERATE_BAR_CODE) {
 
                             // 向handler发送请求
                             method.putParam(OperationExecutor.SCHEME_KEY, data);
@@ -543,6 +545,7 @@ public class FunctionSelectUtil {
 
     /**
      * 设置变量框
+     *
      * @param node
      * @param context
      * @param listener
@@ -572,24 +575,24 @@ public class FunctionSelectUtil {
         // 分别设置内容
         final CheckableRelativeLayout textWrapper = (CheckableRelativeLayout) letView.findViewById(
                 R.id.dialog_action_let_text);
-        ((TextView)textWrapper.findViewById(R.id.dialog_action_let_item_title)).setText(R.string.function_select__text);
-        ((TextView)textWrapper.findViewById(R.id.dialog_action_let_item_value)).setText(node.getText());
+        ((TextView) textWrapper.findViewById(R.id.dialog_action_let_item_title)).setText(R.string.function_select__text);
+        ((TextView) textWrapper.findViewById(R.id.dialog_action_let_item_value)).setText(node.getText());
         final CheckableRelativeLayout descWrapper = (CheckableRelativeLayout) letView.findViewById(
                 R.id.dialog_action_let_description);
-        ((TextView)descWrapper.findViewById(R.id.dialog_action_let_item_title)).setText(R.string.function_select__description);
-        ((TextView)descWrapper.findViewById(R.id.dialog_action_let_item_value)).setText(node.getDescription());
+        ((TextView) descWrapper.findViewById(R.id.dialog_action_let_item_title)).setText(R.string.function_select__description);
+        ((TextView) descWrapper.findViewById(R.id.dialog_action_let_item_value)).setText(node.getDescription());
         final CheckableRelativeLayout classWrapper = (CheckableRelativeLayout) letView.findViewById(
                 R.id.dialog_action_let_class_name);
-        ((TextView)classWrapper.findViewById(R.id.dialog_action_let_item_title)).setText(R.string.function_select__class_name);
-        ((TextView)classWrapper.findViewById(R.id.dialog_action_let_item_value)).setText(node.getClassName());
+        ((TextView) classWrapper.findViewById(R.id.dialog_action_let_item_title)).setText(R.string.function_select__class_name);
+        ((TextView) classWrapper.findViewById(R.id.dialog_action_let_item_value)).setText(node.getClassName());
         final CheckableRelativeLayout xpathWrapper = (CheckableRelativeLayout) letView.findViewById(
                 R.id.dialog_action_let_xpath);
-        ((TextView)xpathWrapper.findViewById(R.id.dialog_action_let_item_title)).setText(R.string.function_select__xpath);
-        ((TextView)xpathWrapper.findViewById(R.id.dialog_action_let_item_value)).setText(node.getXpath());
+        ((TextView) xpathWrapper.findViewById(R.id.dialog_action_let_item_title)).setText(R.string.function_select__xpath);
+        ((TextView) xpathWrapper.findViewById(R.id.dialog_action_let_item_value)).setText(node.getXpath());
         final CheckableRelativeLayout resIdWrapper = (CheckableRelativeLayout) letView.findViewById(
                 R.id.dialog_action_let_resource_id);
-        ((TextView)resIdWrapper.findViewById(R.id.dialog_action_let_item_title)).setText(R.string.function_select__res_id);
-        ((TextView)resIdWrapper.findViewById(R.id.dialog_action_let_item_value)).setText(node.getResourceId());
+        ((TextView) resIdWrapper.findViewById(R.id.dialog_action_let_item_title)).setText(R.string.function_select__res_id);
+        ((TextView) resIdWrapper.findViewById(R.id.dialog_action_let_item_value)).setText(node.getResourceId());
         final CheckableRelativeLayout otherWrapper = (CheckableRelativeLayout) letView.findViewById(
                 R.id.dialog_action_let_other);
         final EditText valExpr = (EditText) otherWrapper.findViewById(R.id.dialog_action_let_other_value);
@@ -648,7 +651,7 @@ public class FunctionSelectUtil {
         });
 
         final CheckableRelativeLayout[] previous = {textWrapper};
-        final String[] valValue = { "${node.text}" };
+        final String[] valValue = {"${node.text}"};
 
         previous[0].setChecked(true);
         CheckableRelativeLayout.OnCheckedChangeListener checkedChangeListener = new CheckableRelativeLayout.OnCheckedChangeListener() {
@@ -706,8 +709,8 @@ public class FunctionSelectUtil {
                         int targetValType = LogicUtil.ALLOC_TYPE_STRING;
                         if (previous[0] == otherWrapper) {
                             targetValValue = valExpr.getText().toString();
-                            targetValType = valType.getCheckedRadioButtonId() == R.id.dialog_action_let_other_type_int?
-                                    LogicUtil.ALLOC_TYPE_INTEGER: LogicUtil.ALLOC_TYPE_STRING;
+                            targetValType = valType.getCheckedRadioButtonId() == R.id.dialog_action_let_other_type_int ?
+                                    LogicUtil.ALLOC_TYPE_INTEGER : LogicUtil.ALLOC_TYPE_STRING;
                         }
 
                         dialog.dismiss();
@@ -733,14 +736,14 @@ public class FunctionSelectUtil {
     }
 
 
-
     /**
      * 动态赋值选择框
+     *
      * @param context
      * @param listener
      */
     private static void chooseCheckMode(AbstractNodeTree node, final Context context,
-                                            final FunctionListener listener, final OperationService service) {
+                                        final FunctionListener listener, final OperationService service) {
 
         // 如果是TextView外面包装的一层，解析内部的TextView
         if (node != null) {
@@ -887,8 +890,8 @@ public class FunctionSelectUtil {
                         LogUtil.i(TAG, "Positive " + which);
                         String leftVal = leftExpr.getText().toString();
                         String rightVal = rightExpr.getText().toString();
-                        int targetValType = valType.getCheckedRadioButtonId() == R.id.dialog_action_check_type_int?
-                                LogicUtil.ALLOC_TYPE_INTEGER: LogicUtil.ALLOC_TYPE_STRING;
+                        int targetValType = valType.getCheckedRadioButtonId() == R.id.dialog_action_check_type_int ?
+                                LogicUtil.ALLOC_TYPE_INTEGER : LogicUtil.ALLOC_TYPE_STRING;
 
                         dialog.dismiss();
                         OperationMethod method;
@@ -954,11 +957,12 @@ public class FunctionSelectUtil {
 
     /**
      * 动态赋值选择框
+     *
      * @param context
      * @param listener
      */
     private static void chooseLetGlobalMode(final Context context,
-                                      final FunctionListener listener, final OperationService service) {
+                                            final FunctionListener listener, final OperationService service) {
 
         // 获取页面
         View letView = LayoutInflater.from(ContextUtil.getContextThemeWrapper(context,
@@ -1028,8 +1032,8 @@ public class FunctionSelectUtil {
                         LogUtil.i(TAG, "Positive " + which);
                         String targetValName = valName.getText().toString();
                         String targetValValue = valExpr.getText().toString();
-                        int targetValType = valType.getCheckedRadioButtonId() == R.id.dialog_action_let_other_type_int?
-                                    LogicUtil.ALLOC_TYPE_INTEGER: LogicUtil.ALLOC_TYPE_STRING;
+                        int targetValType = valType.getCheckedRadioButtonId() == R.id.dialog_action_let_other_type_int ?
+                                LogicUtil.ALLOC_TYPE_INTEGER : LogicUtil.ALLOC_TYPE_STRING;
 
                         dialog.dismiss();
                         OperationMethod method = new OperationMethod(PerformActionEnum.LET);
@@ -1059,7 +1063,7 @@ public class FunctionSelectUtil {
      * @param node
      */
     private static void chooseAssertMode(final AbstractNodeTree node, final PerformActionEnum action,
-                                  final Context context, final FunctionListener listener) {
+                                         final Context context, final FunctionListener listener) {
         try {
             // 文字Assert Mode
             final String[] actionsType = {Constant.ASSERT_ACCURATE, Constant.ASSERT_CONTAIN, Constant.ASSERT_REGULAR};
@@ -1091,7 +1095,7 @@ public class FunctionSelectUtil {
                 assertGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(RadioGroup group, int checkedId) {
-                       if (checkedId == R.id.ch1) {
+                        if (checkedId == R.id.ch1) {
                             selectNumIndex[0] = 0;
                         } else if (checkedId == R.id.ch2) {
                             selectNumIndex[0] = 1;
@@ -1248,7 +1252,6 @@ public class FunctionSelectUtil {
     }
 
 
-
     private static void postiveClick(final PerformActionEnum action, final AbstractNodeTree node,
                                      DialogInterface dialog, HashMap<String, String> param,
                                      final FunctionListener listener) {
@@ -1278,7 +1281,7 @@ public class FunctionSelectUtil {
      * @param node
      */
     protected static void showEditView(final AbstractNodeTree node, final OperationMethod method,
-                                final Context context, final FunctionListener listener) {
+                                       final Context context, final FunctionListener listener) {
 
         try {
             PerformActionEnum action = method.getActionEnum();
@@ -1301,11 +1304,11 @@ public class FunctionSelectUtil {
                 edit.setHint(R.string.function__screenshot_name);
                 title = StringUtil.getString(R.string.function__set_screenshot_name);
                 textPattern = Pattern.compile("\\S+(.*\\S+)?");
-            } else if (action ==PerformActionEnum.MULTI_CLICK) {
+            } else if (action == PerformActionEnum.MULTI_CLICK) {
                 edit.setHint(R.string.function__click_time);
                 title = StringUtil.getString(R.string.function__set_click_time);
                 textPattern = Pattern.compile("\\d{1,2}");
-            } else if (action ==PerformActionEnum.SLEEP_UNTIL) {
+            } else if (action == PerformActionEnum.SLEEP_UNTIL) {
                 edit.setHint(R.string.function__max_wait);
                 edit.setText(R.string.default_sleep_time);
                 title = StringUtil.getString(R.string.function__set_max_wait);
@@ -1409,6 +1412,7 @@ public class FunctionSelectUtil {
 
     /**
      * 隐藏输入法
+     *
      * @param editText
      */
     private static void hideInput(EditText editText) {
@@ -1418,6 +1422,7 @@ public class FunctionSelectUtil {
 
     /**
      * 展示WHILE编辑界面
+     *
      * @param method
      * @param context
      * @param listener
@@ -1499,16 +1504,17 @@ public class FunctionSelectUtil {
 
     /**
      * 展示提供的View
+     *
      * @param node
      * @param method
      * @param context
      * @param content 目标界面
      */
     private static void showProvidedView(final AbstractNodeTree node, final OperationMethod method,
-                                  final Context context, View content,
-                                  final Runnable confirmListener,
-                                  final HighLightService highLightService,
-                                  final FunctionListener listener) {
+                                         final Context context, View content,
+                                         final Runnable confirmListener,
+                                         final HighLightService highLightService,
+                                         final FunctionListener listener) {
         ScrollView view = (ScrollView) LayoutInflater.from(ContextUtil.getContextThemeWrapper(
                 context, R.style.AppDialogTheme))
                 .inflate(R.layout.dialog_setting, null);
@@ -1565,6 +1571,7 @@ public class FunctionSelectUtil {
 
     /**
      * 展示登录信息框
+     *
      * @param action
      * @param context
      */
@@ -1666,6 +1673,7 @@ public class FunctionSelectUtil {
 
     /**
      * 截图
+     *
      * @param captureFile 截图保留文件
      * @return
      */

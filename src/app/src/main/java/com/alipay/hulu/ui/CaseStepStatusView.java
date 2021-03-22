@@ -15,6 +15,13 @@
  */
 package com.alipay.hulu.ui;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.alipay.hulu.R;
+import com.alipay.hulu.common.utils.ContextUtil;
+import com.alipay.hulu.common.utils.StringUtil;
+
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -22,16 +29,9 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
-import androidx.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
-
-import com.alipay.hulu.R;
-import com.alipay.hulu.common.utils.ContextUtil;
-import com.alipay.hulu.common.utils.StringUtil;
-
-import java.util.ArrayList;
-import java.util.List;
+import androidx.annotation.Nullable;
 
 /**
  * Created by qiaoruikai on 2019/2/21 2:46 PM.
@@ -77,7 +77,7 @@ public class CaseStepStatusView extends View {
     private void readAttributes(AttributeSet attrs) {
         TypedArray array = getContext().obtainStyledAttributes(attrs, R.styleable.CaseStepStatusView);
         backGroundColor = array.getColor(R.styleable.CaseStepStatusView_css_backgroundColor,
-                Color.rgb(0xFB, 0xFF, 0xEA ));
+                Color.rgb(0xFB, 0xFF, 0xEA));
 
         lineColor = array.getColor(R.styleable.CaseStepStatusView_css_lineColor,
                 Color.rgb(151, 151, 151));
@@ -110,6 +110,7 @@ public class CaseStepStatusView extends View {
 
     /**
      * 设置level状态
+     *
      * @param occuredLevel
      * @param startLevel
      * @param endLevel
@@ -183,7 +184,7 @@ public class CaseStepStatusView extends View {
 
         if (!endLevel.isEmpty()) {
             int maxLevel = -1;
-            for (int level: endLevel) {
+            for (int level : endLevel) {
                 if (maxLevel < level) {
                     maxLevel = level;
                 }
@@ -204,6 +205,7 @@ public class CaseStepStatusView extends View {
 
     /**
      * 生成三角
+     *
      * @return
      */
     private Path genEndTriangle() {

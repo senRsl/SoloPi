@@ -17,7 +17,8 @@ package com.alipay.hulu.tools;
 
 
 public interface IPerformStress {
-	public abstract void PerformEntry(int param);
-	public abstract void addOrReduceToTargetThread(int count);
+    public abstract void PerformEntry(int param);
+
+    public abstract void addOrReduceToTargetThread(int count);
 
 }

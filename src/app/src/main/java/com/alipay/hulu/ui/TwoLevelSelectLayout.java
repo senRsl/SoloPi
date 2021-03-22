@@ -15,10 +15,18 @@
  */
 package com.alipay.hulu.ui;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.alipay.hulu.R;
+import com.alipay.hulu.common.utils.ContextUtil;
+import com.alipay.hulu.common.utils.LogUtil;
+
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.os.Build;
-import androidx.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,15 +38,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-
-import com.alipay.hulu.R;
-import com.alipay.hulu.common.utils.ContextUtil;
-import com.alipay.hulu.common.utils.LogUtil;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import androidx.annotation.Nullable;
 
 /**
  * Created by qiaoruikai on 2019/1/29 9:36 PM.
@@ -86,6 +86,7 @@ public class TwoLevelSelectLayout extends LinearLayout {
 
     /**
      * 初始化界面
+     *
      * @param context
      * @param attrs
      * @param style
@@ -149,7 +150,7 @@ public class TwoLevelSelectLayout extends LinearLayout {
                     convertView = LayoutInflater.from(
                             ContextUtil.getContextThemeWrapper(getContext(),
                                     R.style.AppDialogTheme)).inflate(
-                                            R.layout.dialog_first_level_item, null);
+                            R.layout.dialog_first_level_item, null);
                 }
 
                 // 设置图标
@@ -248,6 +249,7 @@ public class TwoLevelSelectLayout extends LinearLayout {
 
     /**
      * 更新菜单信息
+     *
      * @param keys
      * @param resources
      * @param secondLevels
@@ -286,6 +288,10 @@ public class TwoLevelSelectLayout extends LinearLayout {
         this.listener = listener;
     }
 
+    public interface OnSubMenuClickListener {
+        void onSubMenuClick(SubMenuItem item);
+    }
+
     /**
      * 子菜单项
      */
@@ -314,9 +320,5 @@ public class TwoLevelSelectLayout extends LinearLayout {
                     ", extra='" + extra + '\'' +
                     '}';
         }
-    }
-
-    public interface OnSubMenuClickListener {
-        void onSubMenuClick(SubMenuItem item);
     }
 }

@@ -14,7 +14,7 @@
   ~ limitations under the License.
 -->
 <resources>
-    <string name="app_name">SoloPi</string>
+    <string name="app_name">SoloPs</string>
 
     <string name="more_setting">更多设置</string>
     <string name="collapse_setting">收起</string>

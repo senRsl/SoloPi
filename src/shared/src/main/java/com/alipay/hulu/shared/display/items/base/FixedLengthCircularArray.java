@@ -19,6 +19,7 @@ import java.util.Arrays;
 
 /**
  * 定长循环列表
+ *
  * @param <T> 包装类
  */
 public class FixedLengthCircularArray<T> {
@@ -51,6 +52,7 @@ public class FixedLengthCircularArray<T> {
 
     /**
      * 向队列添加对象，会自动挤掉最前的对象
+     *
      * @param item
      */
     public void addItem(T item) {
@@ -58,12 +60,13 @@ public class FixedLengthCircularArray<T> {
         mCurrentPos = (mCurrentPos + 1) % mTotalSize;
         mItems[mCurrentPos] = item;
         if (mCurrentSize < mTotalSize) {
-            mCurrentSize ++;
+            mCurrentSize++;
         }
     }
 
     /**
      * 将队列结果按插入顺序输出
+     *
      * @return
      */
     public T[] getAllItems(T[] list) {
@@ -83,6 +86,7 @@ public class FixedLengthCircularArray<T> {
 
     /**
      * 重设队列大小
+     *
      * @param newSize
      */
     public void resize(int newSize) {
@@ -120,7 +124,7 @@ public class FixedLengthCircularArray<T> {
                 return true;
             }
 
-            mLoadPos = mLoadPos > 1? mLoadPos - 1: mTotalSize - 1;
+            mLoadPos = mLoadPos > 1 ? mLoadPos - 1 : mTotalSize - 1;
         }
         return false;
     }
@@ -138,7 +142,7 @@ public class FixedLengthCircularArray<T> {
         }
 
         int reversePos = mCurrentSize - position - 1;
-        int realPos = mCurrentPos < reversePos? mTotalSize - (reversePos - mCurrentPos): mCurrentPos - reversePos;
+        int realPos = mCurrentPos < reversePos ? mTotalSize - (reversePos - mCurrentPos) : mCurrentPos - reversePos;
         return (T) mItems[realPos];
     }
 }

@@ -15,34 +15,6 @@
  */
 package com.alipay.hulu.common.tools;
 
-import android.content.Context;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.os.Build;
-import android.os.Looper;
-import androidx.annotation.IntRange;
-import android.util.Base64;
-
-import com.alipay.hulu.common.R;
-import com.alipay.hulu.common.application.LauncherApplication;
-import com.alipay.hulu.common.bean.ProcessInfo;
-import com.alipay.hulu.common.injector.InjectorService;
-import com.alipay.hulu.common.injector.param.RunningThread;
-import com.alipay.hulu.common.injector.param.SubscribeParamEnum;
-import com.alipay.hulu.common.injector.param.Subscriber;
-import com.alipay.hulu.common.injector.provider.Param;
-import com.alipay.hulu.common.service.SPService;
-import com.alipay.hulu.common.utils.FileUtils;
-import com.alipay.hulu.common.utils.LogUtil;
-import com.alipay.hulu.common.utils.MiscUtil;
-import com.alipay.hulu.common.utils.StringUtil;
-import com.android.permission.rom.RomUtils;
-import com.cgutman.adblib.AdbBase64;
-import com.cgutman.adblib.AdbConnection;
-import com.cgutman.adblib.AdbCrypto;
-import com.cgutman.adblib.AdbStream;
-
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -84,51 +56,71 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import com.alipay.hulu.common.R;
+import com.alipay.hulu.common.application.LauncherApplication;
+import com.alipay.hulu.common.bean.ProcessInfo;
+import com.alipay.hulu.common.injector.InjectorService;
+import com.alipay.hulu.common.injector.param.RunningThread;
+import com.alipay.hulu.common.injector.param.SubscribeParamEnum;
+import com.alipay.hulu.common.injector.param.Subscriber;
+import com.alipay.hulu.common.injector.provider.Param;
+import com.alipay.hulu.common.service.SPService;
+import com.alipay.hulu.common.utils.FileUtils;
+import com.alipay.hulu.common.utils.LogUtil;
+import com.alipay.hulu.common.utils.MiscUtil;
+import com.alipay.hulu.common.utils.StringUtil;
+import com.android.permission.rom.RomUtils;
+import com.cgutman.adblib.AdbBase64;
+import com.cgutman.adblib.AdbConnection;
+import com.cgutman.adblib.AdbCrypto;
+import com.cgutman.adblib.AdbStream;
+
+import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.os.Looper;
+import android.util.Base64;
+import androidx.annotation.IntRange;
+
 /**
  * 命令行操作集合
  */
 public class CmdTools {
-    private static String TAG = "CmdTools";
-
-    private static final int MODE_APPEND = 0;
-
     public static final String FATAL_ADB_CANNOT_RECOVER = "fatalAdbNotRecover";
-
     public static final String ERROR_NO_CONNECTION = "HULU_ERROR_NO_CONNECTION";
     public static final String ERROR_CONNECTION_ILLEGAL_STATE = "HULU_ERROR_CONNECTION_ILLEGAL_STATE";
     public static final String ERROR_CONNECTION_COMMON_EXCEPTION = "HULU_ERROR_CONNECTION_COMMON_EXCEPTION";
-
+    private static final int MODE_APPEND = 0;
     private static final SimpleDateFormat LOG_FILE_FORMAT = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss", Locale.CHINA);
-
-    private static ScheduledExecutorService mOppoKeepAliveExecutor;
-
-    private static ExecutorService cachedExecutor = Executors.newCachedThreadPool();
-
-    private static volatile AdbConnection connection;
-
-    private static Boolean isRoot = null;
-
     public static String DEVICE_ID = null;
-
+    public static long LAST_ADB_RETRY_TIME = 0;
+    private static String TAG = "CmdTools";
+    private static ScheduledExecutorService mOppoKeepAliveExecutor;
+    private static ExecutorService cachedExecutor = Executors.newCachedThreadPool();
+    private static volatile AdbConnection connection;
+    private static Boolean isRoot = null;
     private static List<Process> processes = new ArrayList<>();
-
     private static List<AdbStream> streams = new ArrayList<>();
-
     private static PidWatcher watcher;
-
     private static File currentLogFile;
-
     private static ConcurrentLinkedQueue<String> logs = null;
+    /**
+     * root超时限制
+     */
+    private static ThreadPoolExecutor processReadExecutor = new ThreadPoolExecutor(5, 5, 0, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(10));
+    private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.CHINA);
+    private static volatile long LAST_RUNNING_TIME = 0;
+    private static ScheduledExecutorService scheduledExecutorService;
 
-    public static void forceAdb(){
+    public static void forceAdb() {
         isRoot = false;
     }
 
-    public static void cancelForceAdb(){
+    public static void cancelForceAdb() {
         isRoot = null;
     }
-
-    public static long LAST_ADB_RETRY_TIME = 0;
 
     /**
      * 开始adb日志记录
@@ -155,6 +147,7 @@ public class CmdTools {
 
     /**
      * 结束并获取adb日志记录
+     *
      * @return
      */
     public static File stopAppLog() {
@@ -171,91 +164,16 @@ public class CmdTools {
         return null;
     }
 
-    /**
-     * pid监控器
-     */
-    static final class PidWatcher {
-        private Set<Integer> pids = null;
-        private final CmdLine cmdLine;
-
-        private PidWatcher(CmdLine cmdLine) {
-            this.cmdLine = cmdLine;
-        }
-
-        @Subscriber(value = @Param(SubscribeParamEnum.PID_CHILDREN), thread = RunningThread.BACKGROUND)
-        public void setPid(List<ProcessInfo> processes) {
-            if (processes == null || processes.size() == 0) {
-                return;
-            }
-
-            LogUtil.d(TAG, "收到pid信息：%s", processes);
-            // 查找主进程
-            Set<Integer> processPids = new HashSet<>();
-            for (ProcessInfo process: processes) {
-                processPids.add(process.getPid());
-            }
-
-            // 完全一致
-            if (pids != null && pids.containsAll(processPids) && pids.size() == processPids.size()) {
-                return;
-            }
-
-            pids = processPids;
-
-            StringBuilder sb = new StringBuilder();
-            List<Integer> array = new ArrayList<>(pids);
-            int i;
-            for (i = 0; i < processPids.size() - 1; i++) {
-                sb.append(array.get(i)).append("|");
-            }
-            sb.append(array.get(i));
-
-            // 先中断之前的，再重新录制
-            // 发送Ctrl + \
-            cmdLine.writeBytes(new byte[]{ (char)28 });
-            MiscUtil.sleep(500);
-
-            String filePath = FileUtils.getPathInShell(currentLogFile);
-            String cmd = "logcat -v long *:I | sed -r '/\\[.*(" + sb.toString() + "):.*\\]/,/^$/!d' >> " + filePath;
-
-            LogUtil.d(TAG, "Track logs with cmd: %s", cmd);
-            cmdLine.writeBytes(cmd.getBytes());
-            MiscUtil.sleep(500);
-            cmdLine.writeBytes(new byte[]{ '\n' });
-            MiscUtil.sleep(500);
-        }
-
-        /**
-         * 关闭
-         */
-        public void stop() {
-            LogUtil.i(TAG, "停止监控日志信息");
-            try {
-                cmdLine.writeBytes(new byte[]{(char) 28});
-                MiscUtil.sleep(500);
-                cmdLine.close();
-            } catch (IOException e) {
-                LogUtil.e(TAG, "Catch java.io.IOException: " + e.getMessage(), e);
-            }
-        }
-    }
-
-    /**
-     * root超时限制
-     */
-    private static ThreadPoolExecutor processReadExecutor = new ThreadPoolExecutor(5, 5, 0, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(10));
-
-    private static SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.CHINA);
-
-    protected static void logcatCmd(String cmd){
+    protected static void logcatCmd(String cmd) {
         LogUtil.i("ADB CMD", cmd);
     }
 
     /**
      * 判断当前手机是否有ROOT权限
+     *
      * @returnz
      */
-    public static boolean isRooted(){
+    public static boolean isRooted() {
         if (true) {
             return false;
         }
@@ -265,8 +183,8 @@ public class CmdTools {
         if (isRoot != null) {
             return isRoot;
         }
-        try{
-            if (new File("/system/bin/su").exists()){
+        try {
+            if (new File("/system/bin/su").exists()) {
                 bool = true;
             } else if (new File("/system/xbin/su").exists()) {
                 bool = true;
@@ -283,14 +201,15 @@ public class CmdTools {
 
     /**
      * 是否已初始化
+     *
      * @return
      */
     public static boolean isInitialized() {
         return connection != null;
     }
 
-    public static Process getRootCmd(){
-        try{
+    public static Process getRootCmd() {
+        try {
             return Runtime.getRuntime().exec("su");
         } catch (IOException e) {
             LogUtil.e(TAG, "get root shell failed", e);
@@ -301,6 +220,7 @@ public class CmdTools {
 
     /**
      * 快捷执行ps指令
+     *
      * @param filter grep 过滤条件
      * @return 分行结果
      */
@@ -396,6 +316,7 @@ public class CmdTools {
 
     /**
      * 运行高权限命令
+     *
      * @param cmd
      * @return
      */
@@ -408,6 +329,7 @@ public class CmdTools {
 
     /**
      * 激活辅助功能
+     *
      * @param key
      * @param value
      * @return
@@ -422,7 +344,8 @@ public class CmdTools {
 
     /**
      * 带超时的高权限命令执行
-     * @param cmd shell命令（shell之后的部分）
+     *
+     * @param cmd     shell命令（shell之后的部分）
      * @param maxTime 最长执行时间
      * @return 执行结果
      */
@@ -435,6 +358,7 @@ public class CmdTools {
 
     /**
      * 获取顶部包名和activity
+     *
      * @return
      */
     public static String[] getTopPkgAndActivity() {
@@ -491,7 +415,7 @@ public class CmdTools {
         }
     }
 
-    public static String execAdbExtCmd(final  String cmd, final  int wait) {
+    public static String execAdbExtCmd(final String cmd, final int wait) {
         if (connection == null) {
             LogUtil.e(TAG, "no connection");
             return "";
@@ -538,7 +462,7 @@ public class CmdTools {
                 LogUtil.e(TAG, "regenerateConnection failed");
                 return "";
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             LogUtil.e(TAG, "Throw Exception: " + e.getMessage(), e);
             return "";
         }
@@ -546,6 +470,7 @@ public class CmdTools {
 
     /**
      * 执行点击操作
+     *
      * @param x
      * @param y
      */
@@ -556,7 +481,8 @@ public class CmdTools {
     /**
      * 执行Adb命令，对外<br/>
      * <b>注意：主线程执行的话超时时间会强制设置为5S以内，防止ANR</b>
-     * @param cmd 对应命令
+     *
+     * @param cmd  对应命令
      * @param wait 等待执行时间，0表示一直等待
      * @return 命令行输出
      */
@@ -592,7 +518,8 @@ public class CmdTools {
 
     /**
      * 执行Adb命令
-     * @param cmd 对应命令
+     *
+     * @param cmd  对应命令
      * @param wait 等待执行时间，0表示一直等待
      * @return 命令行输出
      */
@@ -627,7 +554,7 @@ public class CmdTools {
             // 获取stream所有输出
             Queue<byte[]> results = stream.getReadQueue();
             StringBuilder sb = new StringBuilder();
-            for (byte[] bytes: results) {
+            for (byte[] bytes : results) {
                 if (bytes != null) {
                     sb.append(new String(bytes));
                 }
@@ -649,7 +576,7 @@ public class CmdTools {
                 LogUtil.e(TAG, "regenerateConnection failed");
                 return "";
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             LogUtil.e(TAG, "Throw Exception: " + e.getMessage()
                     , e);
             return "";
@@ -658,6 +585,7 @@ public class CmdTools {
 
     /**
      * 打开ADB Stream
+     *
      * @return
      */
     public static CmdLine openAdbStream(String cmd) {
@@ -680,13 +608,13 @@ public class CmdTools {
         }
     }
 
-
     /**
      * 执行adb命令，在超时时间范围内
-     * @deprecated Use {@link #execHighPrivilegeCmd(String, int)}
+     *
      * @param cmd
      * @param timeout 超时时间（必大于0）
      * @return
+     * @deprecated Use {@link #execHighPrivilegeCmd(String, int)}
      */
     public static String execShellCmdWithTimeout(final String cmd, @IntRange(from = 1) final long timeout) {
         if (connection == null) {
@@ -711,7 +639,7 @@ public class CmdTools {
             // 获取stream所有输出
             Queue<byte[]> results = stream.getReadQueue();
             StringBuilder sb = new StringBuilder();
-            for (byte[] bytes: results) {
+            for (byte[] bytes : results) {
                 if (bytes != null) {
                     sb.append(new String(bytes));
                 }
@@ -730,13 +658,12 @@ public class CmdTools {
             } else {
                 return "";
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             LogUtil.e(TAG, "抛出异常 " + e.getMessage(), e);
             LogUtil.e(TAG, "execShellCmdWithTimeout exception:" + e.getMessage());
             return "";
         }
     }
-
 
     private static String retryExecAdb(String cmd, long wait) {
         AdbStream stream = null;
@@ -764,7 +691,7 @@ public class CmdTools {
             // 获取stream所有输出
             Queue<byte[]> results = stream.getReadQueue();
             StringBuilder sb = new StringBuilder();
-            for (byte[] bytes: results) {
+            for (byte[] bytes : results) {
                 if (bytes != null) {
                     sb.append(new String(bytes));
                 }
@@ -779,7 +706,6 @@ public class CmdTools {
 
         return "";
     }
-
 
     private static String execAdbCmdWithStatus(final String cmd, final int wait) {
         if (connection == null) {
@@ -812,7 +738,7 @@ public class CmdTools {
             // 获取stream所有输出
             Queue<byte[]> results = stream.getReadQueue();
             StringBuilder sb = new StringBuilder();
-            for (byte[] bytes: results) {
+            for (byte[] bytes : results) {
                 if (bytes != null) {
                     sb.append(new String(bytes));
                 }
@@ -821,7 +747,7 @@ public class CmdTools {
             return sb.toString();
         } catch (IllegalStateException e) {
             return ERROR_CONNECTION_ILLEGAL_STATE;
-        } catch (Exception e){
+        } catch (Exception e) {
             return ERROR_CONNECTION_COMMON_EXCEPTION;
         }
     }
@@ -845,6 +771,7 @@ public class CmdTools {
 
     /**
      * 打开命令行
+     *
      * @return
      */
     public static CmdLine openCmdLine() {
@@ -899,8 +826,6 @@ public class CmdTools {
         }
     }
 
-
-    private static volatile long LAST_RUNNING_TIME = 0;
     /**
      * 生成Adb连接，由所在文件生成，或创建并保存到相应文件
      */
@@ -1002,7 +927,8 @@ public class CmdTools {
 
     /**
      * 在maxTime内执行root命令
-     * @param cmd 待执行命令
+     *
+     * @param cmd     待执行命令
      * @param maxTime 最长执行时间
      * @return 输出
      */
@@ -1074,10 +1000,11 @@ public class CmdTools {
 
     /**
      * 执行root命令
+     *
      * @param cmd 待执行命令
      * @param log 日志输出文件
      * @param ret 是否保留命令行输出
-     * @param ct 上下文
+     * @param ct  上下文
      * @return 输出
      */
     @SuppressWarnings("deprecation")
@@ -1107,10 +1034,10 @@ public class CmdTools {
             dos.flush();
 
             while ((line = dis.readLine()) != null) {
-                if(log != null) {
+                if (log != null) {
                     writeFileData(log, line, ct);
                 }
-                if(ret) {
+                if (ret) {
                     result.append(line).append("\n");
                 }
             }
@@ -1149,13 +1076,12 @@ public class CmdTools {
             Date curDate = new Date(System.currentTimeMillis());//获取当前时间
             time = formatter.format(curDate);
 
-            byte [] bytes = message.getBytes();
+            byte[] bytes = message.getBytes();
             fout.write(bytes);
             bytes = (time + "\n").getBytes();
             fout.write(bytes);
             fout.close();
-        }
-        catch(Exception e) {
+        } catch (Exception e) {
             LogUtil.e(TAG, "抛出异常 " + e.getMessage(), e);
         }
 
@@ -1199,7 +1125,7 @@ public class CmdTools {
                     LogUtil.e(TAG, "抛出异常 " + e.getMessage(), e);
                 }
             }
-            if(p != null) {
+            if (p != null) {
                 try {
                     p.destroy();
                 } catch (Exception e) {
@@ -1217,7 +1143,7 @@ public class CmdTools {
         if (result.length() < 2) {
             return null;
         } else if (result.endsWith("\n")) {
-            return result.substring(1, result.length()-1);
+            return result.substring(1, result.length() - 1);
         } else {
             return result.substring(1);
         }
@@ -1333,6 +1259,7 @@ public class CmdTools {
 
     /**
      * 过滤Window下重复activity
+     *
      * @param origin
      * @return
      */
@@ -1340,7 +1267,7 @@ public class CmdTools {
         Set<String> windows = new HashSet<>();
         List<String> accept = new ArrayList<>();
         String[] lines = origin.split("\\s*\\n\\s*");
-        for (String line: lines) {
+        for (String line : lines) {
             String[] parts = line.split("\\s+");
             if (parts.length < 8) {
                 continue;
@@ -1360,6 +1287,7 @@ public class CmdTools {
 
     /**
      * 获取屏幕现实的View
+     *
      * @return
      */
     public static String loadTopViews(String app) {
@@ -1372,6 +1300,7 @@ public class CmdTools {
 
     /**
      * 切换到输入法
+     *
      * @param ime
      */
     public static void switchToIme(final String ime) {
@@ -1401,6 +1330,7 @@ public class CmdTools {
 
     /**
      * 真正切换输入法
+     *
      * @param ime
      */
     private static void _switchToIme(String ime) {
@@ -1411,6 +1341,7 @@ public class CmdTools {
 
     /**
      * 判断文件是否存在
+     *
      * @param file shell中文件路径
      * @return
      */
@@ -1424,8 +1355,6 @@ public class CmdTools {
         // md5没对上，重新推
         return true;
     }
-
-    private static ScheduledExecutorService scheduledExecutorService;
 
     /**
      * 开始检查ADB状态
@@ -1520,6 +1449,7 @@ public class CmdTools {
 
     /**
      * 拷贝文件
+     *
      * @param origin
      * @param toPath
      * @return
@@ -1545,7 +1475,6 @@ public class CmdTools {
 
         return newPath;
     }
-
 
     /**
      * 读取外部ADB KEY信息
@@ -1606,6 +1535,7 @@ public class CmdTools {
 
     /**
      * parse android public key
+     *
      * @param inputKey
      * @return
      */
@@ -1624,7 +1554,7 @@ public class CmdTools {
         IntBuffer intBuffer = bb.asIntBuffer();
         int len = intBuffer.get();
         BigInteger n0Inv = BigInteger.valueOf(intBuffer.get());
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(len*4);
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(len * 4);
         int[] dst = new int[len];
         intBuffer.get(dst);
         reverse(dst);
@@ -1654,9 +1584,9 @@ public class CmdTools {
         return publicKey;
     }
 
-
     /**
      * 拷贝可执行文件
+     *
      * @param sourceF 源文件
      * @return 可执行文件路径
      */
@@ -1675,13 +1605,12 @@ public class CmdTools {
         return exec;
     }
 
-
     /**
      * <p>Reverses the order of the given array.</p>
      *
      * <p>This method does nothing for a {@code null} input array.</p>
      *
-     * @param array  the array to reverse, may be {@code null}
+     * @param array the array to reverse, may be {@code null}
      */
     public static void reverse(final int[] array) {
         if (array == null) {
@@ -1699,14 +1628,11 @@ public class CmdTools {
      * This method does nothing for a {@code null} input array.
      * </p>
      *
-     * @param array
-     *            the array to reverse, may be {@code null}
-     * @param startIndexInclusive
-     *            the starting index. Undervalue (&lt;0) is promoted to 0, overvalue (&gt;array.length) results in no
-     *            change.
-     * @param endIndexExclusive
-     *            elements up to endIndex-1 are reversed in the array. Undervalue (&lt; start index) results in no
-     *            change. Overvalue (&gt;array.length) is demoted to array length.
+     * @param array               the array to reverse, may be {@code null}
+     * @param startIndexInclusive the starting index. Undervalue (&lt;0) is promoted to 0, overvalue (&gt;array.length) results in no
+     *                            change.
+     * @param endIndexExclusive   elements up to endIndex-1 are reversed in the array. Undervalue (&lt; start index) results in no
+     *                            change. Overvalue (&gt;array.length) is demoted to array length.
      * @since 3.2
      */
     public static void reverse(final int[] array, int startIndexInclusive, int endIndexExclusive) {
@@ -1727,12 +1653,83 @@ public class CmdTools {
 
     public interface GrantHighPrivPermissionCallback {
         void onGrantSuccess();
+
         void onGrantFail(String msg);
     }
 
     public interface InstallAppCallback {
         void onInstallSuccess(String packageName);
+
         void onInstallFail(String reason);
+    }
+
+    /**
+     * pid监控器
+     */
+    static final class PidWatcher {
+        private final CmdLine cmdLine;
+        private Set<Integer> pids = null;
+
+        private PidWatcher(CmdLine cmdLine) {
+            this.cmdLine = cmdLine;
+        }
+
+        @Subscriber(value = @Param(SubscribeParamEnum.PID_CHILDREN), thread = RunningThread.BACKGROUND)
+        public void setPid(List<ProcessInfo> processes) {
+            if (processes == null || processes.size() == 0) {
+                return;
+            }
+
+            LogUtil.d(TAG, "收到pid信息：%s", processes);
+            // 查找主进程
+            Set<Integer> processPids = new HashSet<>();
+            for (ProcessInfo process : processes) {
+                processPids.add(process.getPid());
+            }
+
+            // 完全一致
+            if (pids != null && pids.containsAll(processPids) && pids.size() == processPids.size()) {
+                return;
+            }
+
+            pids = processPids;
+
+            StringBuilder sb = new StringBuilder();
+            List<Integer> array = new ArrayList<>(pids);
+            int i;
+            for (i = 0; i < processPids.size() - 1; i++) {
+                sb.append(array.get(i)).append("|");
+            }
+            sb.append(array.get(i));
+
+            // 先中断之前的，再重新录制
+            // 发送Ctrl + \
+            cmdLine.writeBytes(new byte[]{(char) 28});
+            MiscUtil.sleep(500);
+
+            String filePath = FileUtils.getPathInShell(currentLogFile);
+            String cmd = "logcat -v long *:I | sed -r '/\\[.*(" + sb.toString() + "):.*\\]/,/^$/!d' >> " + filePath;
+
+            LogUtil.d(TAG, "Track logs with cmd: %s", cmd);
+            cmdLine.writeBytes(cmd.getBytes());
+            MiscUtil.sleep(500);
+            cmdLine.writeBytes(new byte[]{'\n'});
+            MiscUtil.sleep(500);
+        }
+
+        /**
+         * 关闭
+         */
+        public void stop() {
+            LogUtil.i(TAG, "停止监控日志信息");
+            try {
+                cmdLine.writeBytes(new byte[]{(char) 28});
+                MiscUtil.sleep(500);
+                cmdLine.close();
+            } catch (IOException e) {
+                LogUtil.e(TAG, "Catch java.io.IOException: " + e.getMessage(), e);
+            }
+        }
     }
 
 

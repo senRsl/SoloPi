@@ -15,9 +15,9 @@
  */
 package com.alipay.hulu.shared.display.items.util;
 
-import androidx.annotation.StringRes;
-
 import com.alipay.hulu.shared.R;
+
+import androidx.annotation.StringRes;
 
 /**
  * Created by qiaoruikai on 2019/10/30 4:12 PM.
@@ -30,12 +30,11 @@ public enum FinalR {
     MEMORY(R.string.performance__memory),
     NETWORK(R.string.performance__network),
     PROCESS_STATUS(R.string.performance__process_status),
-    NULL(-1)
-    ;
-    
+    NULL(-1);
+
     @StringRes
     private final int realVal;
-    
+
     private FinalR(@StringRes int res) {
         this.realVal = res;
     }

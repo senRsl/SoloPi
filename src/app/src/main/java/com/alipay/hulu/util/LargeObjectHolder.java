@@ -15,23 +15,22 @@
  */
 package com.alipay.hulu.util;
 
-import com.alipay.hulu.bean.ReplayResultBean;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import com.alipay.hulu.bean.ReplayResultBean;
 
 /**
  * Created by lezhou.wyl on 2018/8/19.
  */
 public class LargeObjectHolder {
 
+    private static final LargeObjectHolder sInstance = new LargeObjectHolder();
     private List<ReplayResultBean> mReplayResults;
 
     private LargeObjectHolder() {
         mReplayResults = new ArrayList<>();
     }
-
-    private static final LargeObjectHolder sInstance = new LargeObjectHolder();
 
     public static LargeObjectHolder getInstance() {
         return sInstance;

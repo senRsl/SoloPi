@@ -15,25 +15,12 @@
  */
 package com.alipay.hulu.util;
 
-import com.alibaba.fastjson.JSON;
-import com.alipay.hulu.common.bean.DeviceInfo;
-import com.alipay.hulu.common.service.SPService;
-import com.alipay.hulu.common.utils.DeviceInfoUtil;
-import com.alipay.hulu.common.utils.FileUtils;
-import com.alipay.hulu.common.utils.HttpUtil;
-import com.alipay.hulu.common.utils.LogUtil;
-import com.alipay.hulu.shared.display.items.base.RecordPattern;
-
-import org.apache.commons.io.Charsets;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnsupportedCharsetException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -42,6 +29,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+
+import org.apache.commons.io.Charsets;
+
+import com.alibaba.fastjson.JSON;
+import com.alipay.hulu.common.bean.DeviceInfo;
+import com.alipay.hulu.common.service.SPService;
+import com.alipay.hulu.common.utils.DeviceInfoUtil;
+import com.alipay.hulu.common.utils.FileUtils;
+import com.alipay.hulu.common.utils.HttpUtil;
+import com.alipay.hulu.common.utils.LogUtil;
+import com.alipay.hulu.shared.display.items.base.RecordPattern;
 
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -59,7 +57,7 @@ public class RecordUtil {
     public static File saveToFile(Map<RecordPattern, List<RecordPattern.RecordItem>> records) {
         Date startTime = new Date(System.currentTimeMillis() * 2);
         Date endTime = new Date(System.currentTimeMillis() / 2);
-        for (RecordPattern pattern: records.keySet()) {
+        for (RecordPattern pattern : records.keySet()) {
             Date tmpStart = new Date(pattern.getStartTime());
             Date tmpEnd = new Date(pattern.getEndTime());
             if (tmpStart.compareTo(startTime) < 0) {
@@ -83,7 +81,7 @@ public class RecordUtil {
             charset = Charset.forName("UTF-8");
         }
 
-        for (Map.Entry<RecordPattern, List<RecordPattern.RecordItem>> entry: records.entrySet()){
+        for (Map.Entry<RecordPattern, List<RecordPattern.RecordItem>> entry : records.entrySet()) {
             RecordPattern pattern = entry.getKey();
 
             // 文件输出名称为：${Name}_${Category}_${StartMilli}_${EndMilli}.csv，","分隔
@@ -97,7 +95,7 @@ public class RecordUtil {
                     writer.flush();
 
                     // 写入录制
-                    for (RecordPattern.RecordItem item: entry.getValue()) {
+                    for (RecordPattern.RecordItem item : entry.getValue()) {
                         writer.write(item.time + "," + item.value + "," + item.extra + "\n");
                         writer.flush();
                     }
@@ -112,10 +110,9 @@ public class RecordUtil {
     }
 
 
-
-
     /**
      * 加载保存目录
+     *
      * @param startTime
      * @param endTime
      * @return
@@ -166,8 +163,8 @@ public class RecordUtil {
     /**
      * 上传响应耗时数据
      *
-     * @param path    地址
-     * @param time 响应耗时
+     * @param path  地址
+     * @param time  响应耗时
      * @param title 上传标题
      */
     public static String uploadRecordData(String path, long time, String title) {

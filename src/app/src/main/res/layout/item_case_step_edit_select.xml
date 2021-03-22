@@ -15,29 +15,28 @@
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/control_dp8"
     android:paddingLeft="@dimen/control_dp8"
     android:paddingRight="@dimen/control_dp8"
-    android:paddingTop="@dimen/control_dp8"
-    android:paddingBottom="@dimen/control_dp8">
+    android:paddingTop="@dimen/control_dp8">
+
     <TextView
         android:id="@+id/case_step_edit_select_hint"
+        style="@style/TextView.InputLabel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/case_step_edit__scope"
-        style="@style/TextView.InputLabel"
-        />
+        android:text="@string/case_step_edit__scope" />
+
     <androidx.appcompat.widget.AppCompatSpinner
         android:id="@+id/case_step_edit_select_spinner"
+        style="@style/Widget.AppCompat.Spinner.Underlined"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:spinnerMode="dropdown"
-        tools:listitem="@layout/item_case_step"
-        style="@style/Widget.AppCompat.Spinner.Underlined"
-        >
-    </androidx.appcompat.widget.AppCompatSpinner>
+        tools:listitem="@layout/item_case_step"></androidx.appcompat.widget.AppCompatSpinner>
 
 
 </LinearLayout>

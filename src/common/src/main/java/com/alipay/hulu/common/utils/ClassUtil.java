@@ -15,19 +15,6 @@
  */
 package com.alipay.hulu.common.utils;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import android.util.Pair;
-
-import com.alibaba.fastjson.JSON;
-import com.alipay.hulu.common.application.LauncherApplication;
-import com.alipay.hulu.common.constant.Constant;
-import com.alipay.hulu.common.service.SPService;
-import com.alipay.hulu.common.tools.BackgroundExecutor;
-import com.alipay.hulu.common.utils.patch.PatchClassLoader;
-import com.alipay.hulu.common.utils.patch.PatchLoadResult;
-
-import java.io.File;
 import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
@@ -46,6 +33,15 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
+import com.alibaba.fastjson.JSON;
+import com.alipay.hulu.common.application.LauncherApplication;
+import com.alipay.hulu.common.constant.Constant;
+import com.alipay.hulu.common.utils.patch.PatchClassLoader;
+import com.alipay.hulu.common.utils.patch.PatchLoadResult;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.util.Pair;
 import dalvik.system.DexFile;
 
 /**
@@ -56,17 +52,11 @@ public class ClassUtil {
     private static final String PATCH_KEY = "patch";
     private static final String PATCH_INFO_RES = "patchInfo";
     private static final String TAG = ClassUtil.class.getSimpleName();
-
-    private static boolean init = false;
-
-    private static List<Class> classes = new ArrayList<>();
-
-    private static Map<String, Pair<Float, String>> avaliablePatches = new HashMap<>();
-
-    private static Map<String, PatchLoadResult> mPatchInfo = new HashMap<>();
-
     private final static Map<String, List<Class>> mPatchClasses = new HashMap<>();
-
+    private static boolean init = false;
+    private static List<Class> classes = new ArrayList<>();
+    private static Map<String, Pair<Float, String>> avaliablePatches = new HashMap<>();
+    private static Map<String, PatchLoadResult> mPatchInfo = new HashMap<>();
     /**
      * 用来区分内部类与外部类
      */
@@ -74,6 +64,7 @@ public class ClassUtil {
 
     /**
      * 根据是否加载过类判断是否初始化完毕
+     *
      * @return
      */
     public static boolean recordClasses() {
@@ -82,6 +73,7 @@ public class ClassUtil {
 
     /**
      * 初始化类
+     *
      * @param context
      * @param filter
      */
@@ -142,12 +134,13 @@ public class ClassUtil {
 
     /**
      * 过滤类名
+     *
      * @param className
      * @param filter
      * @return
      */
     private static boolean filterClass(String className, List<String> filter) {
-        for (String accept: filter) {
+        for (String accept : filter) {
             if (StringUtil.contains(className, accept)) {
                 return true;
             }
@@ -160,7 +153,7 @@ public class ClassUtil {
      * 构造类
      *
      * @param targetClass 待构造类
-     * @param arguments 构造函数
+     * @param arguments   构造函数
      * @return
      */
     public static <T> T constructClass(Class<T> targetClass, Class<?>[] classes, Object[] arguments) {
@@ -193,6 +186,7 @@ public class ClassUtil {
 
     /**
      * 获取类包含的所有方法
+     *
      * @param clazz
      * @return
      */
@@ -202,7 +196,8 @@ public class ClassUtil {
 
     /**
      * 获取类包含包含特定注解的所有方法
-     * @param clazz 类
+     *
+     * @param clazz      类
      * @param annotation 注解
      * @return
      */
@@ -236,7 +231,8 @@ public class ClassUtil {
 
     /**
      * 查找子类，过滤掉接口类
-     * @param parent 父类
+     *
+     * @param parent     父类
      * @param annotation 包含的注解
      * @return
      */
@@ -246,6 +242,7 @@ public class ClassUtil {
 
     /**
      * 根据名称查找目标类
+     *
      * @param name
      * @return
      */
@@ -261,7 +258,7 @@ public class ClassUtil {
             }
         }
 
-        for (Class clz: classes) {
+        for (Class clz : classes) {
             if (clz != null && StringUtil.equals(clz.getName(), name)) {
                 return clz;
             }
@@ -278,7 +275,8 @@ public class ClassUtil {
 
     /**
      * 查找子类
-     * @param parent 父类
+     *
+     * @param parent     父类
      * @param annotation 需要包含的注解
      * @return 找到的子类列表
      */
@@ -334,6 +332,7 @@ public class ClassUtil {
 
     /**
      * 在Patch中查找子类
+     *
      * @param rs
      * @param parent
      * @param annotation
@@ -370,6 +369,7 @@ public class ClassUtil {
 
     /**
      * 查找带有包含注解方法的类
+     *
      * @param annotation
      * @return
      */
@@ -410,6 +410,7 @@ public class ClassUtil {
 
     /**
      * 获取patch信息
+     *
      * @return
      */
     private static List<PatchLoadResult> loadStoredPatches() {
@@ -420,7 +421,7 @@ public class ClassUtil {
         // 加载缓存patch版本信息
         String storedPatch = sp.getString(PATCH_INFO_RES, "[]");
         List<PatchVersionInfo> infos = JSON.parseArray(storedPatch, PatchVersionInfo.class);
-        for (PatchVersionInfo info: infos) {
+        for (PatchVersionInfo info : infos) {
             avaliablePatches.put(info.name, new Pair<>(info.version, info.url));
         }
 
@@ -453,6 +454,7 @@ public class ClassUtil {
 
     /**
      * 加载默认HOTPATCH
+     *
      * @return
      */
     private static PatchLoadResult loadDefaultHotPatch() {
@@ -465,6 +467,7 @@ public class ClassUtil {
 
     /**
      * 获取插件信息
+     *
      * @param patchName
      * @return
      */
@@ -478,6 +481,7 @@ public class ClassUtil {
 
     /**
      * 获取所有插件
+     *
      * @return
      */
     public static List<PatchLoadResult> getAllPatches() {
@@ -486,17 +490,19 @@ public class ClassUtil {
 
     /**
      * 初始化依赖
+     *
      * @param patches
      */
     private static void initPatches(List<PatchLoadResult> patches) {
         Queue<PatchLoadResult> result = new LinkedList<>(patches);
         Set<String> names = new HashSet<>();
-        for (PatchLoadResult patch: patches) {
+        for (PatchLoadResult patch : patches) {
             names.add(patch.name);
         }
 
         //FIXME 9102年了还有goto
-        skip: while (!result.isEmpty()) {
+        skip:
+        while (!result.isEmpty()) {
             PatchLoadResult patch = result.poll();
             List<String> dependencies = patch.dependencies;
 
@@ -526,6 +532,7 @@ public class ClassUtil {
 
     /**
      * 加载patch
+     *
      * @param patch
      */
     private static void loadPatch(PatchLoadResult patch) {
@@ -538,7 +545,7 @@ public class ClassUtil {
 
             // 添加依赖
             if (patch.dependencies != null) {
-                for (String name: patch.dependencies) {
+                for (String name : patch.dependencies) {
                     PatchLoadResult depend = mPatchInfo.get(name);
                     if (depend == null) {
                         LogUtil.e(TAG, "无法添加Patch，依赖%s不存在", name);
@@ -585,6 +592,7 @@ public class ClassUtil {
 
     /**
      * 升级可用插件
+     *
      * @param pairs
      */
     public static void updateAvailablePatches(Map<String, Pair<Float, String>> pairs) {
@@ -619,7 +627,7 @@ public class ClassUtil {
      */
     private static void savePatchInfoToSP() {
         List<PatchVersionInfo> patchVersionInfos = new ArrayList<>(avaliablePatches.size() + 1);
-        for (String key: avaliablePatches.keySet()) {
+        for (String key : avaliablePatches.keySet()) {
             Pair<Float, String> pair = avaliablePatches.get(key);
             patchVersionInfos.add(new PatchVersionInfo(key, pair.first, pair.second));
         }
@@ -643,6 +651,7 @@ public class ClassUtil {
 
     /**
      * 安装插件
+     *
      * @param patch
      * @return
      */
@@ -699,6 +708,7 @@ public class ClassUtil {
 
     /**
      * 移除patch
+     *
      * @param patch
      */
     public static void removePatch(String patch) {

@@ -41,6 +41,7 @@ public enum ScanCodeType {
 
     /**
      * 根据编码查找扫描类型
+     *
      * @param code
      * @return
      */
@@ -49,7 +50,7 @@ public enum ScanCodeType {
             return null;
         }
 
-        for (ScanCodeType type: values()) {
+        for (ScanCodeType type : values()) {
             if (code.equals(type.code)) {
                 return type;
             }
@@ -60,6 +61,7 @@ public enum ScanCodeType {
 
     /**
      * 根据类型查找扫描类型
+     *
      * @param format
      * @return
      */
@@ -68,7 +70,7 @@ public enum ScanCodeType {
             return null;
         }
 
-        for (ScanCodeType type: values()) {
+        for (ScanCodeType type : values()) {
             if (format == type.targetFormat) {
                 return type;
             }

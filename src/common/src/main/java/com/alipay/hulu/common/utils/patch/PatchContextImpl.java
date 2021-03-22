@@ -15,7 +15,7 @@
  */
 package com.alipay.hulu.common.utils.patch;
 
-import android.content.Context;
+import java.io.File;
 
 import com.alipay.hulu.common.application.LauncherApplication;
 import com.alipay.hulu.common.injector.InjectorService;
@@ -23,15 +23,15 @@ import com.alipay.hulu.common.tools.AbstCmdLine;
 import com.alipay.hulu.common.tools.CmdTools;
 import com.alipay.hulu.common.utils.FileUtils;
 
-import java.io.File;
+import android.content.Context;
 
 /**
  * Created by qiaoruikai on 2019-04-19 16:29.
  */
 public class PatchContextImpl extends PatchContext {
-    private PatchLoadResult patch;
     private final File rootFolder;
     private final File assetsFolder;
+    private PatchLoadResult patch;
 
 
     public PatchContextImpl(PatchLoadResult patch) {

@@ -15,39 +15,40 @@
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="@dimen/dp_100">
+
         <com.zhy.view.flowlayout.TagFlowLayout
             android:id="@+id/case_step_edit_tag_group"
-            app:max_select="1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="8dp"
             android:paddingBottom="8dp"
             android:paddingLeft="8dp"
-            android:paddingRight="8dp">
-        </com.zhy.view.flowlayout.TagFlowLayout>
+            android:paddingRight="8dp"
+            android:paddingTop="8dp"
+            app:max_select="1"></com.zhy.view.flowlayout.TagFlowLayout>
     </ScrollView>
+
     <include layout="@layout/divider" />
 
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
 
         <com.yydcdut.sdlv.SlideAndDragListView
             android:id="@+id/case_step_edit_drag_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:choiceMode="none"
             android:divider="@null"
             android:dividerHeight="0dp"
-            android:listSelector="?attr/selectableItemBackground"
             android:drawSelectorOnTop="false"
-            android:choiceMode="none"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-        </com.yydcdut.sdlv.SlideAndDragListView>
+            android:listSelector="?attr/selectableItemBackground"></com.yydcdut.sdlv.SlideAndDragListView>
     </LinearLayout>
 </LinearLayout>

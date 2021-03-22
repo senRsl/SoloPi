@@ -15,9 +15,25 @@
  */
 package com.alipay.hulu.common.injector;
 
-import android.content.Context;
-import androidx.annotation.NonNull;
-import android.util.Pair;
+import java.lang.ref.WeakReference;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.alipay.hulu.common.BuildConfig;
 import com.alipay.hulu.common.application.LauncherApplication;
@@ -41,25 +57,9 @@ import com.alipay.hulu.common.utils.ClassUtil;
 import com.alipay.hulu.common.utils.LogUtil;
 import com.alipay.hulu.common.utils.StringUtil;
 
-import java.lang.ref.WeakReference;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
+import android.content.Context;
+import android.util.Pair;
+import androidx.annotation.NonNull;
 
 import static com.alipay.hulu.common.injector.provider.ParamReference.PREFIX_PERSISTENT_PARAM;
 
@@ -73,13 +73,10 @@ public class InjectorService implements ExportService {
     public static final int REGISTER_FAILED = 2;
 
     public static final int SEND_MESSAGE_LOCAL = 0x00000001;
-    public static final int SEND_MESSAGE_IPC   = 0x00000010;
-
-    private boolean LOG_ENABLE = BuildConfig.DEBUG;
-
+    public static final int SEND_MESSAGE_IPC = 0x00000010;
     private static final String TAG = "InjectorService";
     private static ClassInfoCache cache;
-
+    private boolean LOG_ENABLE = BuildConfig.DEBUG;
     /**
      * 注入列表
      */
@@ -111,11 +108,43 @@ public class InjectorService implements ExportService {
      * 更新特定内容
      */
     private ExecutorService loadProviderExecutor;
+    /**
+     * Provider更新Runnable
+     */
+    private final Runnable updateProviders = new Runnable() {
+        @Override
+        public void run() {
+            try {
+                if (providers == null) {
+                    return;
+                }
 
+                Iterator<Pair<ProviderInfo, WeakInjectItem>> iterator = providers.iterator();
+                while (iterator.hasNext()) {
+                    Pair<ProviderInfo, WeakInjectItem> item = iterator.next();
+                    if (item.first.isLazy() && item.first.shouldUpdate() && !item.first.isRunning()) {
+                        item.first.start();
+                        WeakInjectItem provider = item.second;
+                        if (!provider.isValid()) {
+                            iterator.remove();
+                            continue;
+                        }
+
+                        // 异步更新消息
+                        UpdateProviderRunnable runnable = new UpdateProviderRunnable(item.first, provider, InjectorService.this);
+                        loadProviderExecutor.execute(runnable);
+                    }
+                }
+            } catch (Throwable t) {
+                LogUtil.e(TAG, "InjectorService Thrown Throwable: " + t.getMessage(), t);
+            }
+        }
+    };
     private ExecutorService dispatchMessageExecutor;
 
     /**
      * 快捷获取
+     *
      * @return
      */
     public static InjectorService g() {
@@ -131,6 +160,7 @@ public class InjectorService implements ExportService {
         cache = new ClassInfoCache();
         msgExecutor = new ThreadPoolExecutor(5, 5, 0, TimeUnit.HOURS, new SynchronousQueue<Runnable>(), new ThreadFactory() {
             private AtomicInteger counter = new AtomicInteger(1);
+
             @Override
             public Thread newThread(@NonNull Runnable r) {
                 Thread t = new Thread(r);
@@ -214,6 +244,7 @@ public class InjectorService implements ExportService {
 
     /**
      * 取消注册（非必须）
+     *
      * @param any
      */
     public void unregister(Object any) {
@@ -238,7 +269,7 @@ public class InjectorService implements ExportService {
 
         // 查找注册过的引用
         if (info.getCachedInjectInfo() != null && info.getCachedInjectInfo().size() > 0) {
-            for (InjectParamMeta meta: info.getCachedInjectInfo()) {
+            for (InjectParamMeta meta : info.getCachedInjectInfo()) {
                 ParamReference reference = referenceMap.get(meta.getParamType().getName());
                 if (reference != null) {
                     // 移除引用
@@ -250,6 +281,7 @@ public class InjectorService implements ExportService {
 
     /**
      * 立刻发出消息
+     *
      * @param paramName
      * @param value
      */
@@ -259,6 +291,7 @@ public class InjectorService implements ExportService {
 
     /**
      * 立刻发出消息
+     *
      * @param paramName
      * @param value
      */
@@ -268,6 +301,7 @@ public class InjectorService implements ExportService {
 
     /**
      * 立刻发出空消息
+     *
      * @param paramName
      */
     public void pushMessage(String paramName) {
@@ -321,6 +355,7 @@ public class InjectorService implements ExportService {
 
     /**
      * 实际推送消息
+     *
      * @param targetParam
      * @param value
      * @param enqueue
@@ -364,7 +399,7 @@ public class InjectorService implements ExportService {
     /**
      * 获取目标参数
      *
-     * @param key 类名
+     * @param key        类名
      * @param targetType 目标类型
      * @param <T>
      * @return
@@ -426,6 +461,7 @@ public class InjectorService implements ExportService {
 
     /**
      * 通知等待队列
+     *
      * @param name
      * @param value
      */
@@ -434,7 +470,7 @@ public class InjectorService implements ExportService {
         Queue<Callback> callbacks = paramWaitMap.remove(name);
         if (callbacks != null) {
             LogUtil.i(TAG, "Target param has callback queue, count: " + callbacks.size());
-            for (Callback callback: callbacks) {
+            for (Callback callback : callbacks) {
                 try {
                     callback.onResult(value);
                 } catch (Exception e) {
@@ -445,7 +481,6 @@ public class InjectorService implements ExportService {
     }
 
     /**
-     *
      * @param name
      * @param callable
      * @param <T>
@@ -468,6 +503,7 @@ public class InjectorService implements ExportService {
 
     /**
      * 查找特定参数注册数量，-1表示该参数不存在
+     *
      * @param paramName
      * @return
      */
@@ -482,6 +518,7 @@ public class InjectorService implements ExportService {
 
     /**
      * 注册类信息
+     *
      * @param target
      */
     public void registerClass(Class<?> target) {
@@ -496,6 +533,7 @@ public class InjectorService implements ExportService {
 
     /**
      * 注册provider或者receiver对象
+     *
      * @param any
      */
     public int register(Object any) {
@@ -512,7 +550,7 @@ public class InjectorService implements ExportService {
         }
 
         if (targetClassInfo.getCachedInjectInfo() != null) {
-            for (InjectParamMeta paramMeta: targetClassInfo.getCachedInjectInfo()) {
+            for (InjectParamMeta paramMeta : targetClassInfo.getCachedInjectInfo()) {
                 InjectParam type = paramMeta.getParamType();
                 ParamReference reference = referenceMap.get(type.getName());
 
@@ -529,8 +567,8 @@ public class InjectorService implements ExportService {
 
         // 查找依赖注入方法
         if (targetClassInfo.getCachedProviderInfo() != null) {
-            for (ProviderInfoMeta providerMeta: targetClassInfo.getCachedProviderInfo()) {
-                WeakInjectItem weakInjectItem= providerMeta.buildWeakInjectItem(any);
+            for (ProviderInfoMeta providerMeta : targetClassInfo.getCachedProviderInfo()) {
+                WeakInjectItem weakInjectItem = providerMeta.buildWeakInjectItem(any);
                 ProviderInfo providerInfo = providerMeta.buildProvider();
                 providers.add(new Pair<>(providerInfo, weakInjectItem));
             }
@@ -590,39 +628,6 @@ public class InjectorService implements ExportService {
     }
 
     /**
-     * Provider更新Runnable
-     */
-    private final Runnable updateProviders = new Runnable() {
-        @Override
-        public void run() {
-            try {
-                if (providers == null) {
-                    return;
-                }
-
-                Iterator<Pair<ProviderInfo, WeakInjectItem>> iterator = providers.iterator();
-                while (iterator.hasNext()) {
-                    Pair<ProviderInfo, WeakInjectItem> item = iterator.next();
-                    if (item.first.isLazy() && item.first.shouldUpdate() && !item.first.isRunning()) {
-                        item.first.start();
-                        WeakInjectItem provider = item.second;
-                        if (!provider.isValid()) {
-                            iterator.remove();
-                            continue;
-                        }
-
-                        // 异步更新消息
-                        UpdateProviderRunnable runnable = new UpdateProviderRunnable(item.first, provider, InjectorService.this);
-                        loadProviderExecutor.execute(runnable);
-                    }
-                }
-            } catch (Throwable t) {
-                LogUtil.e(TAG, "InjectorService Thrown Throwable: " + t.getMessage(), t);
-            }
-        }
-    };
-
-    /**
      * 更新特定Provider Runnable
      */
     private static class UpdateProviderRunnable implements Runnable {
@@ -668,7 +673,7 @@ public class InjectorService implements ExportService {
                             Pair<String, Object> msg = new Pair<>(provideItem.getKey().getName(), provideItem.getValue());
                             service.msgQueue.add(msg);
                             LogUtil.i(TAG, "消息【%s::%s】注入成功", provideItem.getKey(), provideItem.getValue());
-                        } else if (valid == ParamReference.MESSAGE_TYPE_INVALID){
+                        } else if (valid == ParamReference.MESSAGE_TYPE_INVALID) {
                             LogUtil.w(TAG, "消息【%s::%s】不合法，无法注入", provideItem.getKey(), provideItem.getValue());
                         } else {
 //                            LogUtil.d(TAG, "消息【%s::%s】重复", provideItem.getKey(), provideItem.getValue());

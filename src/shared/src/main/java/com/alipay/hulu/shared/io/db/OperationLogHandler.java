@@ -15,9 +15,12 @@
  */
 package com.alipay.hulu.shared.io.db;
 
-import android.content.Context;
-import androidx.annotation.NonNull;
-import android.util.Pair;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.PriorityQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import com.alibaba.fastjson.JSON;
 import com.alipay.hulu.common.injector.InjectorService;
@@ -28,12 +31,9 @@ import com.alipay.hulu.shared.io.bean.RecordCaseInfo;
 import com.alipay.hulu.shared.io.util.OperationStepUtil;
 import com.alipay.hulu.shared.node.tree.export.bean.OperationStep;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.PriorityQueue;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import android.content.Context;
+import android.util.Pair;
+import androidx.annotation.NonNull;
 
 /**
  * 操作入库
@@ -55,6 +55,7 @@ public class OperationLogHandler implements OperationStepProcessor {
 
     /**
      * 更新用例保存信息
+     *
      * @param caseInfo
      */
     private void updateCase(@NonNull RecordCaseInfo caseInfo) {
@@ -63,6 +64,7 @@ public class OperationLogHandler implements OperationStepProcessor {
 
     /**
      * 开始录制
+     *
      * @param caseInfo
      */
     @Override
@@ -83,6 +85,7 @@ public class OperationLogHandler implements OperationStepProcessor {
 
     /**
      * 录制操作步骤
+     *
      * @param stepIdx
      * @param operation
      */
@@ -114,7 +117,6 @@ public class OperationLogHandler implements OperationStepProcessor {
 
         return false;
     }
-
 
 
     private void saveCaseInDB() {

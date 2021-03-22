@@ -55,12 +55,24 @@ public class RecordPattern {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getUnit() {
         return unit;
     }
 
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+
     public String getSource() {
         return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
     }
 
     public Long getStartTime() {
@@ -77,18 +89,6 @@ public class RecordPattern {
 
     public void setEndTime(Long endTime) {
         this.endTime = endTime;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setUnit(String unit) {
-        this.unit = unit;
-    }
-
-    public void setSource(String source) {
-        this.source = source;
     }
 
     @Override
@@ -119,7 +119,7 @@ public class RecordPattern {
     /**
      * 单行录制数据
      */
-    public static class RecordItem{
+    public static class RecordItem {
         /**
          * 记录时间
          */

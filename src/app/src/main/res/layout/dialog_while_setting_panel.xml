@@ -14,55 +14,56 @@
   ~ limitations under the License.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:paddingBottom="20dp"
     android:paddingLeft="10dp"
     android:paddingRight="10dp"
-    android:paddingTop="20dp"
-    android:orientation="vertical"
-    android:paddingBottom="20dp">
+    android:paddingTop="20dp">
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/while__loop_mode"
         android:textColor="@color/secondaryText"
-        android:textSize="14dp"
-        />
+        android:textSize="14dp" />
+
     <androidx.appcompat.widget.AppCompatSpinner
         android:id="@+id/spinner_while_mode"
+        style="@style/Widget.AppCompat.Spinner.Underlined"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:entries="@array/whileMode"
         android:spinnerMode="dropdown"
-        tools:listitem="@layout/item_case_step"
-        style="@style/Widget.AppCompat.Spinner.Underlined"
-        android:entries="@array/whileMode" />
+        tools:listitem="@layout/item_case_step" />
 
     <TextView
         android:id="@+id/text_while_param_hint"
-        android:layout_marginTop="8dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:text="@string/while__loop_check"
         android:textColor="@color/secondaryText"
-        android:textSize="14dp"
-        />
+        android:textSize="14dp" />
 
     <EditText
         android:id="@+id/edit_while_param"
-        android:textColor="@color/primaryText"
-        android:textColorHint="@color/secondaryText"
-        android:textColorHighlight="@color/colorAccent"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textColor="@color/primaryText"
+        android:textColorHighlight="@color/colorAccent"
+        android:textColorHint="@color/secondaryText"
         android:textSize="18sp" />
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/secondaryText"
-        android:textSize="14dp"
         android:layout_gravity="right"
-        android:layout_marginTop="4dp"
         android:layout_marginRight="16dp"
-        android:text="@string/attention_input_space"/>
+        android:layout_marginTop="4dp"
+        android:text="@string/attention_input_space"
+        android:textColor="@color/secondaryText"
+        android:textSize="14dp" />
 </LinearLayout>

@@ -27,6 +27,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface LocalService {
     boolean lazy() default true;
+
     String name() default "";
+
     int level() default 1;
 }

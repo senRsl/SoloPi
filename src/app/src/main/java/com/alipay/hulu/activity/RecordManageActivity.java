@@ -15,12 +15,13 @@
  */
 package com.alipay.hulu.activity;
 
-import android.os.Bundle;
-import androidx.annotation.Nullable;
-import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ListView;
+import java.io.File;
+import java.io.FileFilter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.regex.Pattern;
 
 import com.alipay.hulu.R;
 import com.alipay.hulu.common.application.LauncherApplication;
@@ -29,13 +30,12 @@ import com.alipay.hulu.common.utils.LogUtil;
 import com.alipay.hulu.common.utils.StringUtil;
 import com.alipay.hulu.ui.HeadControlPanel;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
-import java.util.regex.Pattern;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ListView;
+import androidx.annotation.Nullable;
 
 /**
  * 性能数据管理Activity
@@ -46,22 +46,13 @@ public class RecordManageActivity extends BaseActivity {
     private static Pattern newPattern = Pattern.compile("\\d{14}_\\d{14}");
     private static Pattern midPattern = Pattern.compile("\\d{2}月\\d{2}日\\d{2}:\\d{2}:\\d{2}-\\d{2}月\\d{2}日\\d{2}:\\d{2}:\\d{2}");
     private static Pattern oldPattern = Pattern.compile("\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}_\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}");
-
-
-    // Views
-    private HeadControlPanel headPanel;
-
-    private ListView listView;
-
-    private Button deleteButton;
-
     // Data
     File recordDir;
-
     List<String> recordFolderNames = new ArrayList<>();
-
-
-
+    // Views
+    private HeadControlPanel headPanel;
+    private ListView listView;
+    private Button deleteButton;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -94,6 +85,7 @@ public class RecordManageActivity extends BaseActivity {
 
     /**
      * 初始化数据
+     *
      * @param savedInstanceState 应用状态
      */
     private void initData(Bundle savedInstanceState) {
@@ -133,7 +125,7 @@ public class RecordManageActivity extends BaseActivity {
 
                 String[] toDelete = new String[checkedItems.length];
                 for (int i = 0; i < checkedItems.length; i++) {
-                    for (String fileName: recordFolderNames) {
+                    for (String fileName : recordFolderNames) {
 
                         // 通过hashCode判断
                         if (fileName.hashCode() == checkedItems[i]) {
@@ -153,6 +145,7 @@ public class RecordManageActivity extends BaseActivity {
 
     /**
      * 删除选中的录制文件夹
+     *
      * @param select 被选中的文件夹名列表
      */
     private void deleteSelectFolders(String[] select) {
@@ -163,7 +156,7 @@ public class RecordManageActivity extends BaseActivity {
             if (folder.exists() && folder.isDirectory()) {
                 File[] childrenFiles = folder.listFiles();
 
-                for (File childFile: childrenFiles) {
+                for (File childFile : childrenFiles) {
                     boolean deleteResult = childFile.delete();
 
                     // 当存在子文件无法删除，break当前文件夹删除
@@ -191,7 +184,7 @@ public class RecordManageActivity extends BaseActivity {
                     return file.isDirectory() && (newPattern.matcher(file.getName()).matches() || midPattern.matcher(file.getName()).matches() || oldPattern.matcher(file.getName()).matches());
                 }
             });
-            LogUtil.i(TAG, "get files " +  StringUtil.hide(list));
+            LogUtil.i(TAG, "get files " + StringUtil.hide(list));
 
             // 修改顺序排序
             Arrays.sort(list, new Comparator<File>() {
@@ -202,7 +195,7 @@ public class RecordManageActivity extends BaseActivity {
             });
 
             recordFolderNames.clear();
-            for (File f: list) {
+            for (File f : list) {
                 recordFolderNames.add(f.getName());
             }
 

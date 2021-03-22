@@ -15,63 +15,69 @@
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
-    android:gravity="center_horizontal"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
     <com.alipay.hulu.ui.GesturePadView
         android:id="@+id/node_gesture_gesture_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
-        app:gpv_padding="2dp"
-        app:gpv_gestureFilter="100"
+        android:layout_weight="1"
         app:gpv_backgroundRes="@drawable/bg_custom_input"
-        app:gpv_clearBtn="@drawable/head_icon_delete" />
+        app:gpv_clearBtn="@drawable/head_icon_delete"
+        app:gpv_gestureFilter="100"
+        app:gpv_padding="2dp" />
 
     <LinearLayout
-        android:layout_marginTop="8dp"
         android:layout_width="wrap_content"
-        android:gravity="center_vertical"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center_vertical"
         android:padding="8dp">
 
         <TextView
             android:layout_width="60dp"
             android:layout_height="wrap_content"
+            android:gravity="center"
             android:text="@string/gesture__gesture_interval"
             android:textAlignment="center"
-            android:gravity="center"
             android:textColor="@color/primaryText"
             android:textSize="14dp" />
+
         <com.alipay.hulu.ui.FlowRadioGroup
             android:id="@+id/node_gesture_time_filter"
-            android:layout_marginLeft="4dp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="4dp">
+
             <RadioButton
                 android:id="@+id/node_gesture_time_filter_25"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="25ms"/>
+                android:text="25ms" />
+
             <RadioButton
                 android:id="@+id/node_gesture_time_filter_50"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="50ms"/>
+                android:text="50ms" />
+
             <RadioButton
                 android:id="@+id/node_gesture_time_filter_100"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:checked="true"
-                android:text="100ms"/>
+                android:text="100ms" />
+
             <RadioButton
                 android:id="@+id/node_gesture_time_filter_200"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="200ms"/>
+                android:text="200ms" />
         </com.alipay.hulu.ui.FlowRadioGroup>
     </LinearLayout>
 </LinearLayout>

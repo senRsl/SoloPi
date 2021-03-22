@@ -15,8 +15,11 @@
  */
 package com.alipay.hulu.bean;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import java.io.File;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.alibaba.fastjson.JSON;
 import com.alipay.hulu.activity.CaseReplayResultActivity;
@@ -24,104 +27,137 @@ import com.alipay.hulu.common.bean.DeviceInfo;
 import com.alipay.hulu.common.utils.StringUtil;
 import com.alipay.hulu.shared.node.tree.export.bean.OperationStep;
 
-import java.io.File;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 /**
  * 回放日志Bean
  */
 public class ReplayResultBean implements Parcelable {
-    private static final String TAG = "ReplayResultBean";
+    public static final Creator<ReplayResultBean> CREATOR = new Creator<ReplayResultBean>() {
+        @Override
+        public ReplayResultBean createFromParcel(Parcel source) {
+            return new ReplayResultBean(source);
+        }
 
+        @Override
+        public ReplayResultBean[] newArray(int size) {
+            return new ReplayResultBean[size];
+        }
+    };
+    private static final String TAG = "ReplayResultBean";
     /**
      * 用例名称
      */
     private String caseName;
-
     /**
      * 目标应用
      */
     private String targetApp;
-
     /**
      * 目标应用包名
      */
     private String targetAppPkg;
-
     /**
      * 目标应用版本号
      */
     private String targetAppVersion;
-
     /**
      * 开始时间
      */
     private Date startTime;
-
     /**
      * 结束时间
      */
     private Date endTime;
-
     /**
      * 日志文件地址
      */
     private String logFile;
-
     /**
      * 操作记录
      */
     private Map<Integer, ReplayStepInfoBean> actionLogs;
-
     /**
      * 步骤信息
      */
     private List<OperationStep> currentOperationLog;
-
     /**
      * 故障信息
      */
     private String exceptionMessage;
-
     /**
      * 故障步骤
      */
     private int exceptionStep;
-
     /**
      * 故障步骤ID
      */
     private String exceptionStepId;
-
     private DeviceInfo deviceInfo;
-
     /**
      * 平台
      */
     private String platform;
-
     /**
      * 平台版本
      */
     private String platformVersion;
-
     /**
      * 截图文件
      */
     private Map<String, String> screenshotFiles;
-
     /**
      * （仅用于本地结果）结果截图列表
      */
     private List<CaseReplayResultActivity.ScreenshotBean> screenshots;
-
     /**
      * （仅用于本地结果）结果目录
      */
     private File baseDir;
+
+    public ReplayResultBean() {
+    }
+
+    protected ReplayResultBean(Parcel in) {
+        this.caseName = in.readString();
+        long tmpStartTime = in.readLong();
+        this.startTime = tmpStartTime == -1 ? null : new Date(tmpStartTime);
+        long tmpEndTime = in.readLong();
+        this.endTime = tmpEndTime == -1 ? null : new Date(tmpEndTime);
+        this.logFile = in.readString();
+        this.targetApp = in.readString();
+        this.targetAppPkg = in.readString();
+        this.targetAppVersion = in.readString();
+        int actionLogsSize = in.readInt();
+        if (actionLogsSize > -1) {
+            this.actionLogs = new HashMap<>(actionLogsSize);
+            for (int i = 0; i < actionLogsSize; i++) {
+                int key = in.readInt();
+                ReplayStepInfoBean value = in.readParcelable(ReplayStepInfoBean.class.getClassLoader());
+                this.actionLogs.put(key, value);
+            }
+        }
+        this.currentOperationLog = in.readArrayList(OperationStep.class.getClassLoader());
+        this.exceptionMessage = in.readString();
+        this.exceptionStep = in.readInt();
+        this.exceptionStepId = in.readString();
+        int screenshotFilesSize = in.readInt();
+        if (screenshotFilesSize > -1) {
+            this.screenshotFiles = new HashMap<>(screenshotFilesSize + 1);
+            for (int i = 0; i < screenshotFilesSize; i++) {
+                String key = in.readString();
+                String value = in.readString();
+                this.screenshotFiles.put(key, value);
+            }
+        }
+        String deviceInfo = in.readString();
+        if (!StringUtil.isEmpty(deviceInfo)) {
+            this.deviceInfo = JSON.parseObject(deviceInfo, DeviceInfo.class);
+        }
+        this.platform = in.readString();
+        this.platformVersion = in.readString();
+    }
 
     public String getCaseName() {
         return caseName;
@@ -267,8 +303,6 @@ public class ReplayResultBean implements Parcelable {
         this.platformVersion = platformVersion;
     }
 
-    public ReplayResultBean() {}
-
     @Override
     public int describeContents() {
         return 0;
@@ -314,56 +348,4 @@ public class ReplayResultBean implements Parcelable {
         dest.writeString(this.platform);
         dest.writeString(this.platformVersion);
     }
-
-    protected ReplayResultBean(Parcel in) {
-        this.caseName = in.readString();
-        long tmpStartTime = in.readLong();
-        this.startTime = tmpStartTime == -1 ? null : new Date(tmpStartTime);
-        long tmpEndTime = in.readLong();
-        this.endTime = tmpEndTime == -1 ? null : new Date(tmpEndTime);
-        this.logFile = in.readString();
-        this.targetApp = in.readString();
-        this.targetAppPkg = in.readString();
-        this.targetAppVersion = in.readString();
-        int actionLogsSize = in.readInt();
-        if (actionLogsSize > -1) {
-            this.actionLogs = new HashMap<>(actionLogsSize);
-            for (int i = 0; i < actionLogsSize; i++) {
-                int key = in.readInt();
-                ReplayStepInfoBean value = in.readParcelable(ReplayStepInfoBean.class.getClassLoader());
-                this.actionLogs.put(key, value);
-            }
-        }
-        this.currentOperationLog = in.readArrayList(OperationStep.class.getClassLoader());
-        this.exceptionMessage = in.readString();
-        this.exceptionStep = in.readInt();
-        this.exceptionStepId = in.readString();
-        int screenshotFilesSize = in.readInt();
-        if (screenshotFilesSize > -1) {
-            this.screenshotFiles = new HashMap<>(screenshotFilesSize + 1);
-            for (int i = 0; i < screenshotFilesSize; i++) {
-                String key = in.readString();
-                String value = in.readString();
-                this.screenshotFiles.put(key, value);
-            }
-        }
-        String deviceInfo = in.readString();
-        if (!StringUtil.isEmpty(deviceInfo)) {
-            this.deviceInfo = JSON.parseObject(deviceInfo, DeviceInfo.class);
-        }
-        this.platform = in.readString();
-        this.platformVersion = in.readString();
-    }
-
-    public static final Creator<ReplayResultBean> CREATOR = new Creator<ReplayResultBean>() {
-        @Override
-        public ReplayResultBean createFromParcel(Parcel source) {
-            return new ReplayResultBean(source);
-        }
-
-        @Override
-        public ReplayResultBean[] newArray(int size) {
-            return new ReplayResultBean[size];
-        }
-    };
 }

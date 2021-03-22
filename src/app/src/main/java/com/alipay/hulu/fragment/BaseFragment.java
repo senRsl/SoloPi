@@ -15,28 +15,26 @@
  */
 package com.alipay.hulu.fragment;
 
-import android.app.Activity;
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import android.text.TextUtils;
-import android.view.View;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.Toast;
-
 import com.alipay.hulu.R;
 import com.alipay.hulu.activity.BaseActivity;
 import com.alipay.hulu.activity.MyApplication;
 import com.alipay.hulu.common.application.LauncherApplication;
 import com.alipay.hulu.common.utils.LogUtil;
 
+import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.os.Bundle;
+import android.text.TextUtils;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Toast;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
 public class BaseFragment extends Fragment {
-    private boolean canShowDialog;
-
     private static Toast toast;
-
+    private boolean canShowDialog;
     private ProgressDialog progressDialog;
 
     @Override

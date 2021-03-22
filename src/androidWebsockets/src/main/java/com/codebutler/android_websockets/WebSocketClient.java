@@ -1,20 +1,5 @@
 package com.codebutler.android_websockets;
 
-import android.os.Handler;
-import android.os.HandlerThread;
-import android.text.TextUtils;
-import android.util.Base64;
-import android.util.Log;
-import org.apache.http.*;
-import org.apache.http.message.BasicLineParser;
-import org.apache.http.message.BasicNameValuePair;
-
-import javax.net.SocketFactory;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLException;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -26,41 +11,55 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
+import javax.net.SocketFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLException;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+
+import org.apache.http.Header;
+import org.apache.http.HttpException;
+import org.apache.http.HttpStatus;
+import org.apache.http.NameValuePair;
+import org.apache.http.StatusLine;
+import org.apache.http.message.BasicLineParser;
+import org.apache.http.message.BasicNameValuePair;
+
+import android.os.Handler;
+import android.os.HandlerThread;
+import android.text.TextUtils;
+import android.util.Base64;
+import android.util.Log;
+
 
 public class WebSocketClient {
     private static final String TAG = "WebSocketClient";
-
-    private URI                      mURI;
-    private Listener                 mListener;
-    private Socket                   mSocket;
-
-    private WrapSocket               mWrapSocket;
-
-    private Thread                   mThread;
-    private HandlerThread            mHandlerThread;
-    private Handler                  mHandler;
+    private static TrustManager[] sTrustManagers;
+    private final Object mSendLock = new Object();
+    private URI mURI;
+    private Listener mListener;
+    private Socket mSocket;
+    private WrapSocket mWrapSocket;
+    private Thread mThread;
+    private HandlerThread mHandlerThread;
+    private Handler mHandler;
     private List<BasicNameValuePair> mExtraHeaders;
-    private HybiParser               mParser;
-
+    private HybiParser mParser;
     private boolean running;
 
-    private final Object mSendLock = new Object();
-
-    private static TrustManager[] sTrustManagers;
-
-    public static void setTrustManagers(TrustManager[] tm) {
-        sTrustManagers = tm;
-    }
-
     public WebSocketClient(URI uri, Listener listener, List<BasicNameValuePair> extraHeaders) {
-        mURI          = uri;
+        mURI = uri;
         mListener = listener;
         mExtraHeaders = extraHeaders;
-        mParser       = new HybiParser(this);
+        mParser = new HybiParser(this);
 
         mHandlerThread = new HandlerThread("websocket-thread");
         mHandlerThread.start();
         mHandler = new Handler(mHandlerThread.getLooper());
+    }
+
+    public static void setTrustManagers(TrustManager[] tm) {
+        sTrustManagers = tm;
     }
 
     public void registerWrapSocket(WrapSocket wrapSocket) {
@@ -95,7 +94,6 @@ public class WebSocketClient {
                     if (mWrapSocket == null) {
                         SocketFactory factory = mURI.getScheme().equals("wss") ? getSSLSocketFactory() : SocketFactory.getDefault();
                         mSocket = factory.createSocket(mURI.getHost(), port);
-
 
 
                         PrintWriter out = new PrintWriter(mSocket.getOutputStream());
@@ -228,6 +226,7 @@ public class WebSocketClient {
 
     /**
      * 断开与WebSocket连接
+     *
      * @param code
      * @param reason
      */
@@ -285,6 +284,7 @@ public class WebSocketClient {
 
     /**
      * 异步发送String数据
+     *
      * @param data 数据
      */
     public void send(String data) {
@@ -293,6 +293,7 @@ public class WebSocketClient {
 
     /**
      * 异步发送byte[]数据
+     *
      * @param data 数据
      */
     public void send(byte[] data) {
@@ -301,7 +302,8 @@ public class WebSocketClient {
 
     /**
      * 发送String数据
-     * @param data 数据
+     *
+     * @param data  数据
      * @param async 是否异步
      */
     public void send(String data, boolean async) {
@@ -310,7 +312,8 @@ public class WebSocketClient {
 
     /**
      * 发送byte[]数据
-     * @param data 数据
+     *
+     * @param data  数据
      * @param async 是否异步
      */
     public void send(byte[] data, boolean async) {
@@ -368,6 +371,7 @@ public class WebSocketClient {
 
     /**
      * 异步发送帧
+     *
      * @param frame 帧数据
      */
     void sendFrame(final byte[] frame) {
@@ -376,6 +380,7 @@ public class WebSocketClient {
 
     /**
      * 发送帧
+     *
      * @param frame 帧数据
      * @param async 是否异步
      */
@@ -420,17 +425,21 @@ public class WebSocketClient {
         return running;
     }
 
-    public interface Listener {
-        public void onConnect();
-        public void onMessage(String message);
-        public void onMessage(byte[] data);
-        public void onDisconnect(int code, String reason);
-        public void onError(Exception error);
-    }
-
     private SSLSocketFactory getSSLSocketFactory() throws NoSuchAlgorithmException, KeyManagementException {
         SSLContext context = SSLContext.getInstance("TLS");
         context.init(null, sTrustManagers, null);
         return context.getSocketFactory();
+    }
+
+    public interface Listener {
+        public void onConnect();
+
+        public void onMessage(String message);
+
+        public void onMessage(byte[] data);
+
+        public void onDisconnect(int code, String reason);
+
+        public void onError(Exception error);
     }
 }

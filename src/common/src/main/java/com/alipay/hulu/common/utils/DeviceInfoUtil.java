@@ -15,20 +15,20 @@
  */
 package com.alipay.hulu.common.utils;
 
-import android.graphics.Point;
-import android.os.Build;
-import android.util.DisplayMetrics;
-
-import com.alipay.hulu.common.bean.DeviceInfo;
-import com.alipay.hulu.common.service.SPService;
-import com.alipay.hulu.common.tools.CmdTools;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
+
+import com.alipay.hulu.common.bean.DeviceInfo;
+import com.alipay.hulu.common.service.SPService;
+import com.alipay.hulu.common.tools.CmdTools;
+
+import android.graphics.Point;
+import android.os.Build;
+import android.util.DisplayMetrics;
 
 
 /**
@@ -37,12 +37,10 @@ import java.util.Enumeration;
 
 public class DeviceInfoUtil {
 
-    private static final String TAG = DeviceInfoUtil.class.getSimpleName();
-
     public static final Point realScreenSize = new Point();
     public static final Point curScreenSize = new Point();
     public static final DisplayMetrics metrics = new DisplayMetrics();
-
+    private static final String TAG = DeviceInfoUtil.class.getSimpleName();
 
     public static String getSystemVersion() {
         return "Android " + Build.VERSION.RELEASE;
@@ -153,21 +151,21 @@ public class DeviceInfoUtil {
         return ip;
     }
 
-    public static int getTotalRAM(){
+    public static int getTotalRAM() {
         String path = "/proc/meminfo";
         String firstLine = null;
-        int totalRam = 0 ;
-        try{
+        int totalRam = 0;
+        try {
             FileReader fileReader = new FileReader(path);
-            BufferedReader br = new BufferedReader(fileReader,8192);
+            BufferedReader br = new BufferedReader(fileReader, 8192);
             firstLine = br.readLine().split("\\s+")[1];
             br.close();
-        }catch (Exception e){
+        } catch (Exception e) {
             LogUtil.e(TAG, "Catch Exception: " + e.getMessage(), e);
         }
-        if(firstLine != null){
+        if (firstLine != null) {
             try {
-                totalRam = (int)Math.ceil((Float.valueOf(Float.valueOf(firstLine) / (1024 * 1024)).doubleValue()));
+                totalRam = (int) Math.ceil((Float.valueOf(Float.valueOf(firstLine) / (1024 * 1024)).doubleValue()));
             } catch (Exception e) {
                 LogUtil.e(TAG, "getTotalRam exception: " + e.getMessage(), e);
             }

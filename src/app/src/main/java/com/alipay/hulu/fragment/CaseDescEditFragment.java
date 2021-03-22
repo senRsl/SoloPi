@@ -15,18 +15,12 @@
  */
 package com.alipay.hulu.fragment;
 
-import android.os.Bundle;
-import androidx.annotation.Nullable;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.ListView;
+import java.util.List;
 
 import com.alibaba.fastjson.JSON;
-import com.alipay.hulu.adapter.ParamListAdapter;
 import com.alipay.hulu.R;
 import com.alipay.hulu.activity.CaseEditActivity;
+import com.alipay.hulu.adapter.ParamListAdapter;
 import com.alipay.hulu.bean.AdvanceCaseSetting;
 import com.alipay.hulu.bean.CaseParamBean;
 import com.alipay.hulu.common.injector.InjectorService;
@@ -36,7 +30,13 @@ import com.alipay.hulu.common.injector.provider.Param;
 import com.alipay.hulu.common.utils.LogUtil;
 import com.alipay.hulu.shared.io.bean.RecordCaseInfo;
 
-import java.util.List;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.ListView;
+import androidx.annotation.Nullable;
 
 public class CaseDescEditFragment extends BaseFragment implements CaseEditActivity.OnCaseSaveListener {
     private static final String TAG = "CaseStepEditFrag";
@@ -52,13 +52,6 @@ public class CaseDescEditFragment extends BaseFragment implements CaseEditActivi
 
     private ParamListAdapter adapter;
 
-    @Subscriber(value = @Param(sticky = false), thread = RunningThread.MAIN_THREAD)
-    public void receiveNewParam(CaseParamBean param) {
-        List<CaseParamBean> paramBeanList = adapter.getData();
-        paramBeanList.add(param);
-        adapter.setData(paramBeanList);
-    }
-
     /**
      * 通过RecordCase初始化
      *
@@ -68,6 +61,13 @@ public class CaseDescEditFragment extends BaseFragment implements CaseEditActivi
         CaseDescEditFragment fragment = new CaseDescEditFragment();
         fragment.mRecordCase = recordCaseInfo;
         return fragment;
+    }
+
+    @Subscriber(value = @Param(sticky = false), thread = RunningThread.MAIN_THREAD)
+    public void receiveNewParam(CaseParamBean param) {
+        List<CaseParamBean> paramBeanList = adapter.getData();
+        paramBeanList.add(param);
+        adapter.setData(paramBeanList);
     }
 
     @Nullable

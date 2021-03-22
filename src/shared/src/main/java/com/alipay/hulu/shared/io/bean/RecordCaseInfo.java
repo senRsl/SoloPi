@@ -15,15 +15,15 @@
  */
 package com.alipay.hulu.shared.io.bean;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
-import com.alibaba.fastjson.annotation.JSONField;
-
 import org.greenrobot.greendao.annotation.Entity;
 import org.greenrobot.greendao.annotation.Generated;
 import org.greenrobot.greendao.annotation.Id;
 import org.greenrobot.greendao.annotation.Transient;
+
+import com.alibaba.fastjson.annotation.JSONField;
+
+import android.os.Parcel;
+import android.os.Parcelable;
 
 /**
  * Created by lezhou.wyl on 2018/1/30.
@@ -35,7 +35,17 @@ public class RecordCaseInfo implements Parcelable {
     public static final int DEFAULT_PRIORITY = 2;
     public static final int LOWEST_PRIORITY = 2;
     public static final int HIGHEST_PRIORITY = 0;
+    public static final Creator<RecordCaseInfo> CREATOR = new Creator<RecordCaseInfo>() {
+        @Override
+        public RecordCaseInfo createFromParcel(Parcel source) {
+            return new RecordCaseInfo(source);
+        }
 
+        @Override
+        public RecordCaseInfo[] newArray(int size) {
+            return new RecordCaseInfo[size];
+        }
+    };
     @Id(autoincrement = true)
     @JSONField(serialize = false)
     private Long id;
@@ -46,18 +56,49 @@ public class RecordCaseInfo implements Parcelable {
     private String recordMode;
     private String advanceSettings;
     private String operationLog;
-    private int priority=DEFAULT_PRIORITY;
+    private int priority = DEFAULT_PRIORITY;
     private long gmtCreate;
     private long gmtModify;
     @Transient
     private boolean selected = false;
 
-    public boolean isSelected() {
-        return selected;
+    public RecordCaseInfo() {
+
     }
 
-    public void setSelected(boolean selected) {
-        this.selected = selected;
+    protected RecordCaseInfo(Parcel in) {
+        this.id = (Long) in.readValue(Long.class.getClassLoader());
+        this.caseName = in.readString();
+        this.caseDesc = in.readString();
+        this.targetAppPackage = in.readString();
+        this.targetAppLabel = in.readString();
+        this.recordMode = in.readString();
+        this.advanceSettings = in.readString();
+        this.operationLog = in.readString();
+        this.priority = in.readInt();
+        this.gmtCreate = in.readLong();
+        this.gmtModify = in.readLong();
+    }
+
+    @Generated(hash = 1201720745)
+    public RecordCaseInfo(Long id, String caseName, String caseDesc, String targetAppPackage,
+                          String targetAppLabel, String recordMode, String advanceSettings,
+                          String operationLog, int priority, long gmtCreate, long gmtModify) {
+        this.id = id;
+        this.caseName = caseName;
+        this.caseDesc = caseDesc;
+        this.targetAppPackage = targetAppPackage;
+        this.targetAppLabel = targetAppLabel;
+        this.recordMode = recordMode;
+        this.advanceSettings = advanceSettings;
+        this.operationLog = operationLog;
+        this.priority = priority;
+        this.gmtCreate = gmtCreate;
+        this.gmtModify = gmtModify;
+    }
+
+    public boolean isSelected() {
+        return selected;
     }
 
     public Long getId() {
@@ -150,11 +191,6 @@ public class RecordCaseInfo implements Parcelable {
                 gmtCreate, gmtModify);
     }
 
-    public RecordCaseInfo() {
-
-    }
-
-
     @Override
     public int describeContents() {
         return 0;
@@ -179,6 +215,10 @@ public class RecordCaseInfo implements Parcelable {
         return this.selected;
     }
 
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
     public int getPriority() {
         return this.priority;
     }
@@ -186,49 +226,6 @@ public class RecordCaseInfo implements Parcelable {
     public void setPriority(int priority) {
         this.priority = priority;
     }
-
-    protected RecordCaseInfo(Parcel in) {
-        this.id = (Long) in.readValue(Long.class.getClassLoader());
-        this.caseName = in.readString();
-        this.caseDesc = in.readString();
-        this.targetAppPackage = in.readString();
-        this.targetAppLabel = in.readString();
-        this.recordMode = in.readString();
-        this.advanceSettings = in.readString();
-        this.operationLog = in.readString();
-        this.priority = in.readInt();
-        this.gmtCreate = in.readLong();
-        this.gmtModify = in.readLong();
-    }
-
-    @Generated(hash = 1201720745)
-    public RecordCaseInfo(Long id, String caseName, String caseDesc, String targetAppPackage,
-            String targetAppLabel, String recordMode, String advanceSettings,
-            String operationLog, int priority, long gmtCreate, long gmtModify) {
-        this.id = id;
-        this.caseName = caseName;
-        this.caseDesc = caseDesc;
-        this.targetAppPackage = targetAppPackage;
-        this.targetAppLabel = targetAppLabel;
-        this.recordMode = recordMode;
-        this.advanceSettings = advanceSettings;
-        this.operationLog = operationLog;
-        this.priority = priority;
-        this.gmtCreate = gmtCreate;
-        this.gmtModify = gmtModify;
-    }
-
-    public static final Creator<RecordCaseInfo> CREATOR = new Creator<RecordCaseInfo>() {
-        @Override
-        public RecordCaseInfo createFromParcel(Parcel source) {
-            return new RecordCaseInfo(source);
-        }
-
-        @Override
-        public RecordCaseInfo[] newArray(int size) {
-            return new RecordCaseInfo[size];
-        }
-    };
 
 
 }

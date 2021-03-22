@@ -15,23 +15,7 @@
  */
 package com.alipay.hulu.activity;
 
-import android.content.Intent;
-import android.content.pm.ApplicationInfo;
-import android.database.DataSetObserver;
-import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
-import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.appcompat.widget.AppCompatSpinner;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.SpinnerAdapter;
-import android.widget.TextView;
+import java.util.List;
 
 import com.alipay.hulu.R;
 import com.alipay.hulu.activity.entry.EntryActivity;
@@ -56,7 +40,23 @@ import com.alipay.hulu.shared.node.utils.AssetsManager;
 import com.alipay.hulu.shared.node.utils.PrepareUtil;
 import com.alipay.hulu.ui.HeadControlPanel;
 
-import java.util.List;
+import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.database.DataSetObserver;
+import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.SpinnerAdapter;
+import android.widget.TextView;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatSpinner;
 
 /**
  * Created by lezhou.wyl on 2018/1/28.
@@ -210,12 +210,12 @@ public class PerformanceActivity extends BaseActivity {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 // 全局特殊处理
                 if (position == 0) {
-                    ((MyApplication)getApplication()).updateAppAndName("-", getString(com.alipay.hulu.common.R.string.constant__global));
+                    ((MyApplication) getApplication()).updateAppAndName("-", getString(com.alipay.hulu.common.R.string.constant__global));
                 } else {
                     ApplicationInfo info = listPack.get(position - 1);
                     LogUtil.i(TAG, "Select info: " + StringUtil.hide(info.packageName));
 
-                    ((MyApplication)getApplication()).updateAppAndName(info.packageName, info.loadLabel(getPackageManager()).toString());
+                    ((MyApplication) getApplication()).updateAppAndName(info.packageName, info.loadLabel(getPackageManager()).toString());
                 }
             }
 

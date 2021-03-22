@@ -15,25 +15,24 @@
  */
 package com.alipay.hulu.activity;
 
-import android.Manifest;
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.core.content.FileProvider;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
-import android.widget.BaseAdapter;
-import android.widget.GridView;
-import android.widget.ImageView;
-import android.widget.TextView;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FilenameFilter;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.regex.Pattern;
+
+import org.commonmark.node.Node;
+import org.commonmark.parser.Parser;
+import org.commonmark.renderer.html.HtmlRenderer;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -59,24 +58,25 @@ import com.alipay.hulu.util.SystemUtil;
 import com.alipay.hulu.util.UpgradeUtil;
 import com.alipay.hulu.util.ZipUtil;
 
-import org.commonmark.node.Node;
-import org.commonmark.parser.Parser;
-import org.commonmark.renderer.html.HtmlRenderer;
-
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FilenameFilter;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.regex.Pattern;
+import android.Manifest;
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.widget.BaseAdapter;
+import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.TextView;
+import androidx.annotation.Nullable;
+import androidx.core.content.FileProvider;
 
 /**
  * Created by lezhou.wyl on 2018/1/28.
@@ -192,7 +192,7 @@ public class IndexActivity extends BaseActivity {
         List<Class<? extends Activity>> activities = ClassUtil.findSubClass(Activity.class, EntryActivity.class);
 
         // 配置唯一entry
-        for (Class<? extends Activity> activityClass: activities) {
+        for (Class<? extends Activity> activityClass : activities) {
             // 配置
             Entry target = new Entry(activityClass.getAnnotation(EntryActivity.class), activityClass);
             if (entryList.containsKey(target.name)) {
@@ -270,7 +270,7 @@ public class IndexActivity extends BaseActivity {
             });
 
             if (children != null && children.length > 0) {
-                for (final File errorLog: children) {
+                for (final File errorLog : children) {
                     final long time = errorLog.lastModified();
                     if (time > lastCheckTime) {
                         // 只上传一条，根据修改时间查看
@@ -293,6 +293,7 @@ public class IndexActivity extends BaseActivity {
 
     /**
      * 上报Crash日志
+     *
      * @param errorTime
      * @param errorLog
      */
@@ -343,7 +344,7 @@ public class IndexActivity extends BaseActivity {
                             Intent i = new Intent(Intent.ACTION_SEND);
                             i.setType("application/octet-stream");
                             i.putExtra(Intent.EXTRA_EMAIL,
-                                    new String[] { Constant.MAIL_ADDERSS });
+                                    new String[]{Constant.MAIL_ADDERSS});
                             i.putExtra(Intent.EXTRA_SUBJECT, StringUtil.getString(R.string.index__report_error_log));
                             i.putExtra(Intent.EXTRA_TEXT, getString(R.string.index__error_occur_time, errorTime));
                             Uri uri = FileProvider.getUriForFile(IndexActivity.this, "com.alipay.hulu.myProvider", zipFile);
@@ -559,7 +560,7 @@ public class IndexActivity extends BaseActivity {
                                 if (count == null) {
                                     count = 1;
                                 } else {
-                                    count ++;
+                                    count++;
                                 }
                                 entryCount.put(item.name, count);
                                 versionsCount.put(Integer.toString(currentVersionCode), entryCount);

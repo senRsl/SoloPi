@@ -46,8 +46,8 @@ public class MetaTree {
     @Override
     public String toString() {
         return "MetaTree{" +
-                "currentNode=" + (currentNode == null? null: currentNode.getClass().getSimpleName()) +
-                ", children=" + (children == null? -1: children.size()) +
+                "currentNode=" + (currentNode == null ? null : currentNode.getClass().getSimpleName()) +
+                ", children=" + (children == null ? -1 : children.size()) +
                 '}';
     }
 }

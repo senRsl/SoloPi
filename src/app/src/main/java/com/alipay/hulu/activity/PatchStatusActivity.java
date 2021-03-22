@@ -15,16 +15,8 @@
  */
 package com.alipay.hulu.activity;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.os.Bundle;
-import androidx.annotation.Nullable;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.alipay.hulu.R;
 import com.alipay.hulu.common.application.LauncherApplication;
@@ -33,16 +25,23 @@ import com.alipay.hulu.common.utils.patch.PatchLoadResult;
 import com.alipay.hulu.ui.HeadControlPanel;
 import com.alipay.hulu.upgrade.PatchRequest;
 
-import java.util.ArrayList;
-import java.util.List;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
+import androidx.annotation.Nullable;
 
 public class PatchStatusActivity extends BaseActivity {
-    private  HeadControlPanel header;
+    private final List<PatchLoadResult> patches = new ArrayList<>();
+    private HeadControlPanel header;
     private ListView patchList;
     private BaseAdapter patchItemAdapter;
     private View emptyView;
-
-    private final List<PatchLoadResult> patches = new ArrayList<>();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {

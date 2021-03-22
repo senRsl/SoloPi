@@ -1,5 +1,7 @@
 package com.android.permission.rom;
 
+import java.lang.reflect.Method;
+
 import android.annotation.TargetApi;
 import android.app.AppOpsManager;
 import android.content.ActivityNotFoundException;
@@ -9,8 +11,6 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.Build;
 import android.util.Log;
-
-import java.lang.reflect.Method;
 
 /**
  * Description:
@@ -63,8 +63,7 @@ public class OppoUtils {
             ComponentName comp = new ComponentName("com.coloros.safecenter", "com.coloros.safecenter.sysfloatwindow.FloatWindowListActivity");//悬浮窗管理页面
             intent.setComponent(comp);
             context.startActivity(intent);
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             // 特殊情景
             if (e instanceof ActivityNotFoundException) {
                 try {

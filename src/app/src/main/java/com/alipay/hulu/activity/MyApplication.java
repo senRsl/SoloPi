@@ -15,17 +15,20 @@
  */
 package com.alipay.hulu.activity;
 
-import android.app.Activity;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.os.Build;
-import android.os.Bundle;
-import android.provider.Settings;
-import android.view.WindowManager;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.text.Collator;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import com.alipay.hulu.R;
 import com.alipay.hulu.bean.CaseStepHolder;
@@ -48,61 +51,65 @@ import com.alipay.hulu.util.LargeObjectHolder;
 import com.alipay.hulu.util.SystemUtil;
 import com.liulishuo.filedownloader.FileDownloader;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.text.Collator;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Timer;
-import java.util.TimerTask;
-
+import android.app.Activity;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.os.Bundle;
+import android.provider.Settings;
+import android.view.WindowManager;
 import cn.dreamtobe.filedownloader.OkHttp3Connection;
 
 public class MyApplication extends LauncherApplication {
     private static final String TAG = "MyApplication";
-
-    private static MyApplication sInstance;
-
-    private int activityCount = 0;
-
-    private static String curSysInputMethod;
-
-    public static String getCurSysInputMethod() {
-        return curSysInputMethod;
-    }
-
     private static final long DAY_MILLIONS = 24 * 60 * 60 * 1000;
+    /**
+     * 单用例回放
+     */
+    public static CaseReplayManager.OnFinishListener SINGLE_REPLAY_LISTENER = new CaseReplayManager.OnFinishListener() {
+        @Override
+        public void onFinish(List<ReplayResultBean> resultBeans, Context context) {
+            Intent intent = new Intent(context, CaseReplayResultActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            if (resultBeans == null || resultBeans.size() != 1) {
+                LogUtil.e(TAG, "返回结果异常");
+                //FIXME yuawen
+            } else {
+                int id = CaseStepHolder.storeResult(resultBeans.get(0));
+                intent.putExtra("data", id);
+            }
 
-    private WindowManager.LayoutParams wmParams = new WindowManager.LayoutParams();
-    private WindowManager.LayoutParams floatWinParams = new WindowManager.LayoutParams();
-
-    public WindowManager.LayoutParams getMywmParams() {
-        return wmParams;
-    }
-
-    public WindowManager.LayoutParams getFloatWinParams() {
-        return floatWinParams;
-    }
-
-    private String appPackage = null;
-
-    private String appName = null;
-
-    private String tempAppPackage = null;
-
-    private String tempAppName = null;
-
-    private InjectorService injectorService;
-
-    private final List<ApplicationInfo> packageList = new ArrayList<>();
-
+            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            try {
+                pendingIntent.send();
+            } catch (PendingIntent.CanceledException e) {
+                LogUtil.e(TAG, "Catch android.app.PendingIntent.CanceledException: " + e.getMessage(), e);
+            }
+        }
+    };
+    /**
+     * 多用例回放
+     */
+    public static CaseReplayManager.OnFinishListener MULTI_REPLAY_LISTENER = new CaseReplayManager.OnFinishListener() {
+        @Override
+        public void onFinish(List<ReplayResultBean> resultBeans, Context context) {
+            LargeObjectHolder.getInstance().setReplayResults(resultBeans);
+            Intent intent = new Intent(context, BatchReplayResultActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+            try {
+                pendingIntent.send();
+            } catch (PendingIntent.CanceledException e) {
+                LogUtil.e(TAG, "PendingIntent canceled ", e);
+            }
+        }
+    };
+    private static MyApplication sInstance;
+    private static String curSysInputMethod;
     private static TimerTask CLEAR_FILES_TASK = new TimerTask() {
         @Override
         public void run() {
@@ -114,7 +121,7 @@ public class MyApplication extends LauncherApplication {
             // 待清理文件夹
             File[] clearFolders = FileUtils.getAutoClearDirs();
 
-            for (File downloadDir: clearFolders) {
+            for (File downloadDir : clearFolders) {
 
                 long currentTime = System.currentTimeMillis();
                 long clearTime = currentTime - clearDays * DAY_MILLIONS;
@@ -136,12 +143,20 @@ public class MyApplication extends LauncherApplication {
             }
         }
     };
-
-
+    private final List<ApplicationInfo> packageList = new ArrayList<>();
+    private int activityCount = 0;
+    private WindowManager.LayoutParams wmParams = new WindowManager.LayoutParams();
+    private WindowManager.LayoutParams floatWinParams = new WindowManager.LayoutParams();
+    private String appPackage = null;
+    private String appName = null;
+    private String tempAppPackage = null;
+    private String tempAppName = null;
+    private InjectorService injectorService;
     // ANR 检测
     private Timer ANR_TIMER;
     private TimerTask ANR_WATCHER = new TimerTask() {
         private String lastTime = null;
+
         @Override
         public void run() {
             String cmd = "cat /data/anr/traces.txt | grep Cmd -B1";
@@ -192,6 +207,22 @@ public class MyApplication extends LauncherApplication {
         }
     };
 
+    public static String getCurSysInputMethod() {
+        return curSysInputMethod;
+    }
+
+    public static MyApplication getInstance() {
+        return sInstance;
+    }
+
+    public WindowManager.LayoutParams getMywmParams() {
+        return wmParams;
+    }
+
+    public WindowManager.LayoutParams getFloatWinParams() {
+        return floatWinParams;
+    }
+
     /**
      * 开始检测ANR信息
      */
@@ -208,49 +239,6 @@ public class MyApplication extends LauncherApplication {
             LogUtil.d(TAG, "Anr Timer Already started");
         }
     }
-
-    /**
-     * 单用例回放
-     */
-    public static CaseReplayManager.OnFinishListener SINGLE_REPLAY_LISTENER = new CaseReplayManager.OnFinishListener() {
-        @Override
-        public void onFinish(List< ReplayResultBean > resultBeans, Context context) {
-            Intent intent = new Intent(context, CaseReplayResultActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            if (resultBeans == null || resultBeans.size() != 1) {
-                LogUtil.e(TAG, "返回结果异常");
-                //FIXME yuawen
-            } else {
-                int id = CaseStepHolder.storeResult(resultBeans.get(0));
-                intent.putExtra("data", id);
-            }
-
-            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-            try {
-                pendingIntent.send();
-            } catch (PendingIntent.CanceledException e) {
-                LogUtil.e(TAG, "Catch android.app.PendingIntent.CanceledException: " + e.getMessage(), e);
-            }
-        }
-    };
-
-    /**
-     * 多用例回放
-     */
-    public static CaseReplayManager.OnFinishListener MULTI_REPLAY_LISTENER = new CaseReplayManager.OnFinishListener() {
-        @Override
-        public void onFinish(List<ReplayResultBean> resultBeans, Context context) {
-            LargeObjectHolder.getInstance().setReplayResults(resultBeans);
-            Intent intent = new Intent(context, BatchReplayResultActivity.class);
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-            try{
-                pendingIntent.send();
-            } catch (PendingIntent.CanceledException e) {
-                LogUtil.e(TAG, "PendingIntent canceled ", e);
-            }
-        }
-    };
 
     @Override
     public void init() {
@@ -297,6 +285,7 @@ public class MyApplication extends LauncherApplication {
 
     /**
      * 获取应用列表
+     *
      * @return
      */
     public List<ApplicationInfo> loadAppList() {
@@ -311,6 +300,7 @@ public class MyApplication extends LauncherApplication {
 
     /**
      * 获取应用列表
+     *
      * @return
      */
     public void reloadAppList() {
@@ -381,7 +371,7 @@ public class MyApplication extends LauncherApplication {
         String selfPackage = getPackageName();
         boolean displaySystemApp = SPService.getBoolean(SPService.KEY_DISPLAY_SYSTEM_APP, false);
 
-        for (ApplicationInfo pack: listPack) {
+        for (ApplicationInfo pack : listPack) {
             if (!displaySystemApp && (pack.flags & ApplicationInfo.FLAG_SYSTEM) > 0) {
                 removedItems.add(pack);
             }
@@ -419,6 +409,7 @@ public class MyApplication extends LauncherApplication {
 
     /**
      * 更新临时应用信息
+     *
      * @param appPackage
      * @param appName
      */
@@ -538,9 +529,5 @@ public class MyApplication extends LauncherApplication {
 
     public void updateDefaultIme(String ime) {
         curSysInputMethod = ime;
-    }
-
-    public static MyApplication getInstance() {
-        return sInstance;
     }
 }

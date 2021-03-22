@@ -58,14 +58,14 @@
     <color name="tab_unselect">#bfbfbf</color>
     <color name="bg_btn">#dadada</color>
 
-    <color name = "colorBtnGreen" >#0dc3e4</color >
-    <color name = "colorBtnRed" >#fb0009</color >
+    <color name="colorBtnGreen">#0dc3e4</color>
+    <color name="colorBtnRed">#fb0009</color>
 
-    <color name = "colorStatusGreen" >#54e491</color >
-    <color name = "colorStatusBlue" >#5e72e8</color >
-    <color name = "colorStatusYellow" >#f9b022</color >
-    <color name = "colorStatusRed" >#ff4b2d</color >
-    <color name = "colorStatusGay" >#54b3e4</color >
+    <color name="colorStatusGreen">#54e491</color>
+    <color name="colorStatusBlue">#5e72e8</color>
+    <color name="colorStatusYellow">#f9b022</color>
+    <color name="colorStatusRed">#ff4b2d</color>
+    <color name="colorStatusGay">#54b3e4</color>
 
     <color name="divideBgColor">#c9c9c9</color> <!-- 分割线的背景色, 中灰 -->
     <color name="item_pressed">#D8D8D8</color> <!-- listview中item的按下效果, 中灰 -->

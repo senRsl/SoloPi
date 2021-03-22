@@ -15,18 +15,6 @@
  */
 package com.alipay.hulu.activity;
 
-import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import com.google.android.material.tabs.TabLayout;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.viewpager.widget.ViewPager;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-
 import com.alibaba.fastjson.JSON;
 import com.alipay.hulu.R;
 import com.alipay.hulu.bean.AdvanceCaseSetting;
@@ -43,6 +31,18 @@ import com.alipay.hulu.fragment.CaseParamUnionFragment;
 import com.alipay.hulu.shared.io.bean.RecordCaseInfo;
 import com.alipay.hulu.shared.io.db.GreenDaoManager;
 import com.alipay.hulu.ui.HeadControlPanel;
+import com.google.android.material.tabs.TabLayout;
+
+import android.os.Bundle;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 
 /**
  * Created by qiaoruikai on 2019-08-19 21:16.
@@ -231,6 +231,7 @@ public class CaseParamEditActivity extends BaseActivity {
 
     public static abstract class CaseParamFragment extends BaseFragment {
         public abstract void setAdvanceCaseSetting(@NonNull AdvanceCaseSetting advanceCaseSetting);
+
         public abstract CaseRunningParam getRunningParam();
     }
 }

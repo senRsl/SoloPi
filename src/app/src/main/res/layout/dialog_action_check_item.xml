@@ -14,38 +14,39 @@
   ~ limitations under the License.
 -->
 <com.alipay.hulu.ui.CheckableRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:duplicateParentState="true"
+    android:paddingBottom="8dp"
     android:paddingLeft="8dp"
     android:paddingRight="8dp"
-    android:duplicateParentState="true"
-    android:paddingTop="8dp"
-    android:paddingBottom="8dp">
+    android:paddingTop="8dp">
+
     <ImageView
         android:id="@+id/dialog_action_icon"
         android:layout_width="24dp"
-        android:scaleType="centerInside"
+        android:layout_height="24dp"
         android:layout_centerVertical="true"
-        android:layout_height="24dp" />
+        android:scaleType="centerInside" />
 
     <CheckBox
         android:id="@+id/dialog_action_check"
-        android:layout_alignParentRight="true"
-        android:focusable="false"
-        android:clickable="false"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"/>
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:clickable="false"
+        android:focusable="false" />
 
 
     <TextView
         android:id="@+id/dialog_action_title"
-        android:layout_toRightOf="@id/dialog_action_icon"
-        android:layout_toLeftOf="@id/dialog_action_check"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:textColor="@color/primaryText"
-        android:textSize="18sp"
         android:layout_marginLeft="8dp"
-        />
+        android:layout_toLeftOf="@id/dialog_action_check"
+        android:layout_toRightOf="@id/dialog_action_icon"
+        android:textColor="@color/primaryText"
+        android:textSize="18sp" />
 </com.alipay.hulu.ui.CheckableRelativeLayout>

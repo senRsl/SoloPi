@@ -16,61 +16,63 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
+
     <RelativeLayout
         android:id="@+id/item_patch_delete"
-        android:layout_centerVertical="true"
         android:layout_width="@dimen/control_dp40"
         android:layout_height="@dimen/control_dp64"
         android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
         android:background="?android:attr/selectableItemBackground">
+
         <ImageView
-            android:layout_centerInParent="true"
             android:layout_width="@dimen/control_dp24"
             android:layout_height="@dimen/control_dp24"
-            android:tint="@color/mainRed"
-            android:src="@drawable/head_icon_delete" />
+            android:layout_centerInParent="true"
+            android:src="@drawable/head_icon_delete"
+            android:tint="@color/mainRed" />
     </RelativeLayout>
 
     <LinearLayout
-        android:orientation="vertical"
-        android:gravity="center_vertical"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:layout_toLeftOf="@id/item_patch_delete"
-        android:layout_marginTop="@dimen/control_dp4"
         android:layout_marginBottom="@dimen/control_dp4"
+        android:layout_marginTop="@dimen/control_dp4"
+        android:layout_toLeftOf="@id/item_patch_delete"
+        android:gravity="center_vertical"
+        android:orientation="vertical"
         android:paddingLeft="@dimen/control_dp16"
-        android:paddingRight="@dimen/control_dp8"
-        android:layout_width="match_parent">
+        android:paddingRight="@dimen/control_dp8">
 
         <TextView
             android:id="@+id/item_patch_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="minicap"
-            android:textSize="@dimen/textsize_16"
-            android:textColor="@color/mainFont"
             android:layout_alignParentTop="true"
+            android:ellipsize="end"
             android:maxLines="1"
-            android:ellipsize="end"/>
+            android:text="minicap"
+            android:textColor="@color/mainFont"
+            android:textSize="@dimen/textsize_16" />
 
         <TextView
             android:id="@+id/item_patch_version"
-            android:text="version: 6"
-            android:textSize="@dimen/textsize_14"
-            android:textColor="@color/subFont"
-            android:layout_marginTop="@dimen/control_dp4"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/control_dp4"
+            android:text="version: 6"
+            android:textColor="@color/subFont"
+            android:textSize="@dimen/textsize_14" />
 
         <TextView
             android:id="@+id/item_patch_filter"
-            android:textSize="@dimen/textsize_14"
-            android:textColor="@color/subFont"
-            android:layout_marginTop="@dimen/control_dp2"
             android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/control_dp2"
             android:text="com.alipay.hulu.minicap"
-            android:layout_height="wrap_content"/>
+            android:textColor="@color/subFont"
+            android:textSize="@dimen/textsize_14" />
 
     </LinearLayout>
 

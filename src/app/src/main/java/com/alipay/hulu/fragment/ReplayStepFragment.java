@@ -15,20 +15,9 @@
  */
 package com.alipay.hulu.fragment;
 
-import android.content.DialogInterface;
-import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.appcompat.app.AlertDialog;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import android.util.Pair;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TableRow;
-import android.widget.TextView;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import com.alipay.hulu.R;
 import com.alipay.hulu.actions.ImageCompareActionProvider;
@@ -39,15 +28,26 @@ import com.alipay.hulu.common.utils.GlideApp;
 import com.alipay.hulu.common.utils.LogUtil;
 import com.alipay.hulu.common.utils.StringUtil;
 import com.alipay.hulu.shared.node.action.OperationMethod;
-import com.alipay.hulu.shared.node.tree.export.OperationStepExporter;
 import com.alipay.hulu.shared.node.tree.OperationNode;
+import com.alipay.hulu.shared.node.tree.export.OperationStepExporter;
 import com.alipay.hulu.shared.node.tree.export.bean.OperationStep;
 import com.alipay.hulu.shared.node.utils.BitmapUtil;
 import com.alipay.hulu.util.DialogUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import android.content.DialogInterface;
+import android.os.Bundle;
+import android.util.Pair;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TableRow;
+import android.widget.TextView;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class ReplayStepFragment extends Fragment {
     public static final String RESULT_BEAN_TAG = "ReplayStepBean";
@@ -118,6 +118,7 @@ public class ReplayStepFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getActivity()));
         recyclerView.setAdapter(new RecyclerView.Adapter<ResultItemViewHolder>() {
             private LayoutInflater mInflater = LayoutInflater.from(getActivity());
+
             @Override
             public ResultItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
                 return new ResultItemViewHolder(mInflater.inflate(R.layout.item_case_result_step_actions, parent, false));
@@ -134,12 +135,12 @@ public class ReplayStepFragment extends Fragment {
                         action = CaseStepStatus.UNENFORCED;
                     }
                 }
-                holder.bindData(data.first, data.second == null? new ReplayStepInfoBean(): data.second, action);
+                holder.bindData(data.first, data.second == null ? new ReplayStepInfoBean() : data.second, action);
             }
 
             @Override
             public int getItemCount() {
-                return contents == null? 0: contents.size();
+                return contents == null ? 0 : contents.size();
             }
         });
 
@@ -247,7 +248,7 @@ public class ReplayStepFragment extends Fragment {
             boolean captureFlag = false;
             try {
                 // 获取base64信息
-                findBytes = BitmapUtil.decodeBase64(findNode == null? null:
+                findBytes = BitmapUtil.decodeBase64(findNode == null ? null :
                         findNode.getExtraValue(OperationStepExporter.CAPTURE_IMAGE_BASE64));
                 targetBytes = null;
                 if (method != null) {
@@ -327,6 +328,7 @@ public class ReplayStepFragment extends Fragment {
 
         /**
          * 包装node界面
+         *
          * @param node
          * @return
          */

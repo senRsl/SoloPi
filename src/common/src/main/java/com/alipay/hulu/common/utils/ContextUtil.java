@@ -30,6 +30,7 @@ public class ContextUtil {
 
     /**
      * dp转pix
+     *
      * @param context
      * @param dpValue
      * @return
@@ -42,8 +43,7 @@ public class ContextUtil {
     /**
      * 将px值转换为sp值，保证文字大小不变
      *
-     * @param pxValue
-     *            （DisplayMetrics类中属性scaledDensity）
+     * @param pxValue （DisplayMetrics类中属性scaledDensity）
      * @return
      */
     public static int px2sp(Context context, float pxValue) {
@@ -53,6 +53,7 @@ public class ContextUtil {
 
     /**
      * 加载特定Theme的Context
+     *
      * @param context
      * @param theme
      * @return

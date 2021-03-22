@@ -15,9 +15,15 @@
  */
 package com.alipay.hulu.shared.node;
 
-import android.content.Context;
-import android.os.Build;
-import androidx.annotation.NonNull;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -40,15 +46,9 @@ import com.alipay.hulu.shared.node.tree.annotation.NodeProcessor;
 import com.alipay.hulu.shared.node.tree.annotation.NodeProvider;
 import com.alipay.hulu.shared.node.tree.export.BaseStepExporter;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
-import java.util.concurrent.ConcurrentHashMap;
+import android.content.Context;
+import android.os.Build;
+import androidx.annotation.NonNull;
 
 import static android.view.Surface.ROTATION_0;
 
@@ -85,7 +85,7 @@ public class OperationService implements ExportService {
 
         // 加载所有的节点处理类
         List<Class<? extends AbstractNodeProcessor>> processorClasses = ClassUtil.findSubClass(AbstractNodeProcessor.class, NodeProcessor.class);
-        for (Class<? extends AbstractNodeProcessor> processorClass: processorClasses) {
+        for (Class<? extends AbstractNodeProcessor> processorClass : processorClasses) {
             processorMap.put(processorClass.getName(), new ProcessorWrapper(processorClass));
         }
 
@@ -130,6 +130,7 @@ public class OperationService implements ExportService {
 
     /**
      * 设置默认提供器
+     *
      * @param providerClass
      */
     public void configProvider(Class<? extends AbstractProvider> providerClass) {
@@ -138,6 +139,7 @@ public class OperationService implements ExportService {
 
     /**
      * 设置默认节点处理器
+     *
      * @param processorClasses
      */
     public void configProcessors(List<Class<? extends AbstractNodeProcessor>> processorClasses) {
@@ -146,6 +148,7 @@ public class OperationService implements ExportService {
 
     /**
      * 直接调用
+     *
      * @param method
      * @param targetNode
      * @return
@@ -156,6 +159,7 @@ public class OperationService implements ExportService {
 
     /**
      * 执行特定操作
+     *
      * @param method
      * @param targetNode
      * @return 是否成功
@@ -186,8 +190,9 @@ public class OperationService implements ExportService {
 
     /**
      * 执行并记录操作
-     * @param method 操作方法
-     * @param targetNode 目标控件
+     *
+     * @param method       操作方法
+     * @param targetNode   目标控件
      * @param stepProvider 导出操作类型
      * @return
      */
@@ -203,11 +208,12 @@ public class OperationService implements ExportService {
         boolean valid = executor.performAction(targetNode, method, listener);
 
         // 如果操作失败，不返回记录数据
-        return valid? content: null;
+        return valid ? content : null;
     }
 
     /**
      * 空监听器
+     *
      * @param method
      * @param targetNode
      * @param stepProvider
@@ -254,6 +260,7 @@ public class OperationService implements ExportService {
 
     /**
      * 加载Provider树
+     *
      * @param providerClass
      * @param processorClasses
      * @return
@@ -287,7 +294,7 @@ public class OperationService implements ExportService {
                     }
                 }
             } else {
-                for (Class<? extends AbstractNodeProcessor> processorClass: processorClasses) {
+                for (Class<? extends AbstractNodeProcessor> processorClass : processorClasses) {
                     ProcessorWrapper wrapper = processorMap.get(processorClass.getName());
                     if (wrapper != null && wrapper.canProcessClass(targetSourceClass)) {
                         wrappers.add(wrapper);
@@ -314,7 +321,7 @@ public class OperationService implements ExportService {
         try {
             // 构造树结构
             tree = generator.generateNodeTree();
-        }  catch (Exception e) {
+        } catch (Exception e) {
             LogUtil.e(TAG, "构建树抛出异常，可能是正在切换页面，稍等片刻重试", e);
             MiscUtil.sleep(1000);
 
@@ -330,6 +337,7 @@ public class OperationService implements ExportService {
 
     /**
      * 加载树提供器实例
+     *
      * @param providerClass
      * @return
      */
@@ -405,6 +413,7 @@ public class OperationService implements ExportService {
     /**
      * 配置临时变量
      * 内部用
+     *
      * @param key
      * @param value
      */
@@ -419,6 +428,7 @@ public class OperationService implements ExportService {
     /**
      * 移除临时变量
      * 内部用
+     *
      * @param key
      * @return
      */
@@ -432,6 +442,7 @@ public class OperationService implements ExportService {
 
     /**
      * 设置全局变量
+     *
      * @param key
      * @param value
      */
@@ -444,7 +455,7 @@ public class OperationService implements ExportService {
         }
 
         // already in param stack
-        for (HashMap<String, Object> stack: runtimeVariables) {
+        for (HashMap<String, Object> stack : runtimeVariables) {
             if (stack.containsKey(key)) {
                 stack.put(key, value);
                 return;
@@ -456,6 +467,7 @@ public class OperationService implements ExportService {
 
     /**
      * 设置全局变量
+     *
      * @param params
      */
     public synchronized void putAllRuntimeParamAtTop(Map<String, ?> params) {
@@ -493,6 +505,7 @@ public class OperationService implements ExportService {
 
     /**
      * 移除运行时变量
+     *
      * @param key
      * @return
      */
@@ -501,7 +514,7 @@ public class OperationService implements ExportService {
             return null;
         }
 
-        for (HashMap<String, Object> stack: runtimeVariables) {
+        for (HashMap<String, Object> stack : runtimeVariables) {
             if (stack.containsKey(key)) {
                 return stack.remove(key);
             }
@@ -512,6 +525,7 @@ public class OperationService implements ExportService {
 
     /**
      * 获取变量
+     *
      * @param key
      * @return
      */
@@ -524,12 +538,12 @@ public class OperationService implements ExportService {
             }
         }
 
-        if (runtimeVariables == null || runtimeVariables.isEmpty()){
+        if (runtimeVariables == null || runtimeVariables.isEmpty()) {
             return null;
         }
 
         // 遍历栈
-        for (HashMap<String, Object> stackParam: runtimeVariables) {
+        for (HashMap<String, Object> stackParam : runtimeVariables) {
             if (stackParam.containsKey(key)) {
                 return stackParam.get(key);
             }
@@ -563,6 +577,7 @@ public class OperationService implements ExportService {
 
         /**
          * 是否初始化完毕
+         *
          * @return
          */
         private boolean isInit() {
@@ -578,6 +593,7 @@ public class OperationService implements ExportService {
 
         /**
          * 判断是否可处理该类
+         *
          * @param clazz
          * @return
          */

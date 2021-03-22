@@ -15,9 +15,10 @@
  */
 package com.alipay.hulu.shared.node.utils;
 
-import android.app.ActivityManager;
-import android.content.Intent;
-import android.content.pm.ResolveInfo;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.alipay.hulu.common.application.LauncherApplication;
 import com.alipay.hulu.common.tools.CmdTools;
@@ -25,17 +26,19 @@ import com.alipay.hulu.common.utils.LogUtil;
 import com.alipay.hulu.common.utils.MiscUtil;
 import com.alipay.hulu.common.utils.StringUtil;
 
-import java.util.List;
-import java.util.concurrent.CountDownLatch;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import android.app.ActivityManager;
+import android.content.Intent;
+import android.content.pm.ResolveInfo;
 
 import static android.content.Context.ACTIVITY_SERVICE;
 
 public class AppUtil {
     private static final String TAG = "AppUtil";
+    private static final Pattern TASK_ID_PATTERN = Pattern.compile(".*\\s+#(\\d+)\\s+.*");
+
     /**
      * 通过adb启动应用
+     *
      * @param appPackage
      * @return
      */
@@ -57,18 +60,16 @@ public class AppUtil {
         return true;
     }
 
-
-    private static final Pattern TASK_ID_PATTERN = Pattern.compile(".*\\s+#(\\d+)\\s+.*");
-
     /**
      * 启动目标应用
+     *
      * @param packageName
      */
     public static void launchTargetApp(String packageName) {
         //获得当前运行的task
         String result = CmdTools.execHighPrivilegeCmd("dumpsys activity activities | grep '* TaskRecord.*A=" + packageName + '\'');
 
-        LogUtil.d(TAG,"task list Result: " + result);
+        LogUtil.d(TAG, "task list Result: " + result);
         if (!StringUtil.isEmpty(result) && result.contains(packageName)) {
             String[] list = result.split("\n");
             String targetLine = list[0];
@@ -102,6 +103,7 @@ public class AppUtil {
 
     /**
      * 强制停止APP
+     *
      * @param appPackage
      */
     public static void forceStopApp(String appPackage) {
@@ -110,6 +112,7 @@ public class AppUtil {
 
     /**
      * 清理App数据
+     *
      * @param appPackage
      */
     public static void clearAppData(String appPackage) {

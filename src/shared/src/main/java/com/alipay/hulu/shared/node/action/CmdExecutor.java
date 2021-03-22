@@ -15,7 +15,11 @@
  */
 package com.alipay.hulu.shared.node.action;
 
-import android.os.Looper;
+import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.SynchronousQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import com.alipay.hulu.common.application.LauncherApplication;
 import com.alipay.hulu.common.bean.ContinueGesture;
@@ -25,24 +29,12 @@ import com.alipay.hulu.common.utils.MiscUtil;
 import com.alipay.hulu.shared.event.touch.CmdTouchService;
 import com.android.permission.rom.RomUtils;
 
-import java.util.Locale;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import android.os.Looper;
 
 /**
  * Created by qiaoruikai on 2018/10/8 8:51 PM.
  */
 public class CmdExecutor {
-    private ExecutorService executorService;
-    private TouchService touchService;
-
-    private int clickType = OperationExecutor.CLICK_TYPE_ADB_TAP;
-    private String touchDevice;
-    private float factorX = 1;
-    private float factorY = 1;
-
     /**
      * 通用Click事件
      */
@@ -50,7 +42,6 @@ public class CmdExecutor {
             "sendevent %1$s 1 325 1 && sendevent %1$s 3 57 111 && sendevent %1$s 3 53 %2$d && " +
             "sendevent %1$s 3 54 %3$d && sendevent %1$s 0 0 0 && sendevent %1$s 3 57 4294967295 &&" +
             " sendevent %1$s 1 330 0 && sendevent %1$s 1 325 0 && sendevent %1$s 0 0 0";
-
     /**
      * OPPO的Click事件
      */
@@ -58,24 +49,20 @@ public class CmdExecutor {
             " sendevent %1$s 1 330 1 && sendevent %1$s 1 325 1 && sendevent %1$s 3 53 %2$d && " +
             "sendevent %1$s 3 54 %3$d && sendevent %1$s 0 0 0 && sendevent %1$s 3 57 4294967295 && " +
             "sendevent %1$s 1 330 0 &&  sendevent %1$s 1 325 0 &&  sendevent %1$s 0 0 0";
-
     private static final String SONY_CLICK_EVENT = "sendevent %1$s 3 57 111 && " +
             "sendevent %1$s 3 55 0 && sendevent %1$s 3 53 %2$d && sendevent %1$s 3 54 %3$d && " +
             "sendevent %1$s 3 58 20 && sendevent %1$s 0 2 0 && sendevent %1$s 0 0 0 && " +
             "sendevent %1$s 3 57 4294967295 && sendevent %1$s 0 2 0 && sendevent %1$s 0 0 0";
-
     private static final String VIVO_CLICK_EVENT = "sendevent %1$s 1 330 1 &&" +
             " sendevent %1$s 1 325 1 && sendevent %1$s 3 47 0 && sendevent %1$s 3 57 111 && " +
             "sendevent %1$s 3 53 %2$d && sendevent %1$s 3 54 %3$d && sendevent %1$s 3 58 20 && " +
             "sendevent %1$s 0 0 0 && sendevent %1$s 3 57 4294967295 && sendevent %1$s 1 330 0 && " +
             "sendevent %1$s 1 325 0 && sendevent %1$s 0 0 0";
-
     private static final String GOOGLE_CLICK_EVENT = "sendevent %1$s 3 57 111 && " +
             "sendevent %1$s 1 330 1 && sendevent %1$s 1 325 1 && sendevent %1$s 3 53 %2$d && " +
             "sendevent %1$s 3 54 %3$d && sendevent %1$s 3 58 20 && sendevent %1$s 0 0 0 && " +
             "sendevent %1$s 3 57 4294967295 && sendevent %1$s 1 330 0 &&  sendevent %1$s 1 325 0 && " +
             "sendevent %1$s 0 0 0";
-
     /**
      * 华为的Click事件
      */
@@ -83,11 +70,16 @@ public class CmdExecutor {
             " sendevent %1$s 3 53 %2$d && sendevent %1$s 3 54 %3$d && sendevent %1$s 3 57 0 && " +
             "sendevent %1$s 0 2 0 && sendevent %1$s 1 330 1 && sendevent %1$s 0 0 0 && " +
             "sendevent %1$s 1 330 0 &&  sendevent %1$s 0 0 0";
-
     private static final String MEIZU_CLICK_EVENT = "sendevent %1$s 3 57 111 && " +
             "sendevent %1$s 3 58 20 && sendevent %1$s 3 53 %2$d && sendevent %1$s 3 54 %3$d && " +
             "sendevent %1$s 0 2 0 && sendevent %1$s 1 330 1 && sendevent %1$s 0 0 0 && " +
             "sendevent %1$s 1 330 0 && sendevent %1$s 0 0 0";
+    private ExecutorService executorService;
+    private TouchService touchService;
+    private int clickType = OperationExecutor.CLICK_TYPE_ADB_TAP;
+    private String touchDevice;
+    private float factorX = 1;
+    private float factorY = 1;
 
     public CmdExecutor() {
         this.executorService = new ThreadPoolExecutor(0, Integer.MAX_VALUE,
@@ -114,10 +106,11 @@ public class CmdExecutor {
 
     /**
      * 执行缩放
-     * @param x 中心X
-     * @param y 中心Y
-     * @param fromDis 起始距离
-     * @param toDis 重点距离
+     *
+     * @param x        中心X
+     * @param y        中心Y
+     * @param fromDis  起始距离
+     * @param toDis    重点距离
      * @param duration 耗时
      * @return
      */
@@ -132,6 +125,7 @@ public class CmdExecutor {
 
     /**
      * 是否支持手势操作
+     *
      * @return
      */
     public boolean supportGesture() {
@@ -140,6 +134,7 @@ public class CmdExecutor {
 
     /**
      * 执行手势操作
+     *
      * @param gesture
      */
     public boolean executeGesture(ContinueGesture gesture) {
@@ -161,6 +156,7 @@ public class CmdExecutor {
 
     /**
      * 执行adb命令
+     *
      * @param cmd
      */
     public void executeCmd(final String cmd) {
@@ -178,6 +174,7 @@ public class CmdExecutor {
 
     /**
      * 执行滑动
+     *
      * @param fromX
      * @param fromY
      * @param toX
@@ -190,6 +187,7 @@ public class CmdExecutor {
 
     /**
      * 执行滑动
+     *
      * @param fromX
      * @param fromY
      * @param toX
@@ -202,6 +200,7 @@ public class CmdExecutor {
 
     /**
      * 执行点击操作
+     *
      * @param x
      * @param y
      */
@@ -244,6 +243,7 @@ public class CmdExecutor {
 
     /**
      * 异步执行点击
+     *
      * @param x
      * @param y
      */
@@ -258,6 +258,7 @@ public class CmdExecutor {
 
     /**
      * 异步执行adb命令
+     *
      * @param cmd
      */
     public void executeCmdAsync(final String cmd) {
@@ -271,6 +272,7 @@ public class CmdExecutor {
 
     /**
      * 异步执行adb命令
+     *
      * @param cmd
      * @param maxTime 最长执行时间
      */
@@ -285,6 +287,7 @@ public class CmdExecutor {
 
     /**
      * 执行adb命令
+     *
      * @param cmd
      * @param maxTime 最大执行时间
      */
@@ -303,6 +306,7 @@ public class CmdExecutor {
 
     /**
      * 同步执行adb命令
+     *
      * @param cmd
      */
     public String executeCmdSync(final String cmd) {
@@ -311,6 +315,7 @@ public class CmdExecutor {
 
     /**
      * 同步执行adb命令
+     *
      * @param cmd
      * @param maxTime 最大执行时间
      */
@@ -320,6 +325,7 @@ public class CmdExecutor {
 
     /**
      * 执行runnable
+     *
      * @param runnable
      */
     public void execute(Runnable runnable) {

@@ -15,15 +15,15 @@
  */
 package com.alipay.hulu.shared.event.touch;
 
-import android.content.Context;
-import android.os.Build;
-
 import com.alipay.hulu.common.application.LauncherApplication;
 import com.alipay.hulu.common.bean.ContinueGesture;
 import com.alipay.hulu.common.service.TouchService;
 import com.alipay.hulu.common.service.base.LocalService;
 import com.alipay.hulu.common.tools.CmdTools;
 import com.alipay.hulu.common.utils.LogUtil;
+
+import android.content.Context;
+import android.os.Build;
 
 /**
  * Created by qiaoruikai on 2019/12/2 2:22 PM.

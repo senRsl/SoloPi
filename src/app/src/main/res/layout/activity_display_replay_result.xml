@@ -15,57 +15,60 @@
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <include layout="@layout/head_panel_layout" android:id="@+id/head_replay_result" />
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include
+        android:id="@+id/head_replay_result"
+        layout="@layout/head_panel_layout" />
 
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="@dimen/control_dp16">
+
         <TextView
+            android:id="@+id/case_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/case_result__case_name"
-            android:id="@+id/case_name"
-            android:textSize="@dimen/textsize_20"
             android:textColor="@color/primaryText"
-            />
-        
+            android:textSize="@dimen/textsize_20" />
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/case_name"
             android:layout_marginTop="@dimen/control_dp4"
             android:orientation="vertical">
+
             <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:id="@+id/target_app"
-                android:textSize="@dimen/textsize_14"
-                android:textColor="@color/secondaryText"
-                />
-            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/secondaryText"
+                android:textSize="@dimen/textsize_14" />
+
+            <TextView
                 android:id="@+id/start_time"
-                android:textSize="@dimen/textsize_14"
-                android:textColor="@color/secondaryText"
-                />
-            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/secondaryText"
+                android:textSize="@dimen/textsize_14" />
+
+            <TextView
                 android:id="@+id/end_time"
-                android:textSize="@dimen/textsize_14"
-                android:textColor="@color/secondaryText"
-                />
-            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/secondaryText"
+                android:textSize="@dimen/textsize_14" />
+
+            <TextView
                 android:id="@+id/case_status"
-                android:textSize="@dimen/textsize_14"
-                />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="@dimen/textsize_14" />
 
         </LinearLayout>
 
@@ -75,18 +78,20 @@
         android:id="@+id/tab_layout"
         android:layout_width="match_parent"
         android:layout_height="@dimen/control_dp48"
-        app:tabTextAppearance="@style/TabLayoutTextStyle"
-        app:tabPaddingTop="@dimen/control_dp8"
-        app:tabPaddingBottom="@dimen/control_dp8"
-        app:tabPaddingStart="@dimen/control_dp8"
-        app:tabPaddingEnd="@dimen/control_dp8"
         app:tabGravity="fill"
+        app:tabMaxWidth="0dp"
         app:tabMode="fixed"
-        app:tabMaxWidth="0dp"/>
+        app:tabPaddingBottom="@dimen/control_dp8"
+        app:tabPaddingEnd="@dimen/control_dp8"
+        app:tabPaddingStart="@dimen/control_dp8"
+        app:tabPaddingTop="@dimen/control_dp8"
+        app:tabTextAppearance="@style/TabLayoutTextStyle" />
+
     <View
         android:layout_width="match_parent"
         android:layout_height="1px"
-        android:background="#bebebe"/>
+        android:background="#bebebe" />
+
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/pager"
         android:layout_width="match_parent"

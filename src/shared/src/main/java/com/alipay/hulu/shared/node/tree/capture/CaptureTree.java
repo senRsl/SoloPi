@@ -15,8 +15,7 @@
  */
 package com.alipay.hulu.shared.node.tree.capture;
 
-import android.graphics.Bitmap;
-import android.graphics.Rect;
+import java.util.Map;
 
 import com.alipay.hulu.common.injector.InjectorService;
 import com.alipay.hulu.common.tools.CmdTools;
@@ -31,26 +30,27 @@ import com.alipay.hulu.shared.node.tree.AbstractNodeTree;
 import com.alipay.hulu.shared.node.utils.BitmapUtil;
 import com.alipay.hulu.shared.node.utils.RectUtil;
 
-import java.util.Map;
+import android.graphics.Bitmap;
+import android.graphics.Rect;
 
 /**
  * Created by qiaoruikai on 2019-04-25 14:51.
  */
 public class CaptureTree extends AbstractNodeTree {
-    private static final String TAG = "CaptureTree";
     public static final String KEY_ORIGIN_SCREEN = "originSize";
+    private static final String TAG = "CaptureTree";
     private static final String KEY_ORIGIN_POS = "originPos";
-
-    private byte[] bytes;
-    private float scale;
     private final int scaleWidth;
     private final int scaleHeight;
     private final int originWidth;
     private final int originHeigth;
+    private byte[] bytes;
+    private float scale;
     private boolean resized;
 
     /**
      * 配置截图信息
+     *
      * @param captureInfo
      */
     public CaptureTree(CaptureInfo captureInfo) {
@@ -62,6 +62,10 @@ public class CaptureTree extends AbstractNodeTree {
         this.originHeigth = captureInfo.originH;
         this.originWidth = captureInfo.originW;
         visible = true;
+    }
+
+    private static String flatRectToString(Rect r) {
+        return r.top + "," + r.left + "," + r.bottom + "," + r.right;
     }
 
     @Override
@@ -85,6 +89,7 @@ public class CaptureTree extends AbstractNodeTree {
 
     /**
      * 设置框选区域
+     *
      * @param position
      */
     public void resizeTo(Rect position) {
@@ -102,6 +107,7 @@ public class CaptureTree extends AbstractNodeTree {
 
     /**
      * 获取原始截图
+     *
      * @return
      */
     public Bitmap getOriginScreen() {
@@ -157,6 +163,7 @@ public class CaptureTree extends AbstractNodeTree {
 
     /**
      * 输入文字
+     *
      * @param text
      * @param opContext
      */
@@ -219,10 +226,6 @@ public class CaptureTree extends AbstractNodeTree {
     @Override
     public int getIndex() {
         return 0;
-    }
-
-    private static String flatRectToString(Rect r) {
-        return r.top + "," + r.left + "," + r.bottom + "," + r.right;
     }
 
     @Override

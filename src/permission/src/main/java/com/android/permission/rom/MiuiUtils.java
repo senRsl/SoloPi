@@ -3,6 +3,8 @@
  */
 package com.android.permission.rom;
 
+import java.lang.reflect.Method;
+
 import android.annotation.TargetApi;
 import android.app.AppOpsManager;
 import android.content.Context;
@@ -13,8 +15,6 @@ import android.os.Binder;
 import android.os.Build;
 import android.provider.Settings;
 import android.util.Log;
-
-import java.lang.reflect.Method;
 
 public class MiuiUtils {
     private static final String TAG = "MiuiUtils";
@@ -165,7 +165,7 @@ public class MiuiUtils {
             intent.setPackage("com.miui.securitycenter");
             intent.putExtra("extra_pkgname", context.getPackageName());
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            
+
             if (isIntentAvailable(intent, context)) {
                 context.startActivity(intent);
             } else {

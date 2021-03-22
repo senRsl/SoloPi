@@ -15,13 +15,7 @@
  */
 package com.alipay.hulu.fragment;
 
-import android.os.Bundle;
-import androidx.annotation.Nullable;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ListView;
-import android.widget.TextView;
+import java.util.List;
 
 import com.alipay.hulu.R;
 import com.alipay.hulu.activity.BatchExecutionActivity;
@@ -32,18 +26,22 @@ import com.alipay.hulu.shared.io.bean.RecordCaseInfo;
 import com.alipay.hulu.shared.io.db.GreenDaoManager;
 import com.alipay.hulu.shared.io.db.RecordCaseInfoDao;
 
-import java.util.List;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ListView;
+import android.widget.TextView;
+import androidx.annotation.Nullable;
 
 /**
  * Created by lezhou.wyl on 2018/8/19.
  */
 
 public class BatchExecutionFragment extends BaseFragment {
+    public static final int KEY_LIST_TYPE_LOCAL = 0;
     private static final String TAG = "BatchExeFrag";
     private static final String KEY_ARG_FRAGMENT_TYPE = "KEY_ARG_FRAGMENT_TYPE";
-
-    public static final int KEY_LIST_TYPE_LOCAL = 0;
-
     private ListView mListView;
     private View mEmptyView;
     private TextView mEmptyTextView;
@@ -51,7 +49,7 @@ public class BatchExecutionFragment extends BaseFragment {
     private View mContentContainer;
 
     public static int[] getTypes() {
-        return new int[] {KEY_LIST_TYPE_LOCAL};
+        return new int[]{KEY_LIST_TYPE_LOCAL};
     }
 
     public static String getTypeName(int type) {

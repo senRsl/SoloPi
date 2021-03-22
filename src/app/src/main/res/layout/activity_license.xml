@@ -14,10 +14,13 @@
   ~ limitations under the License.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <include layout="@layout/head_panel_layout"
-        android:id="@+id/license_head"/>
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include
+        android:id="@+id/license_head"
+        layout="@layout/head_panel_layout" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -27,6 +30,6 @@
             android:id="@+id/license_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textIsSelectable="true"/>
+            android:textIsSelectable="true" />
     </ScrollView>
 </LinearLayout>

@@ -15,27 +15,31 @@
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <include layout="@layout/head_panel_layout"
-        android:id="@+id/head_layout" />
+    <include
+        android:id="@+id/head_layout"
+        layout="@layout/head_panel_layout" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/control_dp30"
-        android:orientation="horizontal"
-        android:background="@color/default_background_color">
+        android:background="@color/default_background_color"
+        android:orientation="horizontal">
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/record_manage__data_list"
-            android:textSize="@dimen/textsize_14"
-            android:layout_marginLeft="@dimen/control_dp8"
-            android:layout_marginBottom="@dimen/control_dp2"
             android:layout_gravity="bottom"
-            android:textColor="#a3a3a3"/>
+            android:layout_marginBottom="@dimen/control_dp2"
+            android:layout_marginLeft="@dimen/control_dp8"
+            android:text="@string/record_manage__data_list"
+            android:textColor="#a3a3a3"
+            android:textSize="@dimen/textsize_14" />
     </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -43,15 +47,15 @@
         android:orientation="vertical">
 
         <include layout="@layout/divider" />
+
         <ListView
-            android:background="@color/white"
             android:id="@+id/record_manage_list"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            tools:listitem="@layout/item_record_manage"
+            android:background="@color/white"
             android:choiceMode="multipleChoice"
-            />
+            tools:listitem="@layout/item_record_manage" />
 
         <include layout="@layout/divider" />
 
@@ -60,11 +64,11 @@
             android:layout_width="@dimen/perf_records_btn_width"
             android:layout_height="@dimen/control_dp40"
             android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="@dimen/dp_19"
             android:layout_marginTop="@dimen/control_dp20"
-            android:textSize="@dimen/textsize_14"
+            android:background="@drawable/bg_solid_round_btn"
             android:text="@string/record_manage__delete_data"
             android:textColor="@color/white"
-            android:background="@drawable/bg_solid_round_btn"
-            android:layout_marginBottom="@dimen/dp_19"/>
+            android:textSize="@dimen/textsize_14" />
     </LinearLayout>
 </LinearLayout>

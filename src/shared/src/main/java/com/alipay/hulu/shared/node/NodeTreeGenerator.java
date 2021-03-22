@@ -15,15 +15,15 @@
  */
 package com.alipay.hulu.shared.node;
 
-import com.alipay.hulu.common.utils.LogUtil;
-import com.alipay.hulu.shared.node.tree.AbstractNodeTree;
-import com.alipay.hulu.shared.node.tree.MetaTree;
-import com.alipay.hulu.shared.node.utils.NodeContext;
-
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
+
+import com.alipay.hulu.common.utils.LogUtil;
+import com.alipay.hulu.shared.node.tree.AbstractNodeTree;
+import com.alipay.hulu.shared.node.tree.MetaTree;
+import com.alipay.hulu.shared.node.utils.NodeContext;
 
 /**
  * Created by qiaoruikai on 2018/10/8 4:45 PM.
@@ -45,8 +45,15 @@ public class NodeTreeGenerator {
 
     private WeakReference<OperationService> manager;
 
+    public NodeTreeGenerator(List<AbstractNodeProcessor> nodeProcessors, AbstractProvider nodeProvider, OperationService manager) {
+        this.nodeProcessors = nodeProcessors;
+        this.nodeProvider = nodeProvider;
+        this.manager = new WeakReference<>(manager);
+    }
+
     /**
      * 构建当前Provider的树
+     *
      * @return
      */
     public AbstractNodeTree generateNodeTree() {
@@ -137,24 +144,19 @@ public class NodeTreeGenerator {
 
     /**
      * 加载当前Processor类
+     *
      * @return
      */
     private List<Class<? extends AbstractNodeProcessor>> loadCurrentProviderClass() {
         List<Class<? extends AbstractNodeProcessor>> providerClasses = new ArrayList<>(nodeProcessors.size() + 1);
-        for (AbstractNodeProcessor processor: nodeProcessors) {
+        for (AbstractNodeProcessor processor : nodeProcessors) {
             providerClasses.add(processor.getClass());
         }
 
         return providerClasses;
     }
 
-    public NodeTreeGenerator(List<AbstractNodeProcessor> nodeProcessors, AbstractProvider nodeProvider, OperationService manager) {
-        this.nodeProcessors = nodeProcessors;
-        this.nodeProvider = nodeProvider;
-        this.manager = new WeakReference<>(manager);
-    }
-
-    private static class ProcessPair{
+    private static class ProcessPair {
         private MetaTree source;
         private AbstractNodeTree parentNode;
 

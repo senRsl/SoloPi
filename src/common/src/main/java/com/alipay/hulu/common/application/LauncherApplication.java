@@ -15,33 +15,27 @@
  */
 package com.alipay.hulu.common.application;
 
-import android.app.Activity;
-import android.app.ActivityManager;
-import android.app.AlertDialog;
-import android.app.Application;
-import android.app.PendingIntent;
-import android.app.Service;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.pm.ApplicationInfo;
-import android.content.res.Configuration;
-import android.content.res.Resources;
-import android.os.Build;
-import android.os.Handler;
-import android.os.LocaleList;
-import android.os.Looper;
-import androidx.annotation.StringRes;
-import androidx.multidex.MultiDex;
-import android.util.DisplayMetrics;
-import android.view.WindowManager;
-import android.widget.Toast;
+import java.io.File;
+import java.lang.ref.WeakReference;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
+import java.util.Stack;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import com.alipay.hulu.common.R;
 import com.alipay.hulu.common.injector.InjectorService;
 import com.alipay.hulu.common.logger.DiskLogStrategy;
 import com.alipay.hulu.common.logger.SimpleFormatStrategy;
-import com.alipay.hulu.common.logger.ThreadInfoLoggerPrinter;
 import com.alipay.hulu.common.scheme.SchemeActionResolver;
 import com.alipay.hulu.common.scheme.SchemeResolver;
 import com.alipay.hulu.common.service.SPService;
@@ -63,22 +57,26 @@ import com.orhanobut.logger.CsvFormatStrategy;
 import com.orhanobut.logger.DiskLogAdapter;
 import com.orhanobut.logger.Logger;
 
-import java.io.File;
-import java.lang.ref.WeakReference;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-import java.util.Stack;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
+import android.app.Activity;
+import android.app.ActivityManager;
+import android.app.AlertDialog;
+import android.app.Application;
+import android.app.PendingIntent;
+import android.app.Service;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.res.Configuration;
+import android.content.res.Resources;
+import android.os.Build;
+import android.os.Handler;
+import android.os.LocaleList;
+import android.os.Looper;
+import android.view.WindowManager;
+import android.widget.Toast;
+import androidx.annotation.StringRes;
+import androidx.multidex.MultiDex;
 
 import static android.content.DialogInterface.BUTTON_NEGATIVE;
 import static android.content.DialogInterface.BUTTON_POSITIVE;
@@ -89,45 +87,106 @@ import static android.view.Surface.ROTATION_90;
  * Created by qiaoruikai on 2018/9/29 10:59 AM.
  */
 public abstract class LauncherApplication extends Application {
-    private static final String TAG = LauncherApplication.class.getSimpleName();
-
     public static final String SHOW_LOADING_DIALOG = "showLoadingDialog";
     public static final String DISMISS_LOADING_DIALOG = "dismissLoadingDialog";
-
-    private Map<String, SortedList<SchemeActionResolver>> schemeResolver;
-
-    /**
-     * Android系统默认语言
-     */
-    public final Locale DEFAULT_LOCALE;
-
     /**
      * 屏幕方向监控
      */
     public static final String SCREEN_ORIENTATION = "screenOrientation";
-
-    protected static LauncherApplication appInstance;
-    protected Map<String, ServiceReference> registeredService = new HashMap<>();
-    private Handler handler;
-
-    private Stack<ContextInstanceWrapper> openedActivity = new Stack<>();
-    private Stack<ContextInstanceWrapper> openedService = new Stack<>();
-
-    private volatile boolean finishInit = false;
-
+    private static final String TAG = LauncherApplication.class.getSimpleName();
     /**
      * 是否是DEBUG
      */
     public static boolean DEBUG = false;
-
+    protected static LauncherApplication appInstance;
+    private static int WINDOW_TYPE = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
+    /**
+     * Android系统默认语言
+     */
+    public final Locale DEFAULT_LOCALE;
+    // Activity栈读写锁
+    private final ReentrantReadWriteLock ACTIVITY_STACK_LOCK = new ReentrantReadWriteLock();
+    // Service栈读写锁
+    private final ReentrantReadWriteLock SERVICE_STACK_LOCK = new ReentrantReadWriteLock();
+    public Set<String> foregroundServiceClasses = new HashSet<>();
+    protected Map<String, ServiceReference> registeredService = new HashMap<>();
+    private Map<String, SortedList<SchemeActionResolver>> schemeResolver;
+    private Handler handler;
+    private Stack<ContextInstanceWrapper> openedActivity = new Stack<>();
+    private Stack<ContextInstanceWrapper> openedService = new Stack<>();
+    private volatile boolean finishInit = false;
     private volatile boolean accessibilityRegistered = false;
+    // 主线程借助
+    private volatile boolean MAIN_THREAD_WAIT = false;
+    private Queue<Runnable> MAIN_THREAD_RUNNABLES = new ConcurrentLinkedQueue<>();
+    private boolean isDialogShow = false;
+    private Runnable positiveRunnable = null;
+    private Runnable negativeRunnable = null;
+    private DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+            if (which == BUTTON_POSITIVE) {
+                if (positiveRunnable != null) {
+                    positiveRunnable.run();
+                }
+            } else if (which == BUTTON_NEGATIVE) {
+                if (negativeRunnable != null) {
+                    negativeRunnable.run();
+                }
+            }
+
+            dialog.dismiss();
+        }
+    };
 
     public LauncherApplication() {
         DEFAULT_LOCALE = getSystemLocale();
     }
 
     /**
+     * 获取实例
+     *
+     * @return
+     */
+    public static LauncherApplication getInstance() {
+        return appInstance;
+    }
+
+    /**
+     * 获取Context
+     *
+     * @return
+     */
+    public static Context getContext() {
+        return appInstance;
+    }
+
+    /**
+     * 快捷调用
+     *
+     * @param target
+     * @param <T>
+     * @return
+     */
+    public static <T extends ExportService> T service(Class<T> target) {
+        return getInstance().findServiceByName(target.getName());
+    }
+
+    public static void toast(final String message) {
+        LauncherApplication.getInstance().showToast(message);
+    }
+
+    public static void toast(@StringRes final int message) {
+        toast(LauncherApplication.getContext().getString(message));
+    }
+
+    public static void toast(@StringRes final int message, Object... args) {
+        toast(LauncherApplication.getContext().getString(message, args));
+    }
+
+    /**
      * 获取AccessibilityService是否注册
+     *
      * @return
      */
     public boolean getAccessibilityState() {
@@ -136,6 +195,7 @@ public abstract class LauncherApplication extends Application {
 
     /**
      * 设置AccessibilityService状态
+     *
      * @param state
      */
     public void setAccessibilityState(boolean state) {
@@ -143,17 +203,8 @@ public abstract class LauncherApplication extends Application {
     }
 
     /**
-     * 获取实例
-     * @return
-     */
-    public static LauncherApplication getInstance() {
-        return appInstance;
-    }
-
-    public Set<String> foregroundServiceClasses = new HashSet<>();
-
-    /**
      * 注册自身为前台服务
+     *
      * @param serviceClz
      */
     public void registerSelfAsForegroundService(Class<? extends Service> serviceClz) {
@@ -165,14 +216,6 @@ public abstract class LauncherApplication extends Application {
             return false;
         }
         return foregroundServiceClasses.contains(serviceClz.getName());
-    }
-
-    /**
-     * 获取Context
-     * @return
-     */
-    public static Context getContext() {
-        return appInstance;
     }
 
     @Override
@@ -212,7 +255,7 @@ public abstract class LauncherApplication extends Application {
                     } catch (Throwable t) {
                         LogUtil.e(TAG, "加载类失败, " + t.getMessage(), t);
                     }
-                    
+
                     // 初始化基础服务
                     registerServices();
 
@@ -247,6 +290,7 @@ public abstract class LauncherApplication extends Application {
 
     /**
      * 在主线程运行
+     *
      * @param runnable
      */
     public void runOnUiThread(Runnable runnable) {
@@ -265,6 +309,7 @@ public abstract class LauncherApplication extends Application {
 
     /**
      * 在主线程运行
+     *
      * @param runnable
      */
     public void runOnUiThread(Runnable runnable, long delay) {
@@ -275,8 +320,6 @@ public abstract class LauncherApplication extends Application {
 
     protected void initInMain() {
     }
-
-
 
     /**
      * 设置应用默认语言
@@ -309,6 +352,7 @@ public abstract class LauncherApplication extends Application {
 
     /**
      * 动态注册Patch服务
+     *
      * @param rs
      */
     public void registerPatchServices(PatchLoadResult rs) {
@@ -325,11 +369,12 @@ public abstract class LauncherApplication extends Application {
 
     /**
      * 注册服务
+     *
      * @param serviceClasses
      */
     private void _registerServices(List<Class<? extends ExportService>> serviceClasses) {
         if (serviceClasses != null && serviceClasses.size() > 0) {
-            for (Class<? extends ExportService> childClass: serviceClasses) {
+            for (Class<? extends ExportService> childClass : serviceClasses) {
                 LocalService annotation = childClass.getAnnotation(LocalService.class);
                 String name = annotation.name();
                 if (StringUtil.isEmpty(name)) {
@@ -353,15 +398,11 @@ public abstract class LauncherApplication extends Application {
         }
     }
 
-    // 主线程借助
-    private volatile boolean MAIN_THREAD_WAIT = false;
-    private Queue<Runnable> MAIN_THREAD_RUNNABLES = new ConcurrentLinkedQueue<>();
-
     public void restartAllServices() {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                for (ServiceReference ref: registeredService.values()) {
+                for (ServiceReference ref : registeredService.values()) {
                     ref.onDestroy(LauncherApplication.this);
                 }
             }
@@ -371,6 +412,7 @@ public abstract class LauncherApplication extends Application {
 
     /**
      * 主线程等待
+     *
      * @return
      */
     public boolean prepareInMain() {
@@ -396,6 +438,7 @@ public abstract class LauncherApplication extends Application {
 
     /**
      * 是否初始化完毕
+     *
      * @return
      */
     public boolean hasFinishInit() {
@@ -403,80 +446,15 @@ public abstract class LauncherApplication extends Application {
     }
 
     /**
-     * Context运行状态
-     */
-    private enum ContextRunningStatus {
-        CREATE,
-        RESUME,
-        PAUSE,
-        DESTROY
-    }
-
-    /**
-     * Context维护
-     */
-    private static class ContextInstanceWrapper {
-        /**
-         * 名称
-         */
-        private String name;
-        private WeakReference<Context> currentContext;
-        private ContextRunningStatus status;
-
-        public ContextInstanceWrapper(String name, Context currentContext, ContextRunningStatus status) {
-            this.name = name;
-            this.currentContext = new WeakReference<>(currentContext);
-            this.status = status;
-        }
-
-        /**
-         * 更新Context状态
-         *
-         * @param status
-         */
-        public void updateStatus(ContextRunningStatus status) {
-            this.status = status;
-        }
-
-        /**
-         * 生命周期校验
-         *
-         * @return
-         */
-        public boolean checkValid() {
-            return status != ContextRunningStatus.DESTROY && this.currentContext.get() != null;
-        }
-
-        /**
-         * 检测是否是目标Context
-         *
-         * @param context
-         * @return
-         */
-        public boolean isTargetContext(Context context) {
-            return context != null && context == this.currentContext.get();
-        }
-
-        /**
-         * 是否正在运行
-         * @return
-         */
-        public boolean isRunning() {
-            return currentContext.get() != null &&
-                    (status == ContextRunningStatus.CREATE ||
-                            status == ContextRunningStatus.RESUME);
-        }
-    }
-
-    /**
      * 根据名称获取服务
+     *
      * @param name
      * @return
      */
     public <T extends ExportService> T findServiceByName(String name) {
         if (registeredService.containsKey(name)) {
             final ServiceReference reference = registeredService.get(name);
-            final T target =  (T) reference.getService();
+            final T target = (T) reference.getService();
             if (target instanceof EnhancerInterface) {
                 Object realTarget = ((EnhancerInterface) target).getTarget$Enhancer$();
                 if (realTarget == null) {
@@ -504,17 +482,8 @@ public abstract class LauncherApplication extends Application {
     }
 
     /**
-     * 快捷调用
-     * @param target
-     * @param <T>
-     * @return
-     */
-    public static <T extends ExportService> T service(Class<T> target) {
-        return getInstance().findServiceByName(target.getName());
-    }
-
-    /**
      * 根据名称停止服务
+     *
      * @param name
      * @return
      */
@@ -561,6 +530,7 @@ public abstract class LauncherApplication extends Application {
 
     /**
      * 通知Context创建
+     *
      * @param context
      */
     public void notifyCreate(Context context) {
@@ -584,7 +554,7 @@ public abstract class LauncherApplication extends Application {
             wrapper = new ContextInstanceWrapper(name, context, ContextRunningStatus.CREATE);
             openedService.push(wrapper);
             SERVICE_STACK_LOCK.writeLock().unlock();
-        } else if (context instanceof Activity){
+        } else if (context instanceof Activity) {
             // 校验是否已启动，已启动就不再添加
             ContextInstanceWrapper wrapper = findTargetContext(openedActivity, context);
             if (wrapper != null) {
@@ -605,6 +575,7 @@ public abstract class LauncherApplication extends Application {
 
     /**
      * 通知Context显示
+     *
      * @param context
      */
     public void notifyResume(Context context) {
@@ -636,6 +607,7 @@ public abstract class LauncherApplication extends Application {
 
     /**
      * 通知Context暂停
+     *
      * @param context
      */
     public void notifyPause(Context context) {
@@ -664,6 +636,7 @@ public abstract class LauncherApplication extends Application {
 
     /**
      * 通知context销毁
+     *
      * @param context
      */
     public void notifyDestroy(Context context) {
@@ -710,6 +683,7 @@ public abstract class LauncherApplication extends Application {
 
     /**
      * 加载Scheme解析器
+     *
      * @return
      */
     public synchronized void initActionResolvers() {
@@ -724,7 +698,7 @@ public abstract class LauncherApplication extends Application {
         }
 
         Map<String, SortedList<SchemeActionResolver>> resolvers = new HashMap<>(actionResolvers.size() + 1);
-        for (Class<? extends SchemeActionResolver> cls: actionResolvers) {
+        for (Class<? extends SchemeActionResolver> cls : actionResolvers) {
             SchemeActionResolver resolver = ClassUtil.constructClass(cls);
             if (resolver != null) {
                 SchemeResolver annotation = cls.getAnnotation(SchemeResolver.class);
@@ -747,6 +721,7 @@ public abstract class LauncherApplication extends Application {
 
     /**
      * 获取当前屏幕显示的Activity
+     *
      * @return
      */
     public Context loadActivityOnTop() {
@@ -766,6 +741,7 @@ public abstract class LauncherApplication extends Application {
 
     /**
      * 获取当前屏幕显示的Service
+     *
      * @return
      */
     public Context loadRunningService() {
@@ -782,12 +758,6 @@ public abstract class LauncherApplication extends Application {
         // 没找到，返回空
         return null;
     }
-
-    // Activity栈读写锁
-    private final ReentrantReadWriteLock ACTIVITY_STACK_LOCK = new ReentrantReadWriteLock();
-
-    // Service栈读写锁
-    private final ReentrantReadWriteLock SERVICE_STACK_LOCK = new ReentrantReadWriteLock();
 
     /**
      * 查找目标Context
@@ -832,10 +802,11 @@ public abstract class LauncherApplication extends Application {
 
     /**
      * 清理无用Context
+     *
      * @param stack
      */
     public void clearDestroyedContext(Stack<ContextInstanceWrapper> stack) {
-       ReentrantReadWriteLock.WriteLock writeLock = null;
+        ReentrantReadWriteLock.WriteLock writeLock = null;
 
         // 查找对应锁
         if (stack == openedActivity) {
@@ -862,31 +833,9 @@ public abstract class LauncherApplication extends Application {
         }
     }
 
-    private boolean isDialogShow = false;
-
-    private Runnable positiveRunnable = null;
-
-    private Runnable negativeRunnable = null;
-
-    private DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
-            if (which == BUTTON_POSITIVE) {
-                if (positiveRunnable != null) {
-                    positiveRunnable.run();
-                }
-            } else if (which == BUTTON_NEGATIVE){
-                if (negativeRunnable != null) {
-                    negativeRunnable.run();
-                }
-            }
-
-            dialog.dismiss();
-        }
-    };
-
     /**
      * 展示提示框
+     *
      * @param message
      * @param positiveText
      * @param positiveRunnable
@@ -896,20 +845,9 @@ public abstract class LauncherApplication extends Application {
         showDialog(context, message, positiveText, positiveRunnable, null, null);
     }
 
-    public static void toast(final String message) {
-        LauncherApplication.getInstance().showToast(message);
-    }
-
-    public static void toast(@StringRes final int message) {
-        toast(LauncherApplication.getContext().getString(message));
-    }
-
-    public static void toast(@StringRes final int message, Object... args) {
-        toast(LauncherApplication.getContext().getString(message, args));
-    }
-
     /**
      * 显示toast
+     *
      * @param context
      * @param message
      */
@@ -922,10 +860,9 @@ public abstract class LauncherApplication extends Application {
         });
     }
 
-    private static int WINDOW_TYPE = WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
-
     /**
      * 显示Toast
+     *
      * @param message
      */
     public void showToast(String message) {
@@ -934,6 +871,7 @@ public abstract class LauncherApplication extends Application {
 
     /**
      * 显示Toast
+     *
      * @param res 文字资源
      */
     public void showToast(int res, Object... args) {
@@ -963,7 +901,7 @@ public abstract class LauncherApplication extends Application {
                                 }
                                 dialog.dismiss();
                             }
-                });
+                        });
                 if (!StringUtil.isEmpty(negativeText)) {
                     builder.setNegativeButton(negativeText, new DialogInterface.OnClickListener() {
                         @Override
@@ -991,7 +929,6 @@ public abstract class LauncherApplication extends Application {
     }
 
     /**
-     *
      * @return
      */
     public Locale getLanguageLocale() {
@@ -1098,6 +1035,7 @@ public abstract class LauncherApplication extends Application {
 
     /**
      * 是否在顶层运行
+     *
      * @param context
      * @return
      */
@@ -1110,8 +1048,75 @@ public abstract class LauncherApplication extends Application {
     }
 
     private void setSchemeResolver(Map<String, SortedList<SchemeActionResolver>> schemeResolver) {
-        LogUtil.i(TAG, "配置Scheme处理器，数量: " + (schemeResolver == null? 0: schemeResolver.size()));
+        LogUtil.i(TAG, "配置Scheme处理器，数量: " + (schemeResolver == null ? 0 : schemeResolver.size()));
         this.schemeResolver = schemeResolver;
+    }
+
+    /**
+     * Context运行状态
+     */
+    private enum ContextRunningStatus {
+        CREATE,
+        RESUME,
+        PAUSE,
+        DESTROY
+    }
+
+    /**
+     * Context维护
+     */
+    private static class ContextInstanceWrapper {
+        /**
+         * 名称
+         */
+        private String name;
+        private WeakReference<Context> currentContext;
+        private ContextRunningStatus status;
+
+        public ContextInstanceWrapper(String name, Context currentContext, ContextRunningStatus status) {
+            this.name = name;
+            this.currentContext = new WeakReference<>(currentContext);
+            this.status = status;
+        }
+
+        /**
+         * 更新Context状态
+         *
+         * @param status
+         */
+        public void updateStatus(ContextRunningStatus status) {
+            this.status = status;
+        }
+
+        /**
+         * 生命周期校验
+         *
+         * @return
+         */
+        public boolean checkValid() {
+            return status != ContextRunningStatus.DESTROY && this.currentContext.get() != null;
+        }
+
+        /**
+         * 检测是否是目标Context
+         *
+         * @param context
+         * @return
+         */
+        public boolean isTargetContext(Context context) {
+            return context != null && context == this.currentContext.get();
+        }
+
+        /**
+         * 是否正在运行
+         *
+         * @return
+         */
+        public boolean isRunning() {
+            return currentContext.get() != null &&
+                    (status == ContextRunningStatus.CREATE ||
+                            status == ContextRunningStatus.RESUME);
+        }
     }
 
     /**
@@ -1130,6 +1135,7 @@ public abstract class LauncherApplication extends Application {
 
         /**
          * 获取服务
+         *
          * @return
          */
         private synchronized ExportService getService() {
@@ -1138,6 +1144,7 @@ public abstract class LauncherApplication extends Application {
 
         /**
          * 初始化服务
+         *
          * @param target
          */
         private void initializedService(Class<? extends ExportService> target, boolean lazy) {
@@ -1202,6 +1209,7 @@ public abstract class LauncherApplication extends Application {
 
         /**
          * 构造
+         *
          * @return
          */
         private ExportService initClass() {
@@ -1217,6 +1225,7 @@ public abstract class LauncherApplication extends Application {
 
         /**
          * 调用清理
+         *
          * @param context
          */
         private void onDestroy(final Context context) {

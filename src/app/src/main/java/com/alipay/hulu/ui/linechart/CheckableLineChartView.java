@@ -17,7 +17,6 @@ package com.alipay.hulu.ui.linechart;
 
 import android.content.Context;
 import android.util.AttributeSet;
-
 import lecho.lib.hellocharts.model.LineChartData;
 import lecho.lib.hellocharts.model.PointValue;
 import lecho.lib.hellocharts.model.SelectedValue;
@@ -26,7 +25,7 @@ import lecho.lib.hellocharts.view.LineChartView;
 /**
  * Created by cathor on 17/8/7.
  */
-public class CheckableLineChartView extends LineChartView{
+public class CheckableLineChartView extends LineChartView {
     private CheckableLineChartRenderer renderer;
 
     public CheckableLineChartView(Context context) {

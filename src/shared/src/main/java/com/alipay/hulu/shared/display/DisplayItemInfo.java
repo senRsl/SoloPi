@@ -15,14 +15,14 @@
  */
 package com.alipay.hulu.shared.display;
 
+import java.util.Arrays;
+import java.util.List;
+
 import com.alipay.hulu.common.utils.StringUtil;
 import com.alipay.hulu.shared.R;
 import com.alipay.hulu.shared.display.items.base.DisplayItem;
 import com.alipay.hulu.shared.display.items.base.Displayable;
 import com.alipay.hulu.shared.display.items.util.FinalR;
-
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * 显示信息
@@ -30,35 +30,29 @@ import java.util.List;
  */
 public class DisplayItemInfo {
     /**
+     * level信息
+     */
+    protected final int level;
+    /**
      * 名称
      */
     private final String name;
-
     /**
      * key
      */
     private final String key;
-
     /**
      * 依赖权限
      */
     private final List<String> permissions;
-
     /**
      * 提示文案
      */
     private final String tip;
-
     /**
      * 图标
      */
     private final int icon;
-
-    /**
-     * level信息
-     */
-    protected final int level;
-
     /**
      * 触发文案
      */

@@ -15,28 +15,10 @@
  */
 package com.alipay.hulu.activity;
 
-import android.content.Intent;
-import android.os.Build;
-import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.appcompat.widget.AppCompatSpinner;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.SimpleAdapter;
-import android.widget.TextView;
-
-import com.alipay.hulu.R;
-import com.alipay.hulu.common.utils.FileUtils;
-import com.alipay.hulu.common.utils.LogUtil;
-import com.alipay.hulu.common.utils.StringUtil;
-import com.alipay.hulu.shared.display.items.base.RecordPattern;
-import com.alipay.hulu.ui.HeadControlPanel;
-import com.alipay.hulu.ui.linechart.CheckableLineChartView;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -50,6 +32,28 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.alipay.hulu.R;
+import com.alipay.hulu.common.utils.FileUtils;
+import com.alipay.hulu.common.utils.LogUtil;
+import com.alipay.hulu.common.utils.StringUtil;
+import com.alipay.hulu.shared.display.items.base.RecordPattern;
+import com.alipay.hulu.ui.HeadControlPanel;
+import com.alipay.hulu.ui.linechart.CheckableLineChartView;
+
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Environment;
+import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.SimpleAdapter;
+import android.widget.TextView;
+import android.widget.Toast;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatSpinner;
 import lecho.lib.hellocharts.listener.LineChartOnValueSelectListener;
 import lecho.lib.hellocharts.model.Axis;
 import lecho.lib.hellocharts.model.Line;
@@ -71,6 +75,7 @@ public class PerformanceChartActivity extends BaseActivity {
         Pattern newPattern = Pattern.compile("\\d{14}_\\d{14}");
         Pattern midPattern = Pattern.compile("\\d{2}月\\d{2}日\\d{2}:\\d{2}:\\d{2}-\\d{2}月\\d{2}日\\d{2}:\\d{2}:\\d{2}");
         Pattern oldPattern = Pattern.compile("\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}_\\d{2}-\\d{2} \\d{2}:\\d{2}:\\d{2}");
+
         @Override
         public boolean accept(File file) {
 
@@ -78,7 +83,8 @@ public class PerformanceChartActivity extends BaseActivity {
             return file.isDirectory() && (newPattern.matcher(file.getName()).matches() || midPattern.matcher(file.getName()).matches() || oldPattern.matcher(file.getName()).matches());
         }
     };
-
+    // 录制项列表
+    private final List<Map<String, String>> titles = new ArrayList<>();
     // Views
     // 表格
     private CheckableLineChartView chartView;
@@ -92,13 +98,11 @@ public class PerformanceChartActivity extends BaseActivity {
     private TextView summaryText;
     // Toolbar
     private HeadControlPanel headPanel;
-
     // Adapter
     private SimpleAdapter recordSpinnerAdapter;
     private SimpleAdapter recordItemSpinnerAdapter;
     // 单线录制数据adapter对应Item
     private List<Map<String, String>> items;
-
     // 绘制数据
     // 时间与对应录制项
     private Map<String, RecordPattern[]> records;
@@ -108,9 +112,6 @@ public class PerformanceChartActivity extends BaseActivity {
     private Map<RecordPattern, List<RecordPattern.RecordItem>> recordCache;
     // 折线图数据
     private LineChartData data;
-    // 录制项列表
-    private final List<Map<String, String>> titles = new ArrayList<>();
-
     // IO
     // 当前时间端文件夹
     private File currentFolder;
@@ -127,7 +128,7 @@ public class PerformanceChartActivity extends BaseActivity {
     /**
      * 初始化界面
      */
-    private void initView(){
+    private void initView() {
         setContentView(R.layout.activity_record_chart);
         headPanel = (HeadControlPanel) findViewById(R.id.head_layout);
         headPanel.setMiddleTitle(getString(R.string.activity__performance_display));
@@ -159,7 +160,7 @@ public class PerformanceChartActivity extends BaseActivity {
         summaryText = (TextView) findViewById(R.id.record_summary);
     }
 
-    private void initData(Bundle savedInstanceState){
+    private void initData(Bundle savedInstanceState) {
         // 加载录制数据根目录
         recordDir = FileUtils.getSubDir("records");
 
@@ -181,14 +182,14 @@ public class PerformanceChartActivity extends BaseActivity {
 
                     // 切换当前文件夹到数据集对应文件夹
                     currentFolder = new File(recordDir, title);
-                    if (currentRecords != null){
+                    if (currentRecords != null) {
                         if (items == null) {
                             items = new ArrayList<>(currentRecords.length);
                         } else {
                             items.clear();
                         }
                         // 刷新数据选项
-                        for (RecordPattern recordPattern: currentRecords) {
+                        for (RecordPattern recordPattern : currentRecords) {
                             String name = recordPattern.getName() + " - " + recordPattern.getSource();
                             Map<String, String> keyItem = new HashMap<String, String>(1);
                             keyItem.put("title", name);
@@ -278,7 +279,9 @@ public class PerformanceChartActivity extends BaseActivity {
                 public void onNothingSelected(AdapterView<?> parent) {
 
                 }
+
             });
+
             recordCache = new HashMap<>();
 
             // 默认加载第一项
@@ -294,9 +297,9 @@ public class PerformanceChartActivity extends BaseActivity {
                 }
             }
             LogUtil.d(TAG, "get records " + Arrays.toString(currentRecords));
-            if (currentRecords != null){
+            if (currentRecords != null) {
                 items = new ArrayList<>(currentRecords.length);
-                for (RecordPattern recordPattern: currentRecords) {
+                for (RecordPattern recordPattern : currentRecords) {
                     String name = recordPattern.getName() + " - " + recordPattern.getSource();
                     Map<String, String> keyItem = new HashMap<>(1);
                     keyItem.put("title", name);
@@ -317,8 +320,41 @@ public class PerformanceChartActivity extends BaseActivity {
 
                 }
             });
+            chartView.setOnLongClickListener(new View.OnLongClickListener() {
+                @Override
+                public boolean onLongClick(View v) {
+
+                    Bitmap bitmap = Bitmap.createBitmap(v.getWidth(), v.getHeight(),
+                            Bitmap.Config.ARGB_8888);
+                    Canvas canvas = new Canvas(bitmap);
+                    v.draw(canvas);
+
+                    String filePath = Environment.getExternalStorageDirectory().getPath();
+                    File file = new File(filePath + "/SENRSL/solops/" + System.currentTimeMillis() + ".png");
+                    try {
+                        file.createNewFile();
+
+
+                        FileOutputStream fOut = new FileOutputStream(file);
+                        bitmap.compress(Bitmap.CompressFormat.PNG, 100, fOut);
+
+                        Log.w("TEST", "保存图片：" + file.getAbsolutePath());
+                        Toast.makeText(PerformanceChartActivity.this, "保存成功" + file.getAbsolutePath(), Toast.LENGTH_SHORT).show();
+
+                        fOut.flush();
+                        fOut.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        Log.w("TEST", "保存图片：" + e.getMessage());
+                        Toast.makeText(PerformanceChartActivity.this, "保存失败 " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+
+                    return true;
+                }
+            });
         }
     }
+
 
     @Override
     protected void onResume() {
@@ -346,7 +382,7 @@ public class PerformanceChartActivity extends BaseActivity {
         LogUtil.i(TAG, "get files " + StringUtil.hide(files));
 
         // 记录所有文件夹
-        for (File file: files) {
+        for (File file : files) {
             if (file.isDirectory()) {
                 folders.add(file);
             }
@@ -363,7 +399,7 @@ public class PerformanceChartActivity extends BaseActivity {
             int index = 0;
 
             // 读取数据文件
-            for (String fileName: items) {
+            for (String fileName : items) {
                 Matcher matcher = pattern.matcher(fileName);
                 if (matcher.matches()) {
                     RecordPattern record = new RecordPattern(matcher.group(1), "", matcher.group(2));
@@ -410,7 +446,7 @@ public class PerformanceChartActivity extends BaseActivity {
         });
 
         // 按顺序保存
-        for (File f: folders) {
+        for (File f : folders) {
             String key = f.getName();
             if (!records.containsKey(key)) {
                 continue;
@@ -430,7 +466,7 @@ public class PerformanceChartActivity extends BaseActivity {
     private void drawChart(List<RecordPattern.RecordItem> recordItems, RecordPattern pattern) {
         List<PointValue> points = new ArrayList<>();
 
-        for (RecordPattern.RecordItem item: recordItems) {
+        for (RecordPattern.RecordItem item : recordItems) {
             // 对于时间取从开始到当前时间的秒数
             PointValue point = new PointValue((item.time - pattern.getStartTime()) / 1000F, item.value);
             point.setLabel(item.extra);
@@ -449,7 +485,7 @@ public class PerformanceChartActivity extends BaseActivity {
         line.setStrokeWidth(1);
         line.setHasLabelsOnlyForSelected(true);
 
-        if(data == null) {
+        if (data == null) {
             data = new LineChartData();
         }
         List<Line> newLines = new ArrayList<>();
@@ -484,7 +520,7 @@ public class PerformanceChartActivity extends BaseActivity {
                 lastPoint = item.value;
                 lastTime = item.time;
             }
-            count ++;
+            count++;
             averange += item.value;
 
             if (item.value < min) {

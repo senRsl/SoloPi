@@ -1,12 +1,24 @@
 package com.alipay.hulu.common.utils.activity;
 
+import java.io.File;
+import java.io.FileFilter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.alipay.hulu.common.R;
+import com.alipay.hulu.common.application.LauncherApplication;
+import com.alipay.hulu.common.utils.ContextUtil;
+import com.alipay.hulu.common.utils.StringUtil;
+
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.View;
@@ -17,20 +29,8 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
-
-import com.alipay.hulu.common.R;
-import com.alipay.hulu.common.application.LauncherApplication;
-import com.alipay.hulu.common.utils.ContextUtil;
-import com.alipay.hulu.common.utils.StringUtil;
-
-import java.io.File;
-import java.io.FileFilter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 
 public class FileChooseDialogActivity extends Activity implements View.OnClickListener {
     public static final String KEY_TARGET_FILE = "KEY_TARGET_FILE";
@@ -42,7 +42,7 @@ public class FileChooseDialogActivity extends Activity implements View.OnClickLi
 
     private static final String _KEY_FILE_NAME = "fileName";
     private static final String _KEY_FILE_WRITABLE = "fileWritable";
-
+    private final List<Map<String, String>> currentSubDirData = new ArrayList<>();
     private View upperIcon;
     private View createIcon;
     private TextView titleText;
@@ -52,14 +52,34 @@ public class FileChooseDialogActivity extends Activity implements View.OnClickLi
     private TextView positiveBtnText;
     private LinearLayout negativeButton;
     private TextView negativeBtnText;
-
     private SimpleAdapter dirAdapter;
-
     private File currentDir;
     private String defaultFileName;
     private List<File> currentSubDir = new ArrayList<>();
-    private final List<Map<String, String>> currentSubDirData = new ArrayList<>();
 
+    /**
+     * 启动文件选择器
+     *
+     * @param activity
+     * @param title
+     * @param fileName
+     * @param baseDir
+     */
+    public static void startFileChooser(final Activity activity, final int requestCode, String title, String fileName, File baseDir) {
+        final Intent intent = new Intent(activity, FileChooseDialogActivity.class);
+        intent.putExtra(KEY_NEW_FILE_NAME, fileName);
+        if (baseDir != null) {
+            intent.putExtra(KEY_SOURCE_FILE, baseDir.getPath());
+        }
+        intent.putExtra(KEY_TITLE_NAME, title);
+
+        LauncherApplication.getInstance().runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                activity.startActivityForResult(intent, requestCode);
+            }
+        });
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -108,6 +128,7 @@ public class FileChooseDialogActivity extends Activity implements View.OnClickLi
 
     /**
      * 初始化数据
+     *
      * @param intent
      */
     private void initData(Intent intent) {
@@ -145,6 +166,7 @@ public class FileChooseDialogActivity extends Activity implements View.OnClickLi
 
     /**
      * 重载目录
+     *
      * @param dir
      */
     private void reloadDir(File dir) {
@@ -161,10 +183,10 @@ public class FileChooseDialogActivity extends Activity implements View.OnClickLi
 
         Collections.sort(currentSubDir);
         currentSubDirData.clear();
-        for (File f: currentSubDir) {
+        for (File f : currentSubDir) {
             Map<String, String> data = new HashMap<>();
             data.put(_KEY_FILE_NAME, f.getName());
-            data.put(_KEY_FILE_WRITABLE, f.canWrite()? "": "无权限");
+            data.put(_KEY_FILE_WRITABLE, f.canWrite() ? "" : "无权限");
             currentSubDirData.add(data);
         }
         dirAdapter.notifyDataSetChanged();
@@ -194,8 +216,8 @@ public class FileChooseDialogActivity extends Activity implements View.OnClickLi
      */
     private void initControl() {
         dirAdapter = new SimpleAdapter(this, currentSubDirData, R.layout.file_item_layout,
-                new String[] {_KEY_FILE_NAME, _KEY_FILE_WRITABLE},
-                new int[] {R.id.file_item_name, R.id.file_item_desc});
+                new String[]{_KEY_FILE_NAME, _KEY_FILE_WRITABLE},
+                new int[]{R.id.file_item_name, R.id.file_item_desc});
         dirList.setAdapter(dirAdapter);
         dirList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -275,28 +297,5 @@ public class FileChooseDialogActivity extends Activity implements View.OnClickLi
         }
 
         finish();
-    }
-
-    /**
-     * 启动文件选择器
-     * @param activity
-     * @param title
-     * @param fileName
-     * @param baseDir
-     */
-    public static void startFileChooser(final Activity activity, final int requestCode, String title, String fileName, File baseDir) {
-        final Intent intent = new Intent(activity, FileChooseDialogActivity.class);
-        intent.putExtra(KEY_NEW_FILE_NAME, fileName);
-        if (baseDir != null) {
-            intent.putExtra(KEY_SOURCE_FILE, baseDir.getPath());
-        }
-        intent.putExtra(KEY_TITLE_NAME, title);
-
-        LauncherApplication.getInstance().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                activity.startActivityForResult(intent, requestCode);
-            }
-        });
     }
 }

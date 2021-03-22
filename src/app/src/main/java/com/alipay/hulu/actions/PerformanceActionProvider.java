@@ -15,13 +15,13 @@
  */
 package com.alipay.hulu.actions;
 
-import android.content.Context;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import com.alipay.hulu.R;
 import com.alipay.hulu.common.annotation.Enable;
@@ -41,13 +41,13 @@ import com.alipay.hulu.shared.node.tree.AbstractNodeTree;
 import com.alipay.hulu.ui.CheckableRelativeLayout;
 import com.alipay.hulu.util.RecordUtil;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 /**
  * Created by qiaoruikai on 2019/1/8 9:02 PM.
@@ -55,17 +55,12 @@ import java.util.Set;
 @Enable
 public class PerformanceActionProvider implements ActionProvider {
     private static final String TAG = "PerformActionPvder";
-    private static volatile boolean isRecording = false;
-
     private static final String ACTION_START_RECORD = "startRecord";
-
     private static final String ACTION_STOP_RECORD = "stopRecord";
-
     private static final String CHECK_LIST = "checkList";
     private static final String CHECK_LIST_SPLITTER = ",";
-
     private static final String UPLOAD_URL = "url";
-
+    private static volatile boolean isRecording = false;
     private String uploadUrl = null;
 
     private DisplayProvider displayProvider;
@@ -87,7 +82,7 @@ public class PerformanceActionProvider implements ActionProvider {
 
             // 逐项开启
             displayProvider.stopAllDisplay();
-            for (String name: items) {
+            for (String name : items) {
                 displayProvider.startDisplay(name);
             }
             isRecording = true;
@@ -184,7 +179,7 @@ public class PerformanceActionProvider implements ActionProvider {
             // 添加布局配置
             LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            for (DisplayItemInfo info: displayItemInfos) {
+            for (DisplayItemInfo info : displayItemInfos) {
                 final CheckableRelativeLayout itemView = (CheckableRelativeLayout) inflater.inflate(R.layout.dialog_action_check_item, null);
                 itemView.setOnClickListener(new View.OnClickListener() {
                     @Override

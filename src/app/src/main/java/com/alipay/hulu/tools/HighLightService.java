@@ -15,6 +15,17 @@
  */
 package com.alipay.hulu.tools;
 
+import java.lang.ref.WeakReference;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+
+import com.alipay.hulu.R;
+import com.alipay.hulu.activity.MyApplication;
+import com.alipay.hulu.common.service.base.ExportService;
+import com.alipay.hulu.common.service.base.LocalService;
+import com.alipay.hulu.common.utils.ContextUtil;
+import com.alipay.hulu.common.utils.LogUtil;
+
 import android.content.Context;
 import android.graphics.PixelFormat;
 import android.graphics.Point;
@@ -29,230 +40,219 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.RelativeLayout;
 
-import com.alipay.hulu.R;
-import com.alipay.hulu.activity.MyApplication;
-import com.alipay.hulu.common.service.base.ExportService;
-import com.alipay.hulu.common.service.base.LocalService;
-import com.alipay.hulu.common.utils.ContextUtil;
-import com.alipay.hulu.common.utils.LogUtil;
-
-import java.lang.ref.WeakReference;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
 import static android.view.WindowManager.LayoutParams.TYPE_TOAST;
 
 @LocalService
 public class HighLightService implements ExportService, View.OnTouchListener {
 
-	private static final String TAG = "HighLightService";
+    private static final String TAG = "HighLightService";
 
-	private static int WINDOW_LEVEL = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O? WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY: WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY;
+    private static int WINDOW_LEVEL = Build.VERSION.SDK_INT >= Build.VERSION_CODES.O ? WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY : WindowManager.LayoutParams.TYPE_SYSTEM_OVERLAY;
+    public Handler mHandler;
+    public View invisibleView;
+    Context cx = null;
+    private WeakReference<View> windowViewRef = null;
+    private WindowManager wm;
 
-	Context cx = null;
-	private WeakReference<View> windowViewRef = null;
-	private WindowManager wm;
-	public Handler mHandler;
+    @Override
+    public void onCreate(Context context) {
+        this.cx = context;
+        wm = (WindowManager) cx.getSystemService(Context.WINDOW_SERVICE);
 
-	public View invisibleView;
+        mHandler = new Handler();
 
-	@Override
-	public void onCreate(Context context) {
-		this.cx = context;
-		wm = (WindowManager) cx.getSystemService(Context.WINDOW_SERVICE);
+        invisibleView = new View(cx);
+        int targetColor;
+        if (Build.VERSION.SDK_INT >= 23) {
+            targetColor = context.getColor(R.color.colorAccent);
+        } else {
+            targetColor = context.getResources().getColor(R.color.colorAccent);
+        }
+        invisibleView.setBackgroundColor(targetColor);
+        WindowManager.LayoutParams params = new WindowManager.LayoutParams();
+        //创建非模态、不可碰触
+        params.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
+                | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+                | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+        //放在左上角
+        params.gravity = Gravity.START | Gravity.TOP;
+        params.height = 1;
+        params.width = 1;
+        //设置弹出View类型
+        params.type = WINDOW_LEVEL;
 
-		mHandler = new Handler();
+        try {
+            wm.addView(invisibleView, params);
+        } catch (WindowManager.BadTokenException e) {
+            LogUtil.e(TAG, e, "无法使用Window type = %d, 降级", WINDOW_LEVEL);
+            WINDOW_LEVEL = TYPE_TOAST;
+            params.type = WINDOW_LEVEL;
+            wm.addView(invisibleView, params);
+        }
+    }
 
-		invisibleView = new View(cx);
-		int targetColor;
-		if (Build.VERSION.SDK_INT >= 23) {
-			targetColor = context.getColor(R.color.colorAccent);
-		} else {
-			targetColor = context.getResources().getColor(R.color.colorAccent);
-		}
-		invisibleView.setBackgroundColor(targetColor);
-		WindowManager.LayoutParams params = new WindowManager.LayoutParams();
-		//创建非模态、不可碰触
-		params.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
-				| WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
-				| WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
-		//放在左上角
-		params.gravity = Gravity.START | Gravity.TOP;
-		params.height = 1;
-		params.width = 1;
-		//设置弹出View类型
-		params.type = WINDOW_LEVEL;
+    @Override
+    public void onDestroy(Context context) {
+        if (windowViewRef != null && windowViewRef.get() != null) {
+            wm.removeViewImmediate(windowViewRef.get());
+        }
+        this.cx = null;
+        this.mHandler = null;
 
-		try {
-			wm.addView(invisibleView, params);
-		} catch (WindowManager.BadTokenException e) {
-			LogUtil.e(TAG, e, "无法使用Window type = %d, 降级", WINDOW_LEVEL);
-			WINDOW_LEVEL = TYPE_TOAST;
-			params.type = WINDOW_LEVEL;
-			wm.addView(invisibleView, params);
-		}
-	}
+        wm.removeViewImmediate(invisibleView);
+    }
 
-	@Override
-	public void onDestroy(Context context) {
-		if (windowViewRef != null && windowViewRef.get() != null) {
-			wm.removeViewImmediate(windowViewRef.get());
-		}
-		this.cx = null;
-		this.mHandler = null;
+    /**
+     * 高亮悬浮窗
+     *
+     * @param displayRect
+     * @param point
+     */
+    public void highLight(final Rect displayRect, final Point point) {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    makeWindow(displayRect, point);
+                } catch (Throwable t) {
+                    // 闪退避免
+                    LogUtil.e(TAG, "抛出异常: " + t.getMessage(), t);
+                }
+            }
+        });
+    }
 
-		wm.removeViewImmediate(invisibleView);
-	}
+    /**
+     * 显示高亮悬浮窗
+     *
+     * @param displayRect
+     * @param clickPos
+     */
+    private synchronized void makeWindow(Rect displayRect, Point clickPos) {
+        if (displayRect == null) {
+            LogUtil.w(TAG, "无法绘制空高亮框");
+            return;
+        }
 
-	/**
-	 * 高亮悬浮窗
-	 * @param displayRect
-	 * @param point
-	 */
-	public void highLight(final Rect displayRect, final Point point) {
-		mHandler.post(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					makeWindow(displayRect, point);
-				} catch (Throwable t) {
-					// 闪退避免
-					LogUtil.e(TAG, "抛出异常: " + t.getMessage(), t);
-				}
-			}
-		});
-	}
+        LogUtil.i(TAG, "绘制高亮框开始");
 
-	/**
-	 * 显示高亮悬浮窗
-	 * @param displayRect
-	 * @param clickPos
-	 */
-	private synchronized void makeWindow(Rect displayRect, Point clickPos) {
-		if (displayRect == null) {
-			LogUtil.w(TAG, "无法绘制空高亮框");
-			return;
-		}
+        // 拿一下高亮框引用
+        View windowView;
+        boolean update = true;
+        if (windowViewRef == null || (windowView = windowViewRef.get()) == null) {
+            update = false;
+            windowView = LayoutInflater.from(cx).inflate(R.layout.highlight_win, null);
+            windowView.setOnTouchListener(this);
+            windowViewRef = new WeakReference<>(windowView);
+        } else {
+            if (Build.VERSION.SDK_INT >= 19) {
+                if (windowView.isAttachedToWindow()) {
+                    wm.removeViewImmediate(windowView);
+                }
+            } else {
+                wm.removeViewImmediate(windowView);
+            }
+        }
 
-		LogUtil.i(TAG, "绘制高亮框开始");
+        int px = ContextUtil.dip2px(cx, 6);
+        View thumb = windowView.findViewById(R.id.img_highlight_pos);
+        if (clickPos != null && displayRect.contains(clickPos.x, clickPos.y)) {
+            RelativeLayout.LayoutParams thumbParam = new RelativeLayout.LayoutParams(thumb.getLayoutParams());
 
-		// 拿一下高亮框引用
-		View windowView;
-		boolean update = true;
-		if (windowViewRef == null || (windowView = windowViewRef.get())== null) {
-			update = false;
-			windowView = LayoutInflater.from(cx).inflate(R.layout.highlight_win, null);
-			windowView.setOnTouchListener(this);
-			windowViewRef = new WeakReference<>(windowView);
-		} else {
-			if (Build.VERSION.SDK_INT >= 19) {
-				if (windowView.isAttachedToWindow()) {
-					wm.removeViewImmediate(windowView);
-				}
-			} else {
-				wm.removeViewImmediate(windowView);
-			}
-		}
+            thumbParam.setMargins(clickPos.x - displayRect.left - px, clickPos.y - displayRect.top - px, 0, 0);
+            thumb.setLayoutParams(thumbParam);
+        } else {
+            thumb.setVisibility(View.GONE);
+        }
 
-		int px = ContextUtil.dip2px(cx, 6);
-		View thumb = windowView.findViewById(R.id.img_highlight_pos);
-		if (clickPos != null && displayRect.contains(clickPos.x, clickPos.y)) {
-			RelativeLayout.LayoutParams thumbParam = new RelativeLayout.LayoutParams(thumb.getLayoutParams());
+        // 记录下状态栏高度
+        int[] xAndY = new int[]{0, 0};
+        invisibleView.getLocationOnScreen(xAndY);
 
-			thumbParam.setMargins(clickPos.x - displayRect.left - px, clickPos.y - displayRect.top - px, 0, 0);
-			thumb.setLayoutParams(thumbParam);
-		} else {
-			thumb.setVisibility(View.GONE);
-		}
+        // 设置下windowParam
+        WindowManager.LayoutParams wmParams = ((MyApplication) cx.getApplicationContext()).getMywmParams();
+        wmParams.type = WINDOW_LEVEL;
+        wmParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
+                | WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+                | WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
+        wmParams.gravity = Gravity.LEFT | Gravity.TOP; // 调整悬浮窗口至左上角
+        // 以屏幕左上角为原点，设置x、y初始值
+        wmParams.x = displayRect.left - xAndY[0];
+        wmParams.y = displayRect.top - xAndY[1];
+        // 设置悬浮窗口长宽数据
+        wmParams.width = displayRect.width();
+        wmParams.height = displayRect.height();
+        wmParams.format = PixelFormat.RGBA_8888;
 
-		// 记录下状态栏高度
-		int[] xAndY = new int[] {0, 0};
-		invisibleView.getLocationOnScreen(xAndY);
+        try {
+            if (update) {
+                wm.updateViewLayout(windowView, wmParams);
+            } else {
+                wm.addView(windowView, wmParams);
+            }
+        } catch (WindowManager.BadTokenException e) {
+            LogUtil.e(TAG, "系统不允许显示悬浮窗", e);
+            wm.removeView(windowView);
+        } catch (IllegalStateException e) {
+            LogUtil.e(TAG, "悬浮窗已加载", e);
+            wm.removeView(windowView);
+            windowViewRef = null;
+        }
+    }
 
-		// 设置下windowParam
-		WindowManager.LayoutParams wmParams = ((MyApplication) cx.getApplicationContext()).getMywmParams();
-		wmParams.type = WINDOW_LEVEL;
-		wmParams.flags = WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL
-				| WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
-				| WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE;
-		wmParams.gravity = Gravity.LEFT | Gravity.TOP; // 调整悬浮窗口至左上角
-		// 以屏幕左上角为原点，设置x、y初始值
-		wmParams.x = displayRect.left - xAndY[0];
-		wmParams.y = displayRect.top - xAndY[1];
-		// 设置悬浮窗口长宽数据
-		wmParams.width = displayRect.width();
-		wmParams.height = displayRect.height();
-		wmParams.format = PixelFormat.RGBA_8888;
+    /**
+     * 移除高亮框
+     */
+    public void removeHighLight() {
+        mHandler.post(new Runnable() {
+            @Override
+            public void run() {
+                // 防止多次执行
+                if (windowViewRef != null && windowViewRef.get() != null) {
+                    wm.removeViewImmediate(windowViewRef.get());
+                    windowViewRef.clear();
+                }
+            }
+        });
+    }
 
-		try {
-			if (update) {
-				wm.updateViewLayout(windowView, wmParams);
-			} else {
-				wm.addView(windowView, wmParams);
-			}
-		} catch (WindowManager.BadTokenException e) {
-			LogUtil.e(TAG, "系统不允许显示悬浮窗", e);
-			wm.removeView(windowView);
-		} catch (IllegalStateException e) {
-			LogUtil.e(TAG, "悬浮窗已加载", e);
-			wm.removeView(windowView);
-			windowViewRef = null;
-		}
-	}
+    /**
+     * 等待移除高亮
+     */
+    public void removeHightLightSync() {
+        final CountDownLatch latch = new CountDownLatch(1);
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            // 防止多次执行
+            if (windowViewRef != null && windowViewRef.get() != null) {
+                wm.removeViewImmediate(windowViewRef.get());
+                windowViewRef.clear();
+            }
+            latch.countDown();
+        } else {
+            mHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    // 防止多次执行
+                    if (windowViewRef != null && windowViewRef.get() != null) {
+                        wm.removeViewImmediate(windowViewRef.get());
+                        windowViewRef.clear();
+                    }
+                    latch.countDown();
+                }
+            });
 
-	/**
-	 * 移除高亮框
-	 */
-	public void removeHighLight() {
-		mHandler.post(new Runnable() {
-			@Override
-			public void run() {
-				// 防止多次执行
-				if (windowViewRef != null && windowViewRef.get() != null) {
-					wm.removeViewImmediate(windowViewRef.get());
-					windowViewRef.clear();
-				}
-			}
-		});
-	}
+            try {
+                latch.await(1000, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException e) {
+                LogUtil.e(TAG, "Catch java.lang.InterruptedException: " + e.getMessage(), e);
+            }
+        }
+    }
 
-	/**
-	 * 等待移除高亮
-	 */
-	public void removeHightLightSync() {
-		final CountDownLatch latch = new CountDownLatch(1);
-		if (Looper.myLooper() == Looper.getMainLooper()) {
-			// 防止多次执行
-			if (windowViewRef != null && windowViewRef.get() != null) {
-				wm.removeViewImmediate(windowViewRef.get());
-				windowViewRef.clear();
-			}
-			latch.countDown();
-		} else {
-			mHandler.post(new Runnable() {
-				@Override
-				public void run() {
-					// 防止多次执行
-					if (windowViewRef != null && windowViewRef.get() != null) {
-						wm.removeViewImmediate(windowViewRef.get());
-						windowViewRef.clear();
-					}
-					latch.countDown();
-				}
-			});
-
-			try {
-				latch.await(1000, TimeUnit.MILLISECONDS);
-			} catch (InterruptedException e) {
-				LogUtil.e(TAG, "Catch java.lang.InterruptedException: " + e.getMessage(), e);
-			}
-		}
-	}
-
-	@Override
-	public boolean onTouch(View v, MotionEvent event) {
-		// 防止阻碍操作
-		removeHighLight();
-		return false;
-	}
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        // 防止阻碍操作
+        removeHighLight();
+        return false;
+    }
 }

@@ -15,7 +15,12 @@
  */
 package com.alipay.hulu.replay;
 
-import androidx.annotation.NonNull;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
@@ -31,35 +36,20 @@ import com.alipay.hulu.shared.node.action.OperationMethod;
 import com.alipay.hulu.shared.node.action.PerformActionEnum;
 import com.alipay.hulu.shared.node.tree.export.bean.OperationStep;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import androidx.annotation.NonNull;
 
 /**
  * Created by qiaoruikai on 2019-08-20 19:26.
  */
 public class MultiParamStepProvider extends AbstractStepProvider {
     private static final String TAG = "RepeatStepProvider";
-
+    OperationStepProvider currentStepProvider;
+    List<ReplayResultBean> resultBeans;
     private OperationService operationService;
-
     private RecordCaseInfo recordCase;
     private OperationStep prepareStep;
-
     private int currentIdx;
     private List<Map<String, String>> repeatParams = new ArrayList<>();
-
-    OperationStepProvider currentStepProvider;
-
-    List<ReplayResultBean> resultBeans;
-
-    @Override
-    public void prepare() {
-        loadStep();
-    }
 
     public MultiParamStepProvider(@NonNull RecordCaseInfo recordCase) {
         this.recordCase = recordCase;
@@ -68,6 +58,11 @@ public class MultiParamStepProvider extends AbstractStepProvider {
 
         parseParams();
         resultBeans = new ArrayList<>(repeatParams.size() + 1);
+    }
+
+    @Override
+    public void prepare() {
+        loadStep();
     }
 
     private void parseParams() {
@@ -80,9 +75,9 @@ public class MultiParamStepProvider extends AbstractStepProvider {
 
         if (runningParam.getMode() == CaseRunningParam.ParamMode.UNION) {
             List<JSONObject> paramUnion = runningParam.getParamList();
-            for (JSONObject param: paramUnion) {
+            for (JSONObject param : paramUnion) {
                 Map<String, String> realParams = new HashMap<>(param.size() + 1);
-                for (String key: param.keySet()) {
+                for (String key : param.keySet()) {
                     realParams.put(key, param.getString(key));
                 }
 
@@ -91,8 +86,8 @@ public class MultiParamStepProvider extends AbstractStepProvider {
         } else {
             Map<String, List<String>> paramSet = new HashMap<>();
             List<JSONObject> paramUnion = runningParam.getParamList();
-            for (JSONObject param: paramUnion) {
-                for (String key: param.keySet()) {
+            for (JSONObject param : paramUnion) {
+                for (String key : param.keySet()) {
                     paramSet.put(key, Arrays.asList(StringUtil.split(param.getString(key), ",")));
                 }
             }
@@ -104,7 +99,7 @@ public class MultiParamStepProvider extends AbstractStepProvider {
 
             List<Map<String, String>> stackParam = new ArrayList<>();
             String initKey = keys.get(0);
-            for (String param: paramSet.get(initKey)) {
+            for (String param : paramSet.get(initKey)) {
                 HashMap<String, String> realParams = new HashMap<>(keys.size() + 1);
                 realParams.put(initKey, param);
                 stackParam.add(realParams);
@@ -114,8 +109,8 @@ public class MultiParamStepProvider extends AbstractStepProvider {
             for (int i = 1; i < keys.size(); i++) {
                 List<Map<String, String>> newStackParam = new ArrayList<>();
                 String key = keys.get(i);
-                for (Map<String, String> realParam: stackParam) {
-                    for (String param: paramSet.get(key)) {
+                for (Map<String, String> realParam : stackParam) {
+                    for (String param : paramSet.get(key)) {
                         Map<String, String> newLevelParam = new HashMap<>(realParam);
                         newLevelParam.put(key, param);
                         newStackParam.add(newLevelParam);
@@ -150,7 +145,7 @@ public class MultiParamStepProvider extends AbstractStepProvider {
             prepareStep = null;
             return step;
         }
-        return currentStepProvider == null? null: currentStepProvider.provideStep();
+        return currentStepProvider == null ? null : currentStepProvider.provideStep();
     }
 
     @Override

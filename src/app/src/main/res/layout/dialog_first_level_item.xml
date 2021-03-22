@@ -15,26 +15,26 @@
 -->
 <com.alipay.hulu.ui.CheckableRelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingTop="2dp"
-    android:paddingBottom="2dp"
     android:duplicateParentState="true"
+    android:orientation="vertical"
+    android:paddingBottom="2dp"
+    android:paddingTop="2dp"
     app:selectColor="@color/item_pressed">
 
     <ImageView
-        android:layout_centerHorizontal="true"
         android:id="@+id/first_level_icon"
         android:layout_width="@dimen/float_group_icon_size"
-        android:layout_height="@dimen/float_group_icon_size" />
+        android:layout_height="@dimen/float_group_icon_size"
+        android:layout_centerHorizontal="true" />
 
     <TextView
-        android:textSize="@dimen/float_group_text_size"
-        android:textColor="@color/primaryText"
         android:id="@+id/first_level_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@id/first_level_icon"
         android:layout_centerHorizontal="true"
-        android:layout_below="@id/first_level_icon"/>
+        android:textColor="@color/primaryText"
+        android:textSize="@dimen/float_group_text_size" />
 </com.alipay.hulu.ui.CheckableRelativeLayout>

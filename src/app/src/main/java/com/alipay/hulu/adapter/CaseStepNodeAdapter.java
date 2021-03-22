@@ -15,6 +15,18 @@
  */
 package com.alipay.hulu.adapter;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import com.alibaba.fastjson.JSON;
+import com.alipay.hulu.R;
+import com.alipay.hulu.common.utils.LogUtil;
+import com.alipay.hulu.common.utils.StringUtil;
+import com.alipay.hulu.shared.node.tree.OperationNode;
+import com.alipay.hulu.shared.node.tree.export.OperationStepExporter;
+import com.alipay.hulu.shared.node.utils.BitmapUtil;
+
 import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.text.Editable;
@@ -25,19 +37,6 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import com.alibaba.fastjson.JSON;
-import com.alipay.hulu.R;
-import com.alipay.hulu.common.utils.LogUtil;
-import com.alipay.hulu.common.utils.StringUtil;
-import com.alipay.hulu.shared.node.tree.OperationNode;
-import com.alipay.hulu.shared.node.tree.export.OperationStepExporter;
-import com.alipay.hulu.shared.node.utils.BitmapUtil;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -54,9 +53,148 @@ public class CaseStepNodeAdapter extends RecyclerView.Adapter<CaseStepNodeAdapte
         properties = loadPropertiesKey(node);
     }
 
+    /**
+     * 解析node属性
+     *
+     * @param node
+     * @return
+     */
+    static String extractNodeProperties(OperationNode node, String key) {
+        switch (key) {
+            case "xpath":
+                return node.getXpath();
+            case "description":
+                return node.getDescription();
+            case "text":
+                return node.getText();
+            case "resourceId":
+                return node.getResourceId();
+            case "className":
+                return node.getClassName();
+            case "depth":
+                return Integer.toString(node.getDepth());
+            case "nodeType":
+                return node.getNodeType();
+            case "assistantNodes":
+                return JSON.toJSONString(node.getAssistantNodes());
+            case "nodeBound":
+                Rect nb = node.getNodeBound();
+                return String.format("%d,%d,%d,%d", nb.left, nb.top, nb.right, nb.bottom);
+            default:
+                if (node.getExtra() == null) {
+                    return null;
+                }
+                return node.getExtra().get(key);
+        }
+    }
+
+    static List<String> loadPropertiesKey(OperationNode node) {
+        List<String> list = new ArrayList<>(12);
+        list.add("xpath");
+        list.add("description");
+        list.add("text");
+        list.add("resourceId");
+        list.add("className");
+        list.add("depth");
+        Rect nb = node.getNodeBound();
+        if (nb != null) {
+            list.add("nodeBound");
+        }
+
+        if (node.getAssistantNodes() != null && node.getAssistantNodes().size() > 0) {
+            list.add("assistantNodes");
+        }
+        list.add("nodeType");
+
+        if (node.getExtra() != null) {
+            Map<String, String> extras = node.getExtra();
+            list.addAll(extras.keySet());
+        }
+
+        // 截图放最前面
+        if (list.contains(OperationStepExporter.CAPTURE_IMAGE_BASE64)) {
+            list.remove(OperationStepExporter.CAPTURE_IMAGE_BASE64);
+            list.add(0, OperationStepExporter.CAPTURE_IMAGE_BASE64);
+        }
+
+        return list;
+    }
+
+    /**
+     * 设置Node属性值
+     *
+     * @param key
+     * @param value
+     * @param node
+     * @return
+     */
+    static boolean updateNodeProperty(String key, String value, OperationNode node) {
+        switch (key) {
+            case "xpath":
+                node.setXpath(value);
+                return true;
+            case "description":
+                node.setDescription(value);
+                return true;
+            case "text":
+                node.setText(value);
+                return true;
+            case "resourceId":
+                node.setResourceId(value);
+                return true;
+            case "className":
+                node.setClassName(value);
+                return true;
+            case "depth":
+                try {
+                    int depth = Integer.parseInt(value);
+                    node.setDepth(depth);
+                    return true;
+                } catch (NumberFormatException e) {
+                    LogUtil.w(TAG, "无法解析数字:" + value, e);
+                    return false;
+                }
+            case "nodeBound":
+                // 逗号分隔
+                String[] split = StringUtil.split(value, ",");
+                if (split == null || split.length != 4) {
+                    return false;
+                }
+                try {
+                    Rect bound = new Rect(Integer.parseInt(split[0]),
+                            Integer.parseInt(split[1]),
+                            Integer.parseInt(split[2]),
+                            Integer.parseInt(split[3]));
+                    node.setNodeBound(bound);
+                    return true;
+                } catch (NumberFormatException e) {
+                    LogUtil.w(TAG, "parse content failed for " + value, e);
+                    return false;
+                }
+            case "assistantNodes":
+                try {
+                    List<OperationNode.AssistantNode> assis = JSON.parseArray(value, OperationNode.AssistantNode.class);
+                    node.setAssistantNodes(assis);
+                    return true;
+                } catch (Exception e) {
+                    LogUtil.w(TAG, "can't parse " + value, e);
+                    return false;
+                }
+            case "nodeType":
+                node.setNodeType(value);
+                return true;
+            default:
+                if (node.getExtra() != null) {
+                    node.getExtra().put(key, value);
+                    return true;
+                }
+                return false;
+        }
+    }
+
     @Override
     public int getItemViewType(int position) {
-        return StringUtil.equals(properties.get(position), OperationStepExporter.CAPTURE_IMAGE_BASE64)? 1: 0;
+        return StringUtil.equals(properties.get(position), OperationStepExporter.CAPTURE_IMAGE_BASE64) ? 1 : 0;
     }
 
     @Override
@@ -153,143 +291,6 @@ public class CaseStepNodeAdapter extends RecyclerView.Adapter<CaseStepNodeAdapte
         void wrapData(final String key, String value) {
             Bitmap img = BitmapUtil.base64ToBitmap(value);
             imageView.setImageBitmap(img);
-        }
-    }
-
-    /**
-     * 解析node属性
-     * @param node
-     * @return
-     */
-    static String extractNodeProperties(OperationNode node, String key) {
-        switch (key) {
-            case "xpath":
-                return node.getXpath();
-            case "description":
-                return node.getDescription();
-            case "text":
-                return node.getText();
-            case "resourceId":
-                return node.getResourceId();
-            case "className":
-                return node.getClassName();
-            case "depth":
-                return Integer.toString(node.getDepth());
-            case "nodeType":
-                return node.getNodeType();
-            case "assistantNodes":
-                return JSON.toJSONString(node.getAssistantNodes());
-            case "nodeBound":
-                Rect nb = node.getNodeBound();
-                return String.format("%d,%d,%d,%d", nb.left, nb.top, nb.right, nb.bottom);
-            default:
-                if (node.getExtra() == null) {
-                    return null;
-                }
-                return node.getExtra().get(key);
-        }
-    }
-
-    static List<String> loadPropertiesKey(OperationNode node) {
-        List<String> list = new ArrayList<>(12);
-        list.add("xpath");
-        list.add("description");
-        list.add("text");
-        list.add("resourceId");
-        list.add("className");
-        list.add("depth");
-        Rect nb = node.getNodeBound();
-        if (nb != null) {
-            list.add("nodeBound");
-        }
-
-        if (node.getAssistantNodes() != null && node.getAssistantNodes().size() > 0) {
-            list.add("assistantNodes");
-        }
-        list.add("nodeType");
-
-        if (node.getExtra() != null) {
-            Map<String, String> extras = node.getExtra();
-            list.addAll(extras.keySet());
-        }
-
-        // 截图放最前面
-        if (list.contains(OperationStepExporter.CAPTURE_IMAGE_BASE64)) {
-            list.remove(OperationStepExporter.CAPTURE_IMAGE_BASE64);
-            list.add(0, OperationStepExporter.CAPTURE_IMAGE_BASE64);
-        }
-
-        return list;
-    }
-
-    /**
-     * 设置Node属性值
-     * @param key
-     * @param value
-     * @param node
-     * @return
-     */
-    static boolean updateNodeProperty(String key, String value, OperationNode node) {
-        switch (key) {
-            case "xpath":
-                node.setXpath(value);
-                return true;
-            case "description":
-                node.setDescription(value);
-                return true;
-            case "text":
-                node.setText(value);
-                return true;
-            case "resourceId":
-                node.setResourceId(value);
-                return true;
-            case "className":
-                node.setClassName(value);
-                return true;
-            case "depth":
-                try {
-                    int depth = Integer.parseInt(value);
-                    node.setDepth(depth);
-                    return true;
-                } catch (NumberFormatException e) {
-                    LogUtil.w(TAG, "无法解析数字:" + value, e);
-                    return false;
-                }
-            case "nodeBound":
-                // 逗号分隔
-                String[] split = StringUtil.split(value, ",");
-                if (split == null || split.length != 4) {
-                    return false;
-                }
-                try {
-                    Rect bound = new Rect(Integer.parseInt(split[0]),
-                            Integer.parseInt(split[1]),
-                            Integer.parseInt(split[2]),
-                            Integer.parseInt(split[3]));
-                    node.setNodeBound(bound);
-                    return true;
-                } catch (NumberFormatException e) {
-                    LogUtil.w(TAG, "parse content failed for " + value, e);
-                    return false;
-                }
-            case "assistantNodes":
-                try {
-                    List<OperationNode.AssistantNode> assis = JSON.parseArray(value, OperationNode.AssistantNode.class);
-                    node.setAssistantNodes(assis);
-                    return true;
-                } catch (Exception e) {
-                    LogUtil.w(TAG, "can't parse " + value, e);
-                    return false;
-                }
-            case "nodeType":
-                node.setNodeType(value);
-                return true;
-            default:
-                if (node.getExtra() != null) {
-                    node.getExtra().put(key, value);
-                    return true;
-                }
-                return false;
         }
     }
 }

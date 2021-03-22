@@ -15,9 +15,9 @@
  */
 package com.alipay.hulu.shared.io.bean;
 
-import com.alipay.hulu.shared.node.tree.export.bean.OperationStep;
-
 import java.util.List;
+
+import com.alipay.hulu.shared.node.tree.export.bean.OperationStep;
 
 /**
  * Created by lezhou.wyl on 2018/7/18.

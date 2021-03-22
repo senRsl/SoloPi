@@ -14,178 +14,194 @@
   ~ limitations under the License.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
         android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingBottom="8dp"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
-        android:orientation="horizontal">
+        android:paddingTop="8dp">
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="18dp"
+            android:text="计算类型"
             android:textColor="@color/primaryText"
-            android:text="计算类型"/>
+            android:textSize="18dp" />
+
         <RadioGroup
-            android:layout_marginLeft="8dp"
-            android:orientation="horizontal"
             android:id="@+id/dialog_action_check_type"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:orientation="horizontal">
+
             <RadioButton
                 android:id="@+id/dialog_action_check_type_str"
-                android:checked="true"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="字符串"/>
+                android:checked="true"
+                android:text="字符串" />
+
             <RadioButton
                 android:id="@+id/dialog_action_check_type_int"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="整数"/>
+                android:text="整数" />
         </RadioGroup>
 
     </LinearLayout>
 
     <include layout="@layout/divider" />
+
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
         android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingBottom="8dp"
         android:paddingLeft="16dp"
         android:paddingRight="16dp"
-        android:orientation="horizontal">
+        android:paddingTop="8dp">
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="18dp"
+            android:text="比较方式"
             android:textColor="@color/primaryText"
-            android:text="比较方式"/>
+            android:textSize="18dp" />
+
         <com.alipay.hulu.ui.FlowRadioGroup
-            android:layout_marginLeft="8dp"
-            android:orientation="horizontal"
             android:id="@+id/dialog_action_check_compare"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:orientation="horizontal">
+
             <RadioButton
                 android:id="@+id/dialog_action_check_compare_equal"
-                android:checked="true"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="等于"/>
+                android:checked="true"
+                android:text="等于" />
+
             <RadioButton
                 android:id="@+id/dialog_action_check_compare_no_equal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="不等于"/>
+                android:text="不等于" />
+
             <RadioButton
                 android:id="@+id/dialog_action_check_compare_bigger"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:enabled="false"
-                android:text="大于"/>
+                android:text="大于" />
+
             <RadioButton
                 android:id="@+id/dialog_action_check_compare_bigger_equal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:enabled="false"
-                android:text="大于等于"/>
+                android:text="大于等于" />
+
             <RadioButton
                 android:id="@+id/dialog_action_check_compare_less"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:enabled="false"
-                android:text="小于"/>
+                android:text="小于" />
+
             <RadioButton
                 android:id="@+id/dialog_action_check_compare_less_equal"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:enabled="false"
-                android:text="小于等于"/>
+                android:text="小于等于" />
         </com.alipay.hulu.ui.FlowRadioGroup>
     </LinearLayout>
+
     <include layout="@layout/divider" />
 
     <LinearLayout
         android:id="@+id/dialog_action_check_left"
-        android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:paddingBottom="8dp"
         android:paddingLeft="16dp"
-        android:paddingRight="16dp">
+        android:paddingRight="16dp"
+        android:paddingTop="8dp">
 
         <TextView
-            android:textSize="18dp"
-            android:textColor="@color/primaryText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="左侧变量"/>
+            android:text="左侧变量"
+            android:textColor="@color/primaryText"
+            android:textSize="18dp" />
+
         <EditText
             android:id="@+id/dialog_action_check_left_value"
-            android:layout_marginTop="2dp"
-            android:textSize="14dp"
-            android:hint="${node.text}格式，可使用'+'与'*'"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            />
+            android:layout_marginTop="2dp"
+            android:hint="${node.text}格式，可使用'+'与'*'"
+            android:textSize="14dp" />
+
         <TextView
             android:id="@+id/dialog_action_check_left_value_val"
-            android:textSize="12dp"
-            android:text="@string/action_let_cur_value_null"
-            android:layout_marginLeft="8dp"
-            android:textColor="@color/secondaryText"
             android:layout_width="wrap_content"
-            android:maxLines="4"
             android:layout_height="wrap_content"
-            />
+            android:layout_marginLeft="8dp"
+            android:maxLines="4"
+            android:text="@string/action_let_cur_value_null"
+            android:textColor="@color/secondaryText"
+            android:textSize="12dp" />
 
     </LinearLayout>
 
     <include layout="@layout/divider" />
 
     <LinearLayout
-        android:orientation="vertical"
         android:id="@+id/dialog_action_check_right"
-        android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:paddingTop="8dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:paddingBottom="8dp"
         android:paddingLeft="16dp"
-        android:paddingRight="16dp">
+        android:paddingRight="16dp"
+        android:paddingTop="8dp">
+
         <TextView
-            android:textSize="18dp"
-            android:textColor="@color/primaryText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="右侧变量"/>
+            android:text="右侧变量"
+            android:textColor="@color/primaryText"
+            android:textSize="18dp" />
+
         <EditText
             android:id="@+id/dialog_action_check_right_value"
-            android:layout_marginTop="2dp"
-            android:textSize="14dp"
-            android:hint="${node.text}格式，可使用'+'与'*'"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            />
+            android:layout_marginTop="2dp"
+            android:hint="${node.text}格式，可使用'+'与'*'"
+            android:textSize="14dp" />
+
         <TextView
             android:id="@+id/dialog_action_check_right_value_val"
-            android:textSize="12dp"
-            android:text="@string/action_let_cur_value_null"
-            android:layout_marginLeft="8dp"
-            android:maxLines="4"
-            android:textColor="@color/secondaryText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            />
+            android:layout_marginLeft="8dp"
+            android:maxLines="4"
+            android:text="@string/action_let_cur_value_null"
+            android:textColor="@color/secondaryText"
+            android:textSize="12dp" />
 
     </LinearLayout>
 </LinearLayout>

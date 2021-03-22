@@ -15,19 +15,11 @@
  */
 package com.alipay.hulu.shared.node.tree.accessibility.tree;
 
-import android.graphics.Rect;
-import android.os.Build;
-import android.os.Bundle;
-import android.view.accessibility.AccessibilityNodeInfo;
-
-import com.alipay.hulu.common.application.LauncherApplication;
 import com.alipay.hulu.common.injector.InjectorService;
-import com.alipay.hulu.common.service.SPService;
 import com.alipay.hulu.common.tools.CmdTools;
 import com.alipay.hulu.common.utils.LogUtil;
 import com.alipay.hulu.common.utils.MiscUtil;
 import com.alipay.hulu.common.utils.StringUtil;
-import com.alipay.hulu.shared.node.OperationService;
 import com.alipay.hulu.shared.node.action.OperationContext;
 import com.alipay.hulu.shared.node.action.OperationExecutor;
 import com.alipay.hulu.shared.node.action.OperationMethod;
@@ -36,19 +28,19 @@ import com.alipay.hulu.shared.node.tree.AbstractNodeTree;
 import com.alipay.hulu.shared.node.tree.FakeNodeTree;
 import com.alipay.hulu.shared.node.utils.NodeTreeUtil;
 
-import java.util.concurrent.CountDownLatch;
+import android.graphics.Rect;
+import android.os.Build;
+import android.os.Bundle;
+import android.view.accessibility.AccessibilityNodeInfo;
 
 /**
  * 构建Accessibility树
-
  */
 public class AccessibilityNodeTree extends AbstractNodeTree {
-    private static final String TAG = "AccessibilityTree";
     public static final int TYPE_VERTICAL_SCROLLABLE = 1;
     public static final int TYPE_HORIZONTAL_SCROLLABLE = 2;
     public static final int TYPE_NOT_SCROLLABLE = 0;
-
-
+    private static final String TAG = "AccessibilityTree";
     // 当前节点
     private AccessibilityNodeInfo currentNode;
 
@@ -63,6 +55,7 @@ public class AccessibilityNodeTree extends AbstractNodeTree {
 
     /**
      * 构造函数
+     *
      * @param currentNode
      * @param parentNode
      */
@@ -91,7 +84,7 @@ public class AccessibilityNodeTree extends AbstractNodeTree {
         }
 
         if (this.isWebview) {
-            String content = StringUtil.isEmpty(text)? description : text;
+            String content = StringUtil.isEmpty(text) ? description : text;
 
             // 如果是WebView，将文字同时设置到text和description中做兼容
             this.text = StringUtil.nonNullString(content);
@@ -107,6 +100,7 @@ public class AccessibilityNodeTree extends AbstractNodeTree {
 
     /**
      * 构造函数
+     *
      * @param currentNode
      * @param parentNode
      */
@@ -142,12 +136,12 @@ public class AccessibilityNodeTree extends AbstractNodeTree {
             return TYPE_HORIZONTAL_SCROLLABLE;
         }
 
-        for (AbstractNodeTree child: getChildrenNodes()) {
+        for (AbstractNodeTree child : getChildrenNodes()) {
             if (!(child instanceof AccessibilityNodeTree)) {
                 break;
             }
 
-            int scrollType = ((AccessibilityNodeTree)child).getScrollType();
+            int scrollType = ((AccessibilityNodeTree) child).getScrollType();
             if (scrollType > 0) {
                 return scrollType;
             }
@@ -182,7 +176,7 @@ public class AccessibilityNodeTree extends AbstractNodeTree {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof AccessibilityNodeTree  && (StringUtil.equals(id, ((AccessibilityNodeTree) obj).getId()) || this == obj);
+        return obj instanceof AccessibilityNodeTree && (StringUtil.equals(id, ((AccessibilityNodeTree) obj).getId()) || this == obj);
     }
 
     @Override
@@ -250,6 +244,7 @@ public class AccessibilityNodeTree extends AbstractNodeTree {
 
     /**
      * 执行输入操作
+     *
      * @param content
      * @param opContext
      */
@@ -328,6 +323,7 @@ public class AccessibilityNodeTree extends AbstractNodeTree {
 
     /**
      * 打印结构
+     *
      * @param builder
      */
     public StringBuilder printTrace(StringBuilder builder) {
@@ -340,7 +336,7 @@ public class AccessibilityNodeTree extends AbstractNodeTree {
                 .append("],Text[").append(text)
                 .append("],Description[").append(description)
                 .append("],Resource[").append(resourceId)
-                .append("],ChildCount[").append(childrenNodes == null? 0: childrenNodes.size())
+                .append("],ChildCount[").append(childrenNodes == null ? 0 : childrenNodes.size())
                 .append("],Id[").append(id).append("]\n");
         if (childrenNodes != null) {
             for (AbstractNodeTree child : getChildrenNodes()) {

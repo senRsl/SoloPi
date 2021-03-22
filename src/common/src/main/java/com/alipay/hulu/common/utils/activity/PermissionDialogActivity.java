@@ -15,31 +15,17 @@
  */
 package com.alipay.hulu.common.utils.activity;
 
-import android.Manifest;
-import android.accessibilityservice.AccessibilityService;
-import android.annotation.TargetApi;
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.res.Configuration;
-import android.content.res.Resources;
-import android.media.projection.MediaProjectionManager;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.LocaleList;
-import android.provider.Settings;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import android.text.Html;
-import android.view.Display;
-import android.view.Gravity;
-import android.view.View;
-import android.view.WindowManager;
-import android.widget.LinearLayout;
-import android.widget.ProgressBar;
-import android.widget.TextView;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.alipay.hulu.common.R;
 import com.alipay.hulu.common.application.LauncherApplication;
@@ -60,29 +46,38 @@ import com.android.permission.FloatWindowManager;
 import com.android.permission.rom.MiuiUtils;
 import com.android.permission.rom.RomUtils;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import android.Manifest;
+import android.accessibilityservice.AccessibilityService;
+import android.annotation.TargetApi;
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.res.Configuration;
+import android.content.res.Resources;
+import android.media.projection.MediaProjectionManager;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.LocaleList;
+import android.provider.Settings;
+import android.text.Html;
+import android.view.Display;
+import android.view.Gravity;
+import android.view.View;
+import android.view.WindowManager;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 
 /**
  * Created by qiaoruikai on 2018/10/15 5:20 PM.
  */
 public class PermissionDialogActivity extends Activity implements View.OnClickListener {
-    private static final String TAG = "PermissionDialog";
     public static final String PERMISSIONS_KEY = "permissions";
     public static final String PERMISSION_IDX_KEY = "permissionIdx";
-    private static final String PERMISSION_SKIP_RECORD = "skipRecord";
-    private static final String PERMISSION_GRANT_RECORD = "grantRecord";
-    private static final String PERMISSION_GRANT_ADB = "grantAdb";
-
     public static final int PERMISSION_FLOAT = 1;
     public static final int PERMISSION_ADB = 2;
     public static final int PERMISSION_ROOT = 3;
@@ -93,35 +88,13 @@ public class PermissionDialogActivity extends Activity implements View.OnClickLi
     public static final int PERMISSION_ANDROID = 8;
     public static final int PERMISSION_DYNAMIC = 9;
     public static final int PERMISSION_BACKGROUND = 10;
-
-    public static volatile boolean runningStatus = false;
-
-    private InjectorService injectorService;
-
-    private TextView permissionPassed;
-    private TextView permissionTotal;
-
-    private ProgressBar progressBar;
-    private TextView permissionText;
-
-    private LinearLayout actionLayout;
-    private LinearLayout positiveButton;
-    private TextView positiveBtnText;
-    private LinearLayout negativeButton;
-    private TextView negativeBtnText;
-    private LinearLayout thirdButton;
-    private TextView thirdBtnText;
-    private int currentIdx;
-    private int totalIdx;
-
-    private int USAGE_REQUEST = 10001;
-    private int ACCESSIBILITY_REQUEST = 10002;
-    private int M_PERMISSION_REQUEST = 10003;
-    private int MEDIA_PROJECTION_REQUEST = 10004;
-
-    private List<GroupPermission> allPermissions;
-    private int currentPermissionIdx;
+    private static final String TAG = "PermissionDialog";
+    private static final String PERMISSION_SKIP_RECORD = "skipRecord";
+    private static final String PERMISSION_GRANT_RECORD = "grantRecord";
+    private static final String PERMISSION_GRANT_ADB = "grantAdb";
     private static final Pattern FILED_CALL_PATTERN = Pattern.compile("\\$\\{[^}\\s]+\\.?[^}\\s]*\\}");
+    private static final String HANDLED_PERMISSIONS = "handledPermissions";
+    public static volatile boolean runningStatus = false;
     /**
      * 权限名称映射表
      */
@@ -153,6 +126,109 @@ public class PermissionDialogActivity extends Activity implements View.OnClickLi
 
         }
     };
+    private InjectorService injectorService;
+    private TextView permissionPassed;
+    private TextView permissionTotal;
+    private ProgressBar progressBar;
+    private TextView permissionText;
+    private LinearLayout actionLayout;
+    private LinearLayout positiveButton;
+    private TextView positiveBtnText;
+    private LinearLayout negativeButton;
+    private TextView negativeBtnText;
+    private LinearLayout thirdButton;
+    private TextView thirdBtnText;
+    private int currentIdx;
+    private int totalIdx;
+    private int USAGE_REQUEST = 10001;
+    private int ACCESSIBILITY_REQUEST = 10002;
+    private int M_PERMISSION_REQUEST = 10003;
+    private int MEDIA_PROJECTION_REQUEST = 10004;
+    private List<GroupPermission> allPermissions;
+    private int currentPermissionIdx;
+    private Runnable positiveAction;
+    private Runnable negativeAction;
+    private Runnable thirdAction;
+
+    /**
+     * 关闭Instrument和UIAutomator
+     */
+    public static void cleanInstrumentationAndUiAutomator() {
+        String allActions = CmdTools.execHighPrivilegeCmd("ps -ef | grep shell");
+        LogUtil.i(TAG, "Let me see::::" + allActions);
+
+        // 关闭Instrument
+        String result = CmdTools.execHighPrivilegeCmd("pm list instrumentation");
+        if (StringUtil.isEmpty(result)) {
+            LogUtil.e(TAG, "fail to kill instrument apps");
+        } else {
+            String[] lines = StringUtil.split(result, "\n");
+            Pattern pattern = Pattern.compile("\\(target=(.*)\\)");
+            String targetApp = InjectorService.g().getMessage(SubscribeParamEnum.APP, String.class);
+
+            for (String line : lines) {
+                Matcher matcher = pattern.matcher(line);
+                if (matcher.find()) {
+                    String instPkg = matcher.group(1);
+                    if (StringUtil.equals(instPkg, "com.alipay.hulu")) {
+                        continue;
+                    }
+                    // 不杀目标应用
+                    if (StringUtil.equals(instPkg, targetApp)) {
+                        continue;
+                    }
+
+                    LauncherApplication.getInstance().showToast(StringUtil.getString(R.string.permission__kill_app, instPkg));
+                    LogUtil.i(TAG, "Find instrumentation package and killing \"" + instPkg + "\"");
+                    String exeRes = CmdTools.execHighPrivilegeCmd("am force-stop " + instPkg);
+                    LogUtil.i(TAG, "force-stop result:::" + exeRes);
+                    CmdTools.execHighPrivilegeCmd("am force-stop " + instPkg);
+                }
+            }
+        }
+
+        // 关闭UIAutomator
+        String[] pids = CmdTools.ps("uiautomator");
+        if (pids != null && pids.length > 0) {
+            for (String pid : pids) {
+                LogUtil.i(TAG, "Get uiautomator pid line: " + pid);
+                String[] columns = pid.split("\\s+");
+                if (columns.length > 2) {
+                    pid = columns[1];
+                    CmdTools.execHighPrivilegeCmd("kill " + pid);
+                }
+            }
+        }
+
+        // 杀掉Monkey
+        pids = CmdTools.ps("monkey");
+        if (pids != null && pids.length > 0) {
+            for (String pid : pids) {
+                // 只杀掉shell用户开启的monkey
+                if (!StringUtil.contains(pid, "shell")) {
+                    continue;
+                }
+                LogUtil.i(TAG, "Get Monkey pid line: " + pid);
+                String[] columns = pid.split("\\s+");
+                if (columns.length > 2) {
+                    pid = columns[1];
+                    CmdTools.execHighPrivilegeCmd("kill " + pid);
+                }
+            }
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.N)
+    private static Context updateResources(Context context) {
+
+        Resources resources = context.getResources();
+        Locale locale = LauncherApplication.getInstance().getLanguageLocale();
+
+        Configuration configuration = resources.getConfiguration();
+        configuration.setLocale(locale);
+        configuration.setLocales(new LocaleList(locale));
+        return context.createConfigurationContext(configuration);
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -316,7 +392,7 @@ public class PermissionDialogActivity extends Activity implements View.OnClickLi
         // 按照权限组别处理
         switch (permission.permissionType) {
             case PERMISSION_FLOAT:
-                if(!processFloatPermission()) {
+                if (!processFloatPermission()) {
                     return;
                 }
                 break;
@@ -373,6 +449,7 @@ public class PermissionDialogActivity extends Activity implements View.OnClickLi
 
     /**
      * 悬浮窗权限判断
+     *
      * @return
      */
     private boolean processFloatPermission() {
@@ -399,6 +476,7 @@ public class PermissionDialogActivity extends Activity implements View.OnClickLi
 
     /**
      * 判断root权限
+     *
      * @return
      */
     private boolean processRootPermission() {
@@ -418,6 +496,7 @@ public class PermissionDialogActivity extends Activity implements View.OnClickLi
 
     /**
      * 处理ADB权限
+     *
      * @return
      */
     private boolean processAdbPermission() {
@@ -488,6 +567,7 @@ public class PermissionDialogActivity extends Activity implements View.OnClickLi
 
     /**
      * 处理提示信息
+     *
      * @param permissionG
      * @return
      */
@@ -496,7 +576,7 @@ public class PermissionDialogActivity extends Activity implements View.OnClickLi
         final List<String> real = new ArrayList<>(permissions.size() + 1);
         final List<String> sources = new ArrayList<>();
 
-        for (String p: permissions) {
+        for (String p : permissions) {
             String permission = p.substring(6);
             if (!isToastHandled(permission)) {
                 sources.add(permission);
@@ -522,10 +602,9 @@ public class PermissionDialogActivity extends Activity implements View.OnClickLi
         return true;
     }
 
-    private static final String HANDLED_PERMISSIONS = "handledPermissions";
-
     /**
      * 确认toast是否处理过
+     *
      * @param origin
      * @return
      */
@@ -540,6 +619,7 @@ public class PermissionDialogActivity extends Activity implements View.OnClickLi
 
     /**
      * 处理权限
+     *
      * @param toasts
      */
     private void handleToast(List<String> toasts) {
@@ -554,6 +634,7 @@ public class PermissionDialogActivity extends Activity implements View.OnClickLi
 
     /**
      * 获取toast实际消息
+     *
      * @param source
      * @return
      */
@@ -581,6 +662,7 @@ public class PermissionDialogActivity extends Activity implements View.OnClickLi
 
     /**
      * 处理使用情况权限
+     *
      * @return
      */
     private boolean processUsagePermission() {
@@ -609,6 +691,7 @@ public class PermissionDialogActivity extends Activity implements View.OnClickLi
 
     /**
      * 处理辅助功能权限
+     *
      * @return
      */
     private boolean processAccessibilityPermission() {
@@ -687,6 +770,7 @@ public class PermissionDialogActivity extends Activity implements View.OnClickLi
 
     /**
      * 手动处理辅助功能问题
+     *
      * @param service
      */
     private void processAccessibilityByHand(final InjectorService service) {
@@ -723,6 +807,7 @@ public class PermissionDialogActivity extends Activity implements View.OnClickLi
 
     /**
      * 处理录屏权限
+     *
      * @return
      */
     @SuppressWarnings("NewApi")
@@ -777,6 +862,7 @@ public class PermissionDialogActivity extends Activity implements View.OnClickLi
 
     /**
      * 处理系统权限版本
+     *
      * @param permission
      * @return
      */
@@ -784,7 +870,7 @@ public class PermissionDialogActivity extends Activity implements View.OnClickLi
         int maxVersion = 0;
 
         // 计算需要的最高系统版本
-        for (String per: permission.permissions) {
+        for (String per : permission.permissions) {
             int currentMax = Integer.parseInt(per.substring(8));
             if (currentMax > maxVersion) {
                 maxVersion = currentMax;
@@ -808,6 +894,7 @@ public class PermissionDialogActivity extends Activity implements View.OnClickLi
 
     /**
      * 处理后台弹出界面权限
+     *
      * @return
      */
     private boolean processBackgroundPermission() {
@@ -831,77 +918,6 @@ public class PermissionDialogActivity extends Activity implements View.OnClickLi
         }
         return true;
     }
-
-
-
-    /**
-     * 关闭Instrument和UIAutomator
-     */
-    public static void cleanInstrumentationAndUiAutomator() {
-        String allActions = CmdTools.execHighPrivilegeCmd("ps -ef | grep shell");
-        LogUtil.i(TAG, "Let me see::::" + allActions);
-
-        // 关闭Instrument
-        String result = CmdTools.execHighPrivilegeCmd("pm list instrumentation");
-        if (StringUtil.isEmpty(result)) {
-            LogUtil.e(TAG, "fail to kill instrument apps");
-        } else {
-            String[] lines = StringUtil.split(result, "\n");
-            Pattern pattern = Pattern.compile("\\(target=(.*)\\)");
-            String targetApp = InjectorService.g().getMessage(SubscribeParamEnum.APP, String.class);
-
-            for (String line : lines) {
-                Matcher matcher = pattern.matcher(line);
-                if (matcher.find()) {
-                    String instPkg = matcher.group(1);
-                    if (StringUtil.equals(instPkg, "com.alipay.hulu")) {
-                        continue;
-                    }
-                    // 不杀目标应用
-                    if (StringUtil.equals(instPkg, targetApp)) {
-                        continue;
-                    }
-
-                    LauncherApplication.getInstance().showToast(StringUtil.getString(R.string.permission__kill_app, instPkg));
-                    LogUtil.i(TAG, "Find instrumentation package and killing \"" + instPkg + "\"");
-                    String exeRes = CmdTools.execHighPrivilegeCmd("am force-stop " + instPkg);
-                    LogUtil.i(TAG, "force-stop result:::" + exeRes);
-                    CmdTools.execHighPrivilegeCmd("am force-stop " + instPkg);
-                }
-            }
-        }
-
-        // 关闭UIAutomator
-        String[] pids = CmdTools.ps("uiautomator");
-        if (pids != null && pids.length > 0) {
-            for (String pid : pids) {
-                LogUtil.i(TAG, "Get uiautomator pid line: " + pid);
-                String[] columns = pid.split("\\s+");
-                if (columns.length > 2) {
-                    pid = columns[1];
-                    CmdTools.execHighPrivilegeCmd("kill " + pid);
-                }
-            }
-        }
-
-        // 杀掉Monkey
-        pids = CmdTools.ps("monkey");
-        if (pids != null && pids.length > 0) {
-            for (String pid : pids) {
-                // 只杀掉shell用户开启的monkey
-                if (!StringUtil.contains(pid, "shell")) {
-                    continue;
-                }
-                LogUtil.i(TAG, "Get Monkey pid line: " + pid);
-                String[] columns = pid.split("\\s+");
-                if (columns.length > 2) {
-                    pid = columns[1];
-                    CmdTools.execHighPrivilegeCmd("kill " + pid);
-                }
-            }
-        }
-    }
-
 
     /**
      * 重启辅助功能
@@ -964,7 +980,7 @@ public class PermissionDialogActivity extends Activity implements View.OnClickLi
             final List<String> ungrantedPermissions = PermissionUtil.checkUngrantedPermission(this, requestPermissions);
             if (ungrantedPermissions != null && ungrantedPermissions.size() > 0) {
                 List<String> mappedName = new ArrayList<>();
-                for (String dynPermission: ungrantedPermissions) {
+                for (String dynPermission : ungrantedPermissions) {
                     Integer mapName = PERMISSION_NAMES.get(dynPermission);
                     if (mapName != null) {
                         mappedName.add(StringUtil.getString(mapName));
@@ -997,8 +1013,9 @@ public class PermissionDialogActivity extends Activity implements View.OnClickLi
 
     /**
      * 显示操作框
-     * @param message 显示文案
-     * @param positiveText 确定文案
+     *
+     * @param message        显示文案
+     * @param positiveText   确定文案
      * @param positiveAction 确定动作
      */
     private void showAction(String message, String positiveText, Runnable positiveAction) {
@@ -1007,6 +1024,7 @@ public class PermissionDialogActivity extends Activity implements View.OnClickLi
 
     /**
      * 显示操作框
+     *
      * @see #showAction(String, String, Runnable, String, Runnable, String, Runnable)
      */
     private void showAction(final String message, final String positiveText, final Runnable positiveAct,
@@ -1016,13 +1034,14 @@ public class PermissionDialogActivity extends Activity implements View.OnClickLi
 
     /**
      * 显示操作框
-     * @param message 显示文案
+     *
+     * @param message      显示文案
      * @param positiveText 确定文案
-     * @param positiveAct 确定动作
+     * @param positiveAct  确定动作
      * @param negativeText 取消文案
-     * @param negativeAct 取消动作
-     * @param thirdText 第三操作文案
-     * @param thirdAct 第三操作
+     * @param negativeAct  取消动作
+     * @param thirdText    第三操作文案
+     * @param thirdAct     第三操作
      */
     private void showAction(final String message, final String positiveText, final Runnable positiveAct,
                             final String negativeText, final Runnable negativeAct, final String thirdText, final Runnable thirdAct) {
@@ -1083,10 +1102,6 @@ public class PermissionDialogActivity extends Activity implements View.OnClickLi
         });
     }
 
-    private Runnable positiveAction;
-    private Runnable negativeAction;
-    private Runnable thirdAction;
-
     @Override
     public void onClick(View v) {
         if (v == positiveButton) {
@@ -1108,7 +1123,7 @@ public class PermissionDialogActivity extends Activity implements View.OnClickLi
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == USAGE_REQUEST) {
-            currentIdx --;
+            currentIdx--;
             processedAction();
         } else if (requestCode == MEDIA_PROJECTION_REQUEST && resultCode == RESULT_OK) {
             LogUtil.d(TAG, "获取录屏许可，录屏响应码：" + resultCode);
@@ -1136,25 +1151,12 @@ public class PermissionDialogActivity extends Activity implements View.OnClickLi
         }
     }
 
-
     @Override
     protected void attachBaseContext(Context newBase) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             newBase = updateResources(newBase);
         }
         super.attachBaseContext(newBase);
-    }
-
-    @TargetApi(Build.VERSION_CODES.N)
-    private static Context updateResources(Context context) {
-
-        Resources resources = context.getResources();
-        Locale locale = LauncherApplication.getInstance().getLanguageLocale();
-
-        Configuration configuration = resources.getConfiguration();
-        configuration.setLocale(locale);
-        configuration.setLocales(new LocaleList(locale));
-        return context.createConfigurationContext(configuration);
     }
 
     /**
@@ -1170,6 +1172,7 @@ public class PermissionDialogActivity extends Activity implements View.OnClickLi
 
         /**
          * 添加一条权限
+         *
          * @param permission
          */
         private void addPermission(String permission) {

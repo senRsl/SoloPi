@@ -15,7 +15,7 @@
 -->
 <resources>
 
-    <string name="app_name">SoloPi</string>
+    <string name="app_name">SoloPs</string>
 
     <string name="more_setting">More</string>
     <string name="collapse_setting">Collapse</string>

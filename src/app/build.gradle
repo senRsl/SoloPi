@@ -59,7 +59,7 @@ dependencies {
         exclude group: "com.android.support"
     }
     implementation 'commons-io:commons-io:2.6'
-    implementation ('com.orhanobut:logger:2.2.0') {
+    implementation('com.orhanobut:logger:2.2.0') {
         exclude group: "com.android.support"
     }
     compileOnly 'androidx.multidex:multidex:2.0.0'

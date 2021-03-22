@@ -15,22 +15,21 @@
  */
 package com.alipay.hulu.fragment;
 
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-
-import com.alipay.hulu.R;
-import com.alipay.hulu.common.tools.BackgroundExecutor;
-import com.alipay.hulu.common.utils.LogUtil;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 
+import com.alipay.hulu.R;
+import com.alipay.hulu.common.tools.BackgroundExecutor;
+import com.alipay.hulu.common.utils.LogUtil;
+
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 

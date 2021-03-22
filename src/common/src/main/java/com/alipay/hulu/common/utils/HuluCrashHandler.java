@@ -15,10 +15,10 @@
  */
 package com.alipay.hulu.common.utils;
 
-import android.os.Process;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import android.os.Process;
 
 /**
  * Created by ruyao.yry on 2018/3/12.
@@ -29,6 +29,7 @@ public class HuluCrashHandler implements Thread.UncaughtExceptionHandler {
     private static volatile HuluCrashHandler sHuluCrashHandler;
 
     private static volatile boolean sHasInited = false;
+    private List<CrashCallback> mCrashCallbacks = new ArrayList<>();
 
     public static HuluCrashHandler getCrashHandler() {
         if (sHuluCrashHandler == null) {
@@ -41,8 +42,6 @@ public class HuluCrashHandler implements Thread.UncaughtExceptionHandler {
 
         return sHuluCrashHandler;
     }
-
-    private List<CrashCallback> mCrashCallbacks = new ArrayList<>();
 
     public void init() {
         if (!sHasInited) {
@@ -82,13 +81,13 @@ public class HuluCrashHandler implements Thread.UncaughtExceptionHandler {
     }
 
     public interface CrashCallback {
-        void onAppCrash(Thread t, Throwable e);
-
         CrashCallback KILL_PROCESS_CALLBACK = new CrashCallback() {
             @Override
             public void onAppCrash(Thread t, Throwable e) {
                 Process.killProcess(Process.myPid());
             }
         };
+
+        void onAppCrash(Thread t, Throwable e);
     }
 }

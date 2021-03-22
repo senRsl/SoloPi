@@ -66,6 +66,16 @@ public class PatchResponse {
         this.data = data;
     }
 
+    @Override
+    public String toString() {
+        return "PatchResponse{" +
+                "status='" + status + '\'' +
+                ", reason='" + reason + '\'' +
+                ", version=" + version +
+                ", data=" + data +
+                '}';
+    }
+
     public static class DataBean {
         /**
          * name : hulu_screenRecord
@@ -120,15 +130,5 @@ public class PatchResponse {
                     ", type='" + type + '\'' +
                     '}';
         }
-    }
-
-    @Override
-    public String toString() {
-        return "PatchResponse{" +
-                "status='" + status + '\'' +
-                ", reason='" + reason + '\'' +
-                ", version=" + version +
-                ", data=" + data +
-                '}';
     }
 }

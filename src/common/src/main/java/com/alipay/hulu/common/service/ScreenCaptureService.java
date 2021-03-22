@@ -15,11 +15,11 @@
  */
 package com.alipay.hulu.common.service;
 
-import android.graphics.Bitmap;
+import java.io.File;
 
 import com.alipay.hulu.common.service.base.ExportService;
 
-import java.io.File;
+import android.graphics.Bitmap;
 
 /**
  * Created by qiaoruikai on 2019-04-19 20:12.
@@ -27,6 +27,7 @@ import java.io.File;
 public interface ScreenCaptureService extends ExportService {
     /**
      * 截图操作
+     *
      * @param outFile
      * @return
      */

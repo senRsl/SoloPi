@@ -1,5 +1,9 @@
 package com.android.permission.rom;
 
+import java.lang.reflect.Method;
+
+import com.android.floatwindowpermission.R;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -9,10 +13,6 @@ import android.os.Build;
 import android.provider.Settings;
 import android.util.Log;
 import android.widget.Toast;
-
-import com.android.floatwindowpermission.R;
-
-import java.lang.reflect.Method;
 
 /**
  * Created by qiaoruikai on 2019-03-28 17:01.
@@ -52,7 +52,7 @@ public class VivoUtils {
      */
     public static void applyPermission(final Context context) {
         Intent appIntent = context.getPackageManager().getLaunchIntentForPackage("com.iqoo.secure");
-        if(appIntent != null){
+        if (appIntent != null) {
             try {
                 context.startActivity(appIntent);
                 if (context instanceof Activity) {

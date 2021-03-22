@@ -15,9 +15,9 @@
  */
 package com.alipay.hulu.common.logger;
 
-import android.util.Log;
-
 import com.orhanobut.logger.FormatStrategy;
+
+import android.util.Log;
 
 /**
  * Created by qiaoruikai on 2018/9/29 10:20 PM.

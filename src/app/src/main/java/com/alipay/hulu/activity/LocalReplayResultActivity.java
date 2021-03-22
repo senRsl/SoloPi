@@ -15,9 +15,6 @@
  */
 package com.alipay.hulu.activity;
 
-import android.os.Bundle;
-import android.view.View;
-
 import com.alipay.hulu.R;
 import com.alipay.hulu.common.injector.InjectorService;
 import com.alipay.hulu.common.utils.MiscUtil;
@@ -25,6 +22,8 @@ import com.alipay.hulu.fragment.LocalReplayResultListFragment;
 import com.alipay.hulu.ui.HeadControlPanel;
 import com.google.android.material.tabs.TabLayout;
 
+import android.os.Bundle;
+import android.view.View;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -96,6 +95,7 @@ public class LocalReplayResultActivity extends BaseActivity {
         public CharSequence getPageTitle(int position) {
             return LocalReplayResultListFragment.getTypeName(PAGES[position]);
         }
+
         @Override
         public int getCount() {
             return PAGES.length;

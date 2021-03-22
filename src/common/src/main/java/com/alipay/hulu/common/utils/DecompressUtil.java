@@ -31,7 +31,8 @@ public class DecompressUtil {
 
     /**
      * 解压到目标文件
-     * @param originFile 原始文件
+     *
+     * @param originFile   原始文件
      * @param targetFolder 解压到的文件夹
      * @return
      */
@@ -63,7 +64,7 @@ public class DecompressUtil {
 
         ZipInputStream zip = new ZipInputStream(inputStream);
         ZipEntry zipEntry;
-        String  szName;
+        String szName;
         try {
             while ((zipEntry = zip.getNextEntry()) != null) {
                 szName = zipEntry.getName();
@@ -76,7 +77,7 @@ public class DecompressUtil {
                     }
                 } else {
                     File file = new File(targetFolder, szName);
-                    if (!file.exists()){
+                    if (!file.exists()) {
                         LogUtil.d(TAG, "Create the file: %s", szName);
                         if (!file.getParentFile().exists()) {
                             file.getParentFile().mkdirs();

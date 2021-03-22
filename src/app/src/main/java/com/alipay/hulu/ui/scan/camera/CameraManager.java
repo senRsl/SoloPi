@@ -16,16 +16,17 @@
 
 package com.alipay.hulu.ui.scan.camera;
 
+import java.io.IOException;
+
+import com.alipay.hulu.ui.scan.camera.open.OpenCamera;
+import com.alipay.hulu.ui.scan.camera.open.OpenCameraInterface;
+import com.google.zxing.PlanarYUVLuminanceSource;
+
 import android.content.Context;
 import android.graphics.Point;
 import android.hardware.Camera;
 import android.util.Log;
 import android.view.SurfaceHolder;
-
-import com.alipay.hulu.ui.scan.camera.open.OpenCamera;
-import com.alipay.hulu.ui.scan.camera.open.OpenCameraInterface;
-import com.google.zxing.PlanarYUVLuminanceSource;
-import java.io.IOException;
 
 /**
  * This object wraps the Camera service object and expects to be the only one talking to it. The
@@ -143,6 +144,10 @@ public final class CameraManager {
         cameraObject.setPreviewDisplay(holder);
     }
 
+    public int getPreviewCameraId() {
+        return requestedCameraId;
+    }
+
     /**
      * Allows third party apps to specify the camera ID, rather than determine
      * it automatically based on available cameras and their orientation.
@@ -151,10 +156,6 @@ public final class CameraManager {
      */
     public synchronized void setPreviewCameraId(int cameraId) {
         requestedCameraId = cameraId;
-    }
-
-    public int getPreviewCameraId() {
-        return requestedCameraId;
     }
 
     /**
@@ -229,8 +230,8 @@ public final class CameraManager {
      * A factory method to build the appropriate LuminanceSource object based on the format
      * of the preview buffers, as described by Camera.Parameters.
      *
-     * @param data A preview frame.
-     * @param width The width of the image.
+     * @param data   A preview frame.
+     * @param width  The width of the image.
      * @param height The height of the image.
      * @return A PlanarYUVLuminanceSource instance.
      */

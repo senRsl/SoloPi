@@ -15,20 +15,6 @@
  */
 package com.alipay.hulu.shared.display;
 
-import android.app.Activity;
-import android.content.Context;
-
-import com.alipay.hulu.common.injector.param.Subscriber;
-import com.alipay.hulu.common.service.base.ExportService;
-import com.alipay.hulu.common.service.base.LocalService;
-import com.alipay.hulu.common.utils.ClassUtil;
-import com.alipay.hulu.common.utils.LogUtil;
-import com.alipay.hulu.common.utils.PermissionUtil;
-import com.alipay.hulu.common.utils.StringUtil;
-import com.alipay.hulu.shared.display.items.base.DisplayItem;
-import com.alipay.hulu.shared.display.items.base.Displayable;
-import com.alipay.hulu.shared.display.items.base.RecordPattern;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -42,33 +28,75 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import com.alipay.hulu.common.injector.param.Subscriber;
+import com.alipay.hulu.common.service.base.ExportService;
+import com.alipay.hulu.common.service.base.LocalService;
+import com.alipay.hulu.common.utils.ClassUtil;
+import com.alipay.hulu.common.utils.LogUtil;
+import com.alipay.hulu.common.utils.PermissionUtil;
+import com.alipay.hulu.common.utils.StringUtil;
+import com.alipay.hulu.shared.display.items.base.DisplayItem;
+import com.alipay.hulu.shared.display.items.base.Displayable;
+import com.alipay.hulu.shared.display.items.base.RecordPattern;
+
+import android.app.Activity;
+import android.content.Context;
+
 /**
  * Created by qiaoruikai on 2018/10/15 2:27 PM.
  */
 @LocalService
 public class DisplayProvider implements ExportService {
-    private static final String TAG = "DisplayProvider";
-
     public static final int DISPLAY_MODE = 0;
     public static final int RECORDING_MODE = 1;
-
-    private Map<String, DisplayItemInfo> allDisplayItems;
-
-    private Map<String, DisplayWrapper> runningDisplay;
-
-    private Map<String, String> cachedContent;
-
-    private ScheduledExecutorService scheduledExecutor;
-
-    private ExecutorService executorService;
-
-    private volatile int currentMode = 0;
-
-    private volatile boolean isRunning = false;
-
+    private static final String TAG = "DisplayProvider";
     private static long REFRESH_PERIOD = 500;
-
+    private Map<String, DisplayItemInfo> allDisplayItems;
+    private Map<String, DisplayWrapper> runningDisplay;
+    private Map<String, String> cachedContent;
+    private ScheduledExecutorService scheduledExecutor;
+    private ExecutorService executorService;
+    private volatile int currentMode = 0;
+    private volatile boolean isRunning = false;
     private AtomicBoolean startRefresh = new AtomicBoolean(false);
+    private volatile boolean pauseFlag = false;
+    /**
+     * 定时刷新启动器
+     */
+    private Runnable task = new Runnable() {
+        public void run() {
+
+            if (runningDisplay.size() == 0) {
+                startRefresh.set(false);
+                return;
+            }
+
+            // 定时500ms后执行
+            scheduledExecutor.schedule(this, REFRESH_PERIOD, TimeUnit.MILLISECONDS);
+
+            // 正在运行，或者处于暂停中，不进行操作
+            if (isRunning || pauseFlag) {
+                return;
+            }
+
+            isRunning = true;
+
+            // 调用显示工具刷新方法
+            for (Map.Entry<String, DisplayWrapper> entry : runningDisplay.entrySet()) {
+                // 对于当前不再显示列表的数据，在显示列表加一行
+                DisplayWrapper wrapper = entry.getValue();
+
+                if (wrapper.isRunning) {
+                    continue;
+                }
+                // 当 当前时间 - 上一次刷新时间 > 工具最短刷新时间 时，调用刷新方法
+                if (executorService != null && !executorService.isShutdown()) {
+                    executorService.execute(getDisplayRunnable(entry.getKey()));
+                }
+            }
+            isRunning = false;
+        }
+    };
 
     @Override
     public void onCreate(Context context) {
@@ -81,7 +109,7 @@ public class DisplayProvider implements ExportService {
 
     @Override
     public void onDestroy(Context context) {
-        for (String name: runningDisplay.keySet()) {
+        for (String name : runningDisplay.keySet()) {
             DisplayWrapper wrapper = runningDisplay.get(name);
             wrapper.reference.stop();
         }
@@ -102,6 +130,7 @@ public class DisplayProvider implements ExportService {
 
     /**
      * 获取显示项列表
+     *
      * @return
      */
     public List<DisplayItemInfo> getAllDisplayItems() {
@@ -119,6 +148,7 @@ public class DisplayProvider implements ExportService {
 
     /**
      * 获取正在运行列表
+     *
      * @return
      */
     public Set<String> getRunningDisplayItems() {
@@ -129,6 +159,7 @@ public class DisplayProvider implements ExportService {
 
     /**
      * 加载所有显示项
+     *
      * @return
      */
     private Map<String, DisplayItemInfo> loadDisplayItem() {
@@ -166,7 +197,7 @@ public class DisplayProvider implements ExportService {
      */
     public void startRecording() {
         pauseFlag = true;
-        for (DisplayWrapper wrapper: runningDisplay.values()) {
+        for (DisplayWrapper wrapper : runningDisplay.values()) {
             wrapper.startRecord();
         }
         this.currentMode = RECORDING_MODE;
@@ -175,6 +206,7 @@ public class DisplayProvider implements ExportService {
 
     /**
      * 停止录制
+     *
      * @return
      */
     public Map<RecordPattern, List<RecordPattern.RecordItem>> stopRecording() {
@@ -184,7 +216,7 @@ public class DisplayProvider implements ExportService {
         // 强制停止
         executorService.shutdownNow();
         Map<RecordPattern, List<RecordPattern.RecordItem>> result = new HashMap<>();
-        for (DisplayWrapper wrapper: runningDisplay.values()) {
+        for (DisplayWrapper wrapper : runningDisplay.values()) {
             result.putAll(wrapper.stopRecord());
         }
 
@@ -196,6 +228,7 @@ public class DisplayProvider implements ExportService {
 
     /**
      * 获取显示项列表
+     *
      * @return
      */
     public String getDisplayContent(String name) {
@@ -204,6 +237,7 @@ public class DisplayProvider implements ExportService {
 
     /**
      * 触发特定项
+     *
      * @param name
      * @return
      */
@@ -216,44 +250,6 @@ public class DisplayProvider implements ExportService {
             return false;
         }
     }
-
-    /** 定时刷新启动器 */
-    private Runnable task = new Runnable() {
-        public void run() {
-
-            if (runningDisplay.size() == 0) {
-                startRefresh.set(false);
-                return;
-            }
-
-            // 定时500ms后执行
-            scheduledExecutor.schedule(this, REFRESH_PERIOD, TimeUnit.MILLISECONDS);
-
-            // 正在运行，或者处于暂停中，不进行操作
-            if (isRunning || pauseFlag) {
-                return;
-            }
-
-            isRunning = true;
-
-            // 调用显示工具刷新方法
-            for (Map.Entry<String, DisplayWrapper> entry : runningDisplay.entrySet()) {
-                // 对于当前不再显示列表的数据，在显示列表加一行
-                DisplayWrapper wrapper = entry.getValue();
-
-                if (wrapper.isRunning) {
-                    continue;
-                }
-                // 当 当前时间 - 上一次刷新时间 > 工具最短刷新时间 时，调用刷新方法
-                if (executorService != null && !executorService.isShutdown()) {
-                    executorService.execute(getDisplayRunnable(entry.getKey()));
-                }
-            }
-            isRunning = false;
-        }
-    };
-
-    private volatile boolean pauseFlag = false;
 
     /***
      * 获取任务执行器
@@ -329,7 +325,7 @@ public class DisplayProvider implements ExportService {
      */
     public boolean startDisplayByKey(String key) {
         DisplayItemInfo target = null;
-        for (DisplayItemInfo info: allDisplayItems.values()) {
+        for (DisplayItemInfo info : allDisplayItems.values()) {
             if (StringUtil.equals(key, info.getKey())) {
                 target = info;
                 break;
@@ -383,6 +379,7 @@ public class DisplayProvider implements ExportService {
 
     /**
      * 停止特定项
+     *
      * @param name
      */
     public void stopDisplay(String name) {
@@ -397,7 +394,7 @@ public class DisplayProvider implements ExportService {
      * 停止所有显示项
      */
     public void stopAllDisplay() {
-        for (String name: runningDisplay.keySet()) {
+        for (String name : runningDisplay.keySet()) {
             DisplayWrapper wrapper = runningDisplay.get(name);
             wrapper.reference.stop();
         }
@@ -409,11 +406,11 @@ public class DisplayProvider implements ExportService {
      * 显示项容器
      */
     public static class DisplayWrapper {
+        private final long minSpendTime;
         public long lastCallTime = 0L;
         private String previousContent;
         private Displayable reference;
         private long maxSpendTime = 0;
-        private final long minSpendTime;
         private int smallCount = 0;
         private volatile boolean isRunning = false;
 
@@ -465,9 +462,9 @@ public class DisplayProvider implements ExportService {
                 maxSpendTime = spendTime;
                 smallCount = 0;
 
-            // 小于一半
+                // 小于一半
             } else if (spendTime < maxSpendTime / 2) {
-                smallCount ++;
+                smallCount++;
 
                 if (smallCount >= 2) {
                     maxSpendTime = minSpendTime;
@@ -505,7 +502,7 @@ public class DisplayProvider implements ExportService {
 
                 // 小于一半
             } else if (spendTime < maxSpendTime / 2) {
-                smallCount ++;
+                smallCount++;
 
                 if (smallCount >= 2) {
                     maxSpendTime = minSpendTime;

@@ -15,20 +15,20 @@
  */
 package com.alipay.hulu.adapter;
 
-import android.content.Context;
-import android.util.Pair;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
+import java.util.Arrays;
+import java.util.List;
 
 import com.alipay.hulu.R;
 import com.alipay.hulu.bean.CaseParamBean;
 import com.alipay.hulu.common.utils.LogUtil;
 import com.alipay.hulu.util.DialogUtils;
 
-import java.util.Arrays;
-import java.util.List;
+import android.content.Context;
+import android.util.Pair;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
 public class ParamListAdapter extends SoloBaseAdapter<CaseParamBean> implements View.OnClickListener {
     private static final String TAG = "ParamListAdapter";

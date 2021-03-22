@@ -15,6 +15,9 @@
  */
 package com.alipay.hulu.ui;
 
+import com.alipay.hulu.R;
+import com.alipay.hulu.common.utils.LogUtil;
+
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
@@ -25,12 +28,9 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.util.AttributeSet;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
-import android.util.AttributeSet;
-
-import com.alipay.hulu.R;
-import com.alipay.hulu.common.utils.LogUtil;
 
 /**
  * 带反色遮罩ImageView<br/>
@@ -55,7 +55,30 @@ public class ReverseImageView extends AppCompatImageView {
     }
 
     /**
+     * Android 5.0以上支持VectorDrawable，所以不能直接decodeResource
+     *
+     * @param context
+     * @param vectorDrawableId
+     * @return
+     */
+    private static Bitmap getBitmap(Context context, int vectorDrawableId) {
+        Bitmap bitmap;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Drawable vectorDrawable = context.getDrawable(vectorDrawableId);
+            bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(),
+                    vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(bitmap);
+            vectorDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+            vectorDrawable.draw(canvas);
+        } else {
+            bitmap = BitmapFactory.decodeResource(context.getResources(), vectorDrawableId);
+        }
+        return bitmap;
+    }
+
+    /**
      * 获取参数
+     *
      * @param attrs
      */
     private void readAttrs(AttributeSet attrs) {
@@ -75,6 +98,7 @@ public class ReverseImageView extends AppCompatImageView {
 
     /**
      * 重置图标
+     *
      * @param maskRes
      * @param frontRes
      */
@@ -113,26 +137,5 @@ public class ReverseImageView extends AppCompatImageView {
                 result.getWidth(), result.getHeight(), mask.getWidth(), mask.getHeight(),
                 origin.getWidth(), origin.getHeight());
         setImageBitmap(result);
-    }
-
-    /**
-     * Android 5.0以上支持VectorDrawable，所以不能直接decodeResource
-     * @param context
-     * @param vectorDrawableId
-     * @return
-     */
-    private static Bitmap getBitmap(Context context,int vectorDrawableId) {
-        Bitmap bitmap;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-            Drawable vectorDrawable = context.getDrawable(vectorDrawableId);
-            bitmap = Bitmap.createBitmap(vectorDrawable.getIntrinsicWidth(),
-                    vectorDrawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-            Canvas canvas = new Canvas(bitmap);
-            vectorDrawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-            vectorDrawable.draw(canvas);
-        }else {
-            bitmap = BitmapFactory.decodeResource(context.getResources(), vectorDrawableId);
-        }
-        return bitmap;
     }
 }

@@ -15,10 +15,9 @@
  */
 package com.alipay.hulu.scheme;
 
-import android.app.Activity;
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.provider.Settings;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 import com.alipay.hulu.common.application.LauncherApplication;
 import com.alipay.hulu.common.scheme.SchemeActionResolver;
@@ -30,9 +29,10 @@ import com.alipay.hulu.shared.io.db.GreenDaoManager;
 import com.alipay.hulu.shared.io.db.RecordCaseInfoDao;
 import com.alipay.hulu.util.CaseReplayUtil;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.provider.Settings;
 
 /**
  * Created by qiaoruikai on 2019/11/11 4:57 PM.
@@ -61,6 +61,7 @@ public class ReplaySchemeResolver implements SchemeActionResolver {
 
     /**
      * 通常模式启动录制
+     *
      * @param context
      * @param params
      * @return

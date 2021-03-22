@@ -15,14 +15,14 @@
  */
 package com.alipay.hulu.shared.node.utils.prepare;
 
-import androidx.annotation.IntRange;
-
-import com.alipay.hulu.shared.node.utils.PrepareUtil;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+
+import com.alipay.hulu.shared.node.utils.PrepareUtil;
+
+import androidx.annotation.IntRange;
 
 /**
  * Created by qiaoruikai on 2018/12/26 9:15 PM.

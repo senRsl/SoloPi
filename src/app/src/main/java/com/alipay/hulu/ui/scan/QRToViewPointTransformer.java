@@ -1,9 +1,9 @@
 package com.alipay.hulu.ui.scan;
 
+import com.google.zxing.ResultPoint;
+
 import android.graphics.Point;
 import android.graphics.PointF;
-
-import com.google.zxing.ResultPoint;
 
 public class QRToViewPointTransformer {
 

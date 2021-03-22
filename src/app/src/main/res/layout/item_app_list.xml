@@ -14,28 +14,28 @@
   ~ limitations under the License.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="horizontal"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:paddingTop="@dimen/control_dp16"
-              android:paddingBottom="@dimen/control_dp16"
-                android:gravity="center_vertical">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    android:paddingBottom="@dimen/control_dp16"
+    android:paddingTop="@dimen/control_dp16">
 
     <ImageView
         android:id="@+id/app_icon"
-        android:layout_marginLeft="@dimen/control_dp24"
         android:layout_width="@dimen/control_dp24"
-        android:layout_height="@dimen/control_dp24"/>
+        android:layout_height="@dimen/control_dp24"
+        android:layout_marginLeft="@dimen/control_dp24" />
 
     <TextView
         android:id="@+id/app_name"
-        android:layout_marginLeft="@dimen/control_dp16"
-        android:layout_marginRight="@dimen/control_dp16"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="@dimen/textsize_17"
-        android:textColor="@color/mainFont"
+        android:layout_marginLeft="@dimen/control_dp16"
+        android:layout_marginRight="@dimen/control_dp16"
+        android:ellipsize="end"
         android:maxLines="1"
-        android:ellipsize="end"/>
+        android:textColor="@color/mainFont"
+        android:textSize="@dimen/textsize_17" />
 
 </LinearLayout>

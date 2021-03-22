@@ -1,13 +1,5 @@
 package com.alipay.hulu.common.logger;
 
-import com.alipay.hulu.common.utils.StringUtil;
-import com.orhanobut.logger.LogAdapter;
-import com.orhanobut.logger.Printer;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.PrintWriter;
 import java.io.StringReader;
 import java.io.StringWriter;
@@ -22,6 +14,14 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import com.alipay.hulu.common.utils.StringUtil;
+import com.orhanobut.logger.LogAdapter;
+import com.orhanobut.logger.Printer;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -47,46 +47,86 @@ public class ThreadInfoLoggerPrinter implements Printer {
 
     private final List<LogAdapter> logAdapters = new ArrayList<>();
 
-    @Override public Printer t(String tag) {
+    static String getStackTraceString(Throwable tr) {
+        if (tr == null) {
+            return "";
+        }
+
+        // This is to reduce the amount of log spew that apps do in the non-error
+        // condition of the network being unavailable.
+        Throwable t = tr;
+        while (t != null) {
+            if (t instanceof UnknownHostException) {
+                return "";
+            }
+            t = t.getCause();
+        }
+
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        tr.printStackTrace(pw);
+        pw.flush();
+        return sw.toString();
+    }
+
+    @NonNull
+    static <T> T checkNotNull(@Nullable final T obj) {
+        if (obj == null) {
+            throw new NullPointerException();
+        }
+        return obj;
+    }
+
+    @Override
+    public Printer t(String tag) {
         if (tag != null) {
             localTag.set(tag);
         }
         return this;
     }
 
-    @Override public void d(@NonNull String message, @Nullable Object... args) {
+    @Override
+    public void d(@NonNull String message, @Nullable Object... args) {
         log(DEBUG, null, message, args);
     }
 
-    @Override public void d(@Nullable Object object) {
+    @Override
+    public void d(@Nullable Object object) {
         log(DEBUG, null, StringUtil.toString(object));
     }
 
-    @Override public void e(@NonNull String message, @Nullable Object... args) {
+    @Override
+    public void e(@NonNull String message, @Nullable Object... args) {
         e(null, message, args);
     }
 
-    @Override public void e(@Nullable Throwable throwable, @NonNull String message, @Nullable Object... args) {
+    @Override
+    public void e(@Nullable Throwable throwable, @NonNull String message, @Nullable Object... args) {
         log(ERROR, throwable, message, args);
     }
 
-    @Override public void w(@NonNull String message, @Nullable Object... args) {
+    @Override
+    public void w(@NonNull String message, @Nullable Object... args) {
         log(WARN, null, message, args);
     }
 
-    @Override public void i(@NonNull String message, @Nullable Object... args) {
+    @Override
+    public void i(@NonNull String message, @Nullable Object... args) {
         log(INFO, null, message, args);
     }
 
-    @Override public void v(@NonNull String message, @Nullable Object... args) {
+    @Override
+    public void v(@NonNull String message, @Nullable Object... args) {
         log(VERBOSE, null, message, args);
     }
 
-    @Override public void wtf(@NonNull String message, @Nullable Object... args) {
+    @Override
+    public void wtf(@NonNull String message, @Nullable Object... args) {
         log(ASSERT, null, message, args);
     }
 
-    @Override public void json(@Nullable String json) {
+    @Override
+    public void json(@Nullable String json) {
         if (StringUtil.isEmpty(json)) {
             d("Empty/Null json content");
             return;
@@ -111,7 +151,8 @@ public class ThreadInfoLoggerPrinter implements Printer {
         }
     }
 
-    @Override public void xml(@Nullable String xml) {
+    @Override
+    public void xml(@Nullable String xml) {
         if (StringUtil.isEmpty(xml)) {
             d("Empty/Null xml content");
             return;
@@ -129,10 +170,11 @@ public class ThreadInfoLoggerPrinter implements Printer {
         }
     }
 
-    @Override public synchronized void log(int priority,
-                                           @Nullable String tag,
-                                           @Nullable String message,
-                                           @Nullable Throwable throwable) {
+    @Override
+    public synchronized void log(int priority,
+                                 @Nullable String tag,
+                                 @Nullable String message,
+                                 @Nullable Throwable throwable) {
         if (throwable != null && message != null) {
             message += " : " + getStackTraceString(throwable);
         }
@@ -145,16 +187,18 @@ public class ThreadInfoLoggerPrinter implements Printer {
 
         for (LogAdapter adapter : logAdapters) {
             if (adapter.isLoggable(priority, tag)) {
-                adapter.log(priority, tag, "[" + Thread.currentThread().getName() +  "]" + message);
+                adapter.log(priority, tag, "[" + Thread.currentThread().getName() + "]" + message);
             }
         }
     }
 
-    @Override public void clearLogAdapters() {
+    @Override
+    public void clearLogAdapters() {
         logAdapters.clear();
     }
 
-    @Override public void addAdapter(@NonNull LogAdapter adapter) {
+    @Override
+    public void addAdapter(@NonNull LogAdapter adapter) {
         logAdapters.add(checkNotNull(adapter));
     }
 
@@ -175,7 +219,8 @@ public class ThreadInfoLoggerPrinter implements Printer {
     /**
      * @return the appropriate tag based on local or global
      */
-    @Nullable private String getTag() {
+    @Nullable
+    private String getTag() {
         String tag = localTag.get();
         if (tag != null) {
             localTag.remove();
@@ -184,36 +229,8 @@ public class ThreadInfoLoggerPrinter implements Printer {
         return null;
     }
 
-    @NonNull private String createMessage(@NonNull String message, @Nullable Object... args) {
+    @NonNull
+    private String createMessage(@NonNull String message, @Nullable Object... args) {
         return args == null || args.length == 0 ? message : String.format(message, args);
-    }
-
-    static String getStackTraceString(Throwable tr) {
-        if (tr == null) {
-            return "";
-        }
-
-        // This is to reduce the amount of log spew that apps do in the non-error
-        // condition of the network being unavailable.
-        Throwable t = tr;
-        while (t != null) {
-            if (t instanceof UnknownHostException) {
-                return "";
-            }
-            t = t.getCause();
-        }
-
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        tr.printStackTrace(pw);
-        pw.flush();
-        return sw.toString();
-    }
-
-    @NonNull static <T> T checkNotNull(@Nullable final T obj) {
-        if (obj == null) {
-            throw new NullPointerException();
-        }
-        return obj;
     }
 }

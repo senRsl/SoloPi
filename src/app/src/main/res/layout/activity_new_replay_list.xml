@@ -13,31 +13,35 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
 -->
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/content_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/content_container"
     android:orientation="vertical">
-    <include layout="@layout/head_panel_layout" android:id="@+id/head_replay_list" />
+
+    <include
+        android:id="@+id/head_replay_list"
+        layout="@layout/head_panel_layout" />
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tab_layout"
         android:layout_width="match_parent"
         android:layout_height="@dimen/control_dp48"
-        app:tabTextAppearance="@style/TabLayoutTextStyle"
-        app:tabPaddingTop="@dimen/control_dp8"
-        app:tabPaddingBottom="@dimen/control_dp8"
-        app:tabPaddingStart="@dimen/control_dp16"
-        app:tabPaddingEnd="@dimen/control_dp16"
         app:tabGravity="fill"
         app:tabIndicatorHeight="@dimen/control_dp2"
-        app:tabMode="fixed"/>
+        app:tabMode="fixed"
+        app:tabPaddingBottom="@dimen/control_dp8"
+        app:tabPaddingEnd="@dimen/control_dp16"
+        app:tabPaddingStart="@dimen/control_dp16"
+        app:tabPaddingTop="@dimen/control_dp8"
+        app:tabTextAppearance="@style/TabLayoutTextStyle" />
+
     <View
         android:layout_width="match_parent"
         android:layout_height="1px"
-        android:background="#bebebe"/>
+        android:background="#bebebe" />
+
     <androidx.viewpager.widget.ViewPager
         android:id="@+id/pager"
         android:layout_width="match_parent"

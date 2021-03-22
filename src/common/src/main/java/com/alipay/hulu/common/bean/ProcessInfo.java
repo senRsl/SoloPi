@@ -31,12 +31,12 @@ public class ProcessInfo {
         return pid;
     }
 
-    public String getProcessName() {
-        return processName;
-    }
-
     public void setPid(int pid) {
         this.pid = pid;
+    }
+
+    public String getProcessName() {
+        return processName;
     }
 
     public void setProcessName(String processName) {

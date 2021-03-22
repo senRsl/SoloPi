@@ -15,9 +15,19 @@
  */
 package com.alipay.hulu.replay;
 
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.text.TextUtils;
+import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Stack;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 import com.alibaba.fastjson.JSON;
 import com.alipay.hulu.R;
@@ -43,19 +53,9 @@ import com.alipay.hulu.shared.node.tree.OperationNode;
 import com.alipay.hulu.shared.node.tree.export.bean.OperationStep;
 import com.alipay.hulu.shared.node.utils.LogicUtil;
 
-import java.io.File;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Stack;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.text.TextUtils;
 
 import static com.alipay.hulu.shared.node.utils.LogicUtil.CHECK_PARAM;
 import static com.alipay.hulu.shared.node.utils.LogicUtil.SCOPE;
@@ -68,51 +68,37 @@ public class OperationStepProvider extends AbstractStepProvider {
     private static final Pattern FILED_CALL_PATTERN = Pattern.compile("\\$\\{[^}\\s]+\\.?[^}\\s]*\\}");
 
     protected OperationService operationService;
-
-    private List<OperationStep> stepList = new ArrayList<>();
     protected Map<Integer, ReplayStepInfoBean> currentStepInfo;
-
     protected Map<String, String> screenshotFiles;
-
     protected String targetApp;
     protected String targetAppPkg;
     protected String targetAppVersionName;
-
     protected RecordCaseInfo caseInfo;
-
     /**
      * IF位置
      */
     protected int ifIdx = -1;
-
-
     /**
      * Loop信息栈
      */
     protected Stack<LoopParam> loopParams = new PeekableStack<>();
-
     /**
      * 等待check
      */
     protected boolean waitForCheck;
-
     /**
      * 是否初始化环境
      */
     protected boolean initEnvironment;
-
     /**
      * check结果
      */
     protected int checkIdx = -1;
-
-    private String errorReason;
     protected String errorStepId;
-
     protected int currentIdx;
-
     protected Map<String, String> initParams = new HashMap<>();
-
+    private List<OperationStep> stepList = new ArrayList<>();
+    private String errorReason;
     /**
      * 参数映射处理
      */
@@ -122,6 +108,22 @@ public class OperationStepProvider extends AbstractStepProvider {
             return getMappedContent(value, operationService);
         }
     };
+
+    public OperationStepProvider(RecordCaseInfo caseInfo) {
+        this(caseInfo, true);
+    }
+
+    public OperationStepProvider(RecordCaseInfo caseInfo, boolean initParams) {
+        this.caseInfo = caseInfo;
+        loadOperation(caseInfo.getOperationLog());
+        currentStepInfo = new HashMap<>();
+        screenshotFiles = new LinkedHashMap<>();
+        initEnvironment = initParams;
+        currentIdx = 0;
+
+        // 加载OperationService
+        operationService = LauncherApplication.getInstance().findServiceByName(OperationService.class.getName());
+    }
 
     /**
      * 将当期运行时变量映射到字符串中
@@ -184,24 +186,9 @@ public class OperationStepProvider extends AbstractStepProvider {
         });
     }
 
-    public OperationStepProvider(RecordCaseInfo caseInfo) {
-        this(caseInfo, true);
-    }
-
-    public OperationStepProvider(RecordCaseInfo caseInfo, boolean initParams) {
-        this.caseInfo = caseInfo;
-        loadOperation(caseInfo.getOperationLog());
-        currentStepInfo = new HashMap<>();
-        screenshotFiles = new LinkedHashMap<>();
-        initEnvironment = initParams;
-        currentIdx = 0;
-
-        // 加载OperationService
-        operationService = LauncherApplication.getInstance().findServiceByName(OperationService.class.getName());
-    }
-
     /**
      * 配置初始化参数
+     *
      * @param params
      */
     public void putParams(Map<String, String> params) {
@@ -271,7 +258,7 @@ public class OperationStepProvider extends AbstractStepProvider {
                 // 参数信息
                 if (setting.getParams() != null && setting.getParams().size() > 0) {
                     Map<String, String> params = new HashMap<>(setting.getParams().size() + 1);
-                    for (CaseParamBean caseParam: setting.getParams()) {
+                    for (CaseParamBean caseParam : setting.getParams()) {
                         params.put(caseParam.getParamName(), caseParam.getParamDefaultValue());
                     }
 
@@ -350,7 +337,7 @@ public class OperationStepProvider extends AbstractStepProvider {
             String status = method.getParam(CHECK_PARAM);
             status = OperationExecutor.getMappedContent(status, operationService);
 
-            String scopeContent =  OperationExecutor.getMappedContent(method.getParam(SCOPE), operationService);
+            String scopeContent = OperationExecutor.getMappedContent(method.getParam(SCOPE), operationService);
             if (StringUtil.startWith(status, LogicUtil.LOOP_PREFIX)) {
                 LoopParam newParam = new LoopParam(currentIdx,
                         currentIdx - 1 + Integer.parseInt(scopeContent),
@@ -597,6 +584,7 @@ public class OperationStepProvider extends AbstractStepProvider {
 
     /**
      * Peek不抛异常的Stack
+     *
      * @param <T>
      */
     public static class PeekableStack<T> extends Stack<T> {

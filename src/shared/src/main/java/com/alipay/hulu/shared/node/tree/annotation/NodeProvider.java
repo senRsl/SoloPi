@@ -28,6 +28,7 @@ import java.lang.annotation.Target;
 public @interface NodeProvider {
     /**
      * 元数据类型
+     *
      * @return
      */
     Class dataType();

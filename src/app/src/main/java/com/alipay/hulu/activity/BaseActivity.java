@@ -15,6 +15,15 @@
  */
 package com.alipay.hulu.activity;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import com.alipay.hulu.R;
+import com.alipay.hulu.common.application.LauncherApplication;
+import com.alipay.hulu.common.utils.ClassUtil;
+import com.alipay.hulu.common.utils.DeviceInfoUtil;
+import com.alipay.hulu.common.utils.LogUtil;
+
 import android.annotation.TargetApi;
 import android.app.ProgressDialog;
 import android.app.Service;
@@ -29,16 +38,6 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
-
-import com.alipay.hulu.R;
-import com.alipay.hulu.common.application.LauncherApplication;
-import com.alipay.hulu.common.utils.ClassUtil;
-import com.alipay.hulu.common.utils.DeviceInfoUtil;
-import com.alipay.hulu.common.utils.LogUtil;
-
-import java.util.HashSet;
-import java.util.Set;
-
 import androidx.annotation.IdRes;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
@@ -52,14 +51,31 @@ import androidx.fragment.app.FragmentManager;
 
 public abstract class BaseActivity extends AppCompatActivity {
     private static boolean initializeScreenInfo = false;
-
-    private boolean canShowDialog;
-
-    private Set<String> fragmentTags = new HashSet<>();
-
     private static Toast toast;
-
+    private boolean canShowDialog;
+    private Set<String> fragmentTags = new HashSet<>();
     private ProgressDialog progressDialog;
+
+    public static Context createLocaleContext(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            //7.0及以后
+            return updateResourcesForAndroidN(context);
+        } else {
+            //7.0之前
+            Configuration configuration = context.getResources().getConfiguration();
+            configuration.locale = LauncherApplication.getInstance().getLanguageLocale();
+            context.getResources().updateConfiguration(configuration, null);
+            return context;
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.N)
+    private static Context updateResourcesForAndroidN(Context context) {
+        Resources resources = context.getResources();
+        Configuration configuration = resources.getConfiguration();
+        configuration.setLocale(LauncherApplication.getInstance().getLanguageLocale());
+        return context.createConfigurationContext(configuration);
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -87,28 +103,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     protected void attachBaseContext(Context newBase) {
         super.attachBaseContext(createLocaleContext(newBase));
-    }
-
-
-    public static Context createLocaleContext(Context context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            //7.0及以后
-            return updateResourcesForAndroidN(context);
-        } else {
-            //7.0之前
-            Configuration configuration = context.getResources().getConfiguration();
-            configuration.locale = LauncherApplication.getInstance().getLanguageLocale();
-            context.getResources().updateConfiguration(configuration, null);
-            return context;
-        }
-    }
-
-    @TargetApi(Build.VERSION_CODES.N)
-    private static Context updateResourcesForAndroidN(Context context) {
-        Resources resources = context.getResources();
-        Configuration configuration = resources.getConfiguration();
-        configuration.setLocale(LauncherApplication.getInstance().getLanguageLocale());
-        return context.createConfigurationContext(configuration);
     }
 
     @Override
@@ -170,6 +164,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     /**
      * 短toast
+     *
      * @param stringRes
      */
     public void toastShort(@StringRes final int stringRes) {
@@ -178,6 +173,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     /**
      * 短toast
+     *
      * @param stringRes
      */
     public void toastShort(@StringRes final int stringRes, final Object... args) {
@@ -212,6 +208,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     /**
      * 短toast
+     *
      * @param stringRes
      */
     public void toastLong(@StringRes final int stringRes) {
@@ -220,6 +217,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     /**
      * 短toast
+     *
      * @param stringRes
      */
     public void toastLong(@StringRes final int stringRes, final Object... args) {
@@ -303,6 +301,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     /**
      * 添加Fragment tag信息
+     *
      * @param tag
      */
     public void addFragmentTag(String tag) {
@@ -315,6 +314,7 @@ public abstract class BaseActivity extends AppCompatActivity {
 
     /**
      * 根据tag查找fragment
+     *
      * @param tag
      * @return
      */
@@ -327,7 +327,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         return null;
     }
 
-    protected   <T extends View> T _findViewById(@IdRes int resId) {
+    protected <T extends View> T _findViewById(@IdRes int resId) {
         return (T) findViewById(resId);
     }
 }

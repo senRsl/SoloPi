@@ -15,10 +15,10 @@
  */
 package com.alipay.hulu.shared.node.utils;
 
-import android.content.Context;
-import android.graphics.Rect;
-import android.util.DisplayMetrics;
-import android.view.WindowManager;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.alipay.hulu.common.application.LauncherApplication;
 import com.alipay.hulu.common.tools.CmdTools;
@@ -33,10 +33,10 @@ import com.alipay.hulu.shared.node.tree.AbstractNodeTree;
 import com.alipay.hulu.shared.node.tree.OperationNode;
 import com.alipay.hulu.shared.node.tree.capture.CaptureTree;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import android.content.Context;
+import android.graphics.Rect;
+import android.util.DisplayMetrics;
+import android.view.WindowManager;
 
 /**
  * 节点工具
@@ -44,11 +44,9 @@ import java.util.Map;
  */
 public class OperationUtil {
 
-    private static final String TAG = "OperationUtil";
-
-    private static final Map<CharSequence, Integer> alertContentMap;
-
     public static final int MAX_CONTENT_PRIORITY = Integer.MAX_VALUE;
+    private static final String TAG = "OperationUtil";
+    private static final Map<CharSequence, Integer> alertContentMap;
 
     static {
 
@@ -127,6 +125,7 @@ public class OperationUtil {
 
     /**
      * 滑动控件到屏幕内
+     *
      * @param node
      * @param service
      * @return
@@ -158,23 +157,23 @@ public class OperationUtil {
                 if (!(operationNode instanceof CaptureTree)) {
                     // 判断下是否在屏幕内
                     Rect bound = operationNode.getNodeBound();
-                    LogUtil.d(TAG, "控件空间属性：%s, 屏幕属性：%s",  bound, dm);
+                    LogUtil.d(TAG, "控件空间属性：%s, 屏幕属性：%s", bound, dm);
                     if (bound.bottom <= 5) {
                         service.doSomeAction(new OperationMethod(PerformActionEnum.GLOBAL_SCROLL_TO_BOTTOM), null);
                         MiscUtil.sleep(2500);
-                        scrollCount ++;
+                        scrollCount++;
                     } else if (bound.top >= height - 5) {
                         service.doSomeAction(new OperationMethod(PerformActionEnum.GLOBAL_SCROLL_TO_TOP), null);
                         MiscUtil.sleep(2500);
-                        scrollCount ++;
+                        scrollCount++;
                     } else if (bound.centerX() <= 5) {
                         service.doSomeAction(new OperationMethod(PerformActionEnum.GLOBAL_SCROLL_TO_RIGHT), null);
                         MiscUtil.sleep(2500);
-                        scrollCount ++;
+                        scrollCount++;
                     } else if (bound.centerX() >= width - 5) {
                         service.doSomeAction(new OperationMethod(PerformActionEnum.GLOBAL_SCROLL_TO_LEFT), null);
                         MiscUtil.sleep(2500);
-                        scrollCount ++;
+                        scrollCount++;
                     } else {
                         pos = 1;
                     }
@@ -198,7 +197,7 @@ public class OperationUtil {
         }
         String curActivity = "";
         long start = System.currentTimeMillis();
-        while (!isCurActivityInTargetArray(curActivity, targetActivities) && System.currentTimeMillis() - start < 60*1000) {
+        while (!isCurActivityInTargetArray(curActivity, targetActivities) && System.currentTimeMillis() - start < 60 * 1000) {
             MiscUtil.sleep(5000);
             curActivity = CmdTools.getTopActivity();
         }
@@ -217,11 +216,12 @@ public class OperationUtil {
     }
 
     public static AbstractNodeTree findAbstractNode(OperationNode node, OperationService service) {
-        return findAbstractNode(node, service,  null);
+        return findAbstractNode(node, service, null);
     }
 
     /**
      * 查找控件
+     *
      * @param node
      * @param service
      * @return
@@ -317,6 +317,7 @@ public class OperationUtil {
 
     /**
      * 查找控件
+     *
      * @param node
      * @param service
      * @return

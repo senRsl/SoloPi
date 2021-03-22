@@ -15,14 +15,14 @@
  */
 package com.alipay.hulu.screenRecord;
 
+import java.util.Objects;
+
+import com.alipay.hulu.util.VideoUtils;
+
 import android.annotation.TargetApi;
 import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
 import android.os.Build;
-
-import com.alipay.hulu.util.VideoUtils;
-
-import java.util.Objects;
 
 /**
  * @author yrom
@@ -48,7 +48,7 @@ public class VideoEncodeConfig {
     public VideoEncodeConfig(int width, int height, int bitrate,
                              int framerate, int iframeInterval,
                              String codecName, String mimeType,
-                             MediaCodecInfo.CodecProfileLevel codecProfileLevel,double exceptDiff) {
+                             MediaCodecInfo.CodecProfileLevel codecProfileLevel, double exceptDiff) {
         this.width = width;
         this.height = height;
         this.bitrate = bitrate;

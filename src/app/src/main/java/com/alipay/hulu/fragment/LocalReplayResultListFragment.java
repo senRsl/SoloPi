@@ -15,16 +15,16 @@
  */
 package com.alipay.hulu.fragment;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ListView;
-import android.widget.TextView;
+import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONReader;
@@ -42,27 +42,24 @@ import com.alipay.hulu.common.utils.LogUtil;
 import com.alipay.hulu.common.utils.StringUtil;
 import com.alipay.hulu.shared.node.tree.export.bean.OperationStep;
 
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-
+import android.app.AlertDialog;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ListView;
+import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.collection.ArrayMap;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 public class LocalReplayResultListFragment extends BaseFragment {
+    public static final int KEY_LIST_TYPE_LOCAL = 0;
     private static final String TAG = "LocalResultListFrag";
     private static final String KEY_ARG_FRAGMENT_TYPE = "KEY_ARG_FRAGMENT_TYPE";
-
-    public static final int KEY_LIST_TYPE_LOCAL = 0;
-
     private int type;
     private ListView mListView;
     private SwipeRefreshLayout refreshLayout;
@@ -80,7 +77,7 @@ public class LocalReplayResultListFragment extends BaseFragment {
     }
 
     public static int[] getAvailableTypes() {
-        return new int[] {KEY_LIST_TYPE_LOCAL};
+        return new int[]{KEY_LIST_TYPE_LOCAL};
     }
 
     public static String getTypeName(int type) {
@@ -147,7 +144,7 @@ public class LocalReplayResultListFragment extends BaseFragment {
                 }
 
                 List<ReplayResultBean> resultBeans = new ArrayList<>(subDirs.length + 1);
-                for (File folder: subDirs) {
+                for (File folder : subDirs) {
                     File info = new File(folder, "info.json");
                     try {
                         ReplayResultBean result = JSON.parseObject(new FileInputStream(info), ReplayResultBean.class);
@@ -250,6 +247,7 @@ public class LocalReplayResultListFragment extends BaseFragment {
 
     /**
      * 删除回放结果
+     *
      * @param position
      */
     private void deleteResult(int position) {
@@ -277,13 +275,15 @@ public class LocalReplayResultListFragment extends BaseFragment {
 
     /**
      * 展示回放结果
+     *
      * @param position
      */
     private void showReplayResult(int position) {
         ReplayResultBean resultBean = localResultList.get(position);
         File baseDir = resultBean.getBaseDir();
         try {
-            Map<Integer, ReplayStepInfoBean> actionLogs = new JSONReader(new FileReader(new File(baseDir, "actions.json"))).readObject(new TypeReference<Map<Integer, ReplayStepInfoBean>>() {});
+            Map<Integer, ReplayStepInfoBean> actionLogs = new JSONReader(new FileReader(new File(baseDir, "actions.json"))).readObject(new TypeReference<Map<Integer, ReplayStepInfoBean>>() {
+            });
             resultBean.setActionLogs(actionLogs);
         } catch (IOException e) {
             LogUtil.e(TAG, "Fail to find ", e);
@@ -294,7 +294,8 @@ public class LocalReplayResultListFragment extends BaseFragment {
 
         File steps = new File(baseDir, "steps.json");
         try {
-            List<OperationStep> operations = new JSONReader(new FileReader(steps)).readObject(new TypeReference<List<OperationStep>>() {});
+            List<OperationStep> operations = new JSONReader(new FileReader(steps)).readObject(new TypeReference<List<OperationStep>>() {
+            });
             resultBean.setCurrentOperationLog(operations);
         } catch (IOException e) {
             LogUtil.e(TAG, "Fail to find ", e);
@@ -303,7 +304,7 @@ public class LocalReplayResultListFragment extends BaseFragment {
         List<CaseReplayResultActivity.ScreenshotBean> screenshotBeans = resultBean.getScreenshots();
         if (screenshotBeans != null) {
             ArrayMap<String, String> screenshots = new ArrayMap<>();
-            for (CaseReplayResultActivity.ScreenshotBean screenshot: screenshotBeans) {
+            for (CaseReplayResultActivity.ScreenshotBean screenshot : screenshotBeans) {
                 screenshots.put(screenshot.getName(), new File(baseDir, screenshot.getFile()).getPath());
             }
             resultBean.setScreenshotFiles(screenshots);

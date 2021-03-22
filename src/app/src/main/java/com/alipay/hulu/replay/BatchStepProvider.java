@@ -15,6 +15,9 @@
  */
 package com.alipay.hulu.replay;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.alipay.hulu.bean.ReplayResultBean;
 import com.alipay.hulu.bean.ReplayStepInfoBean;
 import com.alipay.hulu.shared.io.bean.RecordCaseInfo;
@@ -22,30 +25,17 @@ import com.alipay.hulu.shared.node.action.OperationMethod;
 import com.alipay.hulu.shared.node.action.PerformActionEnum;
 import com.alipay.hulu.shared.node.tree.export.bean.OperationStep;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Created by qiaoruikai on 2018/10/16 2:04 AM.
  */
 public class BatchStepProvider extends AbstractStepProvider {
     private static final String TAG = "BatchStepProvider";
-
+    OperationStepProvider currentStepProvider;
+    List<ReplayResultBean> resultBeans;
     private List<RecordCaseInfo> mRecordCases;
     private int currentCaseIdx;
-
     private OperationStep prepareStep;
     private boolean restart;
-
-    OperationStepProvider currentStepProvider;
-
-    List<ReplayResultBean> resultBeans;
-
-    @Override
-    public void prepare() {
-        // 加载当前Step
-        loadProvider(currentCaseIdx);
-    }
 
     public BatchStepProvider(List<RecordCaseInfo> recordCaseInfos, boolean restart) {
         mRecordCases = recordCaseInfos;
@@ -55,8 +45,15 @@ public class BatchStepProvider extends AbstractStepProvider {
         resultBeans = new ArrayList<>(recordCaseInfos.size() + 1);
     }
 
+    @Override
+    public void prepare() {
+        // 加载当前Step
+        loadProvider(currentCaseIdx);
+    }
+
     /**
      * 加载Provider
+     *
      * @param startPos
      */
     private void loadProvider(int startPos) {
@@ -64,7 +61,7 @@ public class BatchStepProvider extends AbstractStepProvider {
         RecordCaseInfo currentCase = null;
         currentStepProvider = null;
         while (pos < mRecordCases.size() && (currentCase = mRecordCases.get(pos)) == null) {
-            pos ++;
+            pos++;
         }
 
         currentCaseIdx = pos;
@@ -103,7 +100,7 @@ public class BatchStepProvider extends AbstractStepProvider {
             prepareStep = null;
             return step;
         }
-        return currentStepProvider == null? null: currentStepProvider.provideStep();
+        return currentStepProvider == null ? null : currentStepProvider.provideStep();
     }
 
     @Override

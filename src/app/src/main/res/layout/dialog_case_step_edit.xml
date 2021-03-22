@@ -15,26 +15,28 @@
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/dialog_case_step_edit_tab"
         android:layout_width="match_parent"
         android:layout_height="@dimen/control_dp48"
-        app:tabTextAppearance="@style/TabLayoutTextStyle"
-        app:tabPaddingTop="@dimen/control_dp8"
-        app:tabPaddingBottom="@dimen/control_dp8"
-        app:tabPaddingStart="@dimen/control_dp16"
-        app:tabPaddingEnd="@dimen/control_dp16"
         app:tabGravity="fill"
+        app:tabMaxWidth="0dp"
         app:tabMode="fixed"
-        app:tabMaxWidth="0dp">
-    </com.google.android.material.tabs.TabLayout>
+        app:tabPaddingBottom="@dimen/control_dp8"
+        app:tabPaddingEnd="@dimen/control_dp16"
+        app:tabPaddingStart="@dimen/control_dp16"
+        app:tabPaddingTop="@dimen/control_dp8"
+        app:tabTextAppearance="@style/TabLayoutTextStyle"></com.google.android.material.tabs.TabLayout>
+
     <com.alipay.hulu.ui.MaxHeightScrollView
         android:id="@+id/dialog_case_step_edit_scroll"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/dialog_case_step_edit_recycler"
             android:layout_width="match_parent"

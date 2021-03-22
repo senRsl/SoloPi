@@ -15,13 +15,13 @@
  */
 package com.alipay.hulu.common.injector.provider;
 
-import com.alipay.hulu.common.injector.param.SubscribeParamEnum;
-
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+
+import com.alipay.hulu.common.injector.param.SubscribeParamEnum;
 
 /**
  * 依赖注入方法注解

@@ -41,6 +41,7 @@ public class RectUtil {
 
     /**
      * 安全扩展区域
+     *
      * @param origin
      * @param pixel
      * @param maxWidth
@@ -56,6 +57,7 @@ public class RectUtil {
 
     /**
      * 安全缩放
+     *
      * @param origin
      * @param scale
      * @param maxWidth
@@ -68,6 +70,7 @@ public class RectUtil {
 
     /**
      * 安全缩放
+     *
      * @param origin
      * @param scale
      * @param maxWidth
@@ -80,6 +83,7 @@ public class RectUtil {
 
     /**
      * 缩放Rect
+     *
      * @param origin
      * @param scale
      * @return
@@ -97,6 +101,7 @@ public class RectUtil {
 
     /**
      * 缩放Rect
+     *
      * @param origin
      * @param scale
      * @return
@@ -125,6 +130,7 @@ public class RectUtil {
 
     /**
      * 确保边界
+     *
      * @param target
      * @param maxWidth
      * @param maxHeight

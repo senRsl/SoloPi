@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Map;
 
 import dalvik.system.DexClassLoader;
-import dalvik.system.PathClassLoader;
 
 /**
  * Created by qiaoruikai on 2018/12/20 10:21 PM.
@@ -49,6 +48,7 @@ public class PatchClassLoader extends DexClassLoader {
 
     /**
      * 获取自身加载的类
+     *
      * @param name
      * @return
      */
@@ -58,6 +58,7 @@ public class PatchClassLoader extends DexClassLoader {
 
     /**
      * 添加依赖的ClassLoader
+     *
      * @param classLoader
      */
     public void addDependentPatch(PatchClassLoader classLoader) {
@@ -80,7 +81,7 @@ public class PatchClassLoader extends DexClassLoader {
         }
 
         if (dependencyClassLoaders != null) {
-            for (PatchClassLoader depend: dependencyClassLoaders) {
+            for (PatchClassLoader depend : dependencyClassLoaders) {
                 Class parent = depend.loadSelfClass(name);
                 if (parent != null) {
                     return parent;
@@ -93,6 +94,7 @@ public class PatchClassLoader extends DexClassLoader {
 
     /**
      * 获取patch关联的Context信息
+     *
      * @return
      */
     public PatchContext getContext() {

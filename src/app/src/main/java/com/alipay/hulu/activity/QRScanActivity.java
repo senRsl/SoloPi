@@ -15,16 +15,6 @@
  */
 package com.alipay.hulu.activity;
 
-import android.Manifest;
-import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.graphics.PointF;
-import android.net.Uri;
-import android.os.Bundle;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
-
 import com.alipay.hulu.R;
 import com.alipay.hulu.common.application.LauncherApplication;
 import com.alipay.hulu.common.injector.InjectorService;
@@ -40,6 +30,15 @@ import com.alipay.hulu.ui.AnyCodeReaderView;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.zxing.BarcodeFormat;
 
+import android.Manifest;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.PointF;
+import android.net.Uri;
+import android.os.Bundle;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 
@@ -51,10 +50,8 @@ import androidx.core.app.ActivityCompat;
         @Param(type = HandlePermissionEvent.class, sticky = false)})
 public class QRScanActivity extends BaseActivity
         implements ActivityCompat.OnRequestPermissionsResultCallback, AnyCodeReaderView.OnCodeReadListener {
-    private static final String TAG = "QRScanActivity";
-
     public static final String KEY_SCAN_TYPE = "KEY_SCAN_TYPE";
-
+    private static final String TAG = "QRScanActivity";
     private static final int MY_PERMISSION_REQUEST_CAMERA = 0;
 
     private ViewGroup mainLayout;

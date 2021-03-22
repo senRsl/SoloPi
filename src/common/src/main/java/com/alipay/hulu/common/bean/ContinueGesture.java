@@ -50,6 +50,7 @@ public class ContinueGesture {
 
     /**
      * 持续性动作
+     *
      * @param x
      * @param y
      * @param time

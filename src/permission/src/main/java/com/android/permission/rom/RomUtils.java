@@ -3,13 +3,13 @@
  */
 package com.android.permission.rom;
 
-import android.os.Build;
-import android.text.TextUtils;
-import android.util.Log;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+
+import android.os.Build;
+import android.text.TextUtils;
+import android.util.Log;
 
 /**
  * Description:
@@ -19,9 +19,19 @@ import java.io.InputStreamReader;
  */
 public class RomUtils {
     private static final String TAG = "RomUtils";
+    private static Boolean isSony = null;
+    private static Boolean isSamSung = null;
+    private static Boolean isOppo = null;
+    private static Boolean isVivo = null;
+    private static Boolean isGoogle = null;
+    private static Boolean isSmartisan = null;
+    private static Boolean isMiui = null;
+    private static Boolean isMeizu = null;
+    private static Boolean is360 = null;
 
     /**
      * 获取 emui 版本号
+     *
      * @return
      */
     public static double getEmuiVersion() {
@@ -35,9 +45,9 @@ public class RomUtils {
         return 4.0;
     }
 
-    private static Boolean isSony = null;
     /**
      * 判断是否是sony
+     *
      * @return
      */
     public static boolean isSonySystem() {
@@ -46,8 +56,6 @@ public class RomUtils {
         }
         return isSony;
     }
-
-    private static Boolean isSamSung = null;
 
     /**
      * 判断是否是三星
@@ -61,9 +69,9 @@ public class RomUtils {
         return isSamSung;
     }
 
-    private static Boolean isOppo = null;
     /**
      * 判断是否是oppo
+     *
      * @return
      */
     public static boolean isOppoSystem() {
@@ -73,7 +81,6 @@ public class RomUtils {
         return isOppo;
     }
 
-    private static Boolean isVivo = null;
     public static boolean isVivoSystem() {
         if (isVivo == null) {
             isVivo = Build.MANUFACTURER.toUpperCase().contains("VIVO");
@@ -81,7 +88,6 @@ public class RomUtils {
         return isVivo;
     }
 
-    private static Boolean isGoogle = null;
     public static boolean isGoogleSystem() {
         if (isGoogle == null) {
             isGoogle = Build.MANUFACTURER.toUpperCase().contains("GOOGLE");
@@ -90,14 +96,12 @@ public class RomUtils {
         return isGoogle;
     }
 
-    private static Boolean isSmartisan = null;
     public static boolean isSmartisanSystem() {
         if (isSmartisan == null) {
             isSmartisan = Build.MANUFACTURER.toUpperCase().contains("SMARTISAN");
         }
         return isSmartisan;
     }
-
 
     /**
      * 获取小米 rom 版本号，获取失败返回 -1
@@ -138,11 +142,11 @@ public class RomUtils {
         }
         return line;
     }
+
     public static boolean checkIsHuaweiRom() {
         return Build.MANUFACTURER.contains("HUAWEI");
     }
 
-    private static Boolean isMiui = null;
     /**
      * check if is miui ROM
      */
@@ -153,8 +157,6 @@ public class RomUtils {
         return isMiui;
     }
 
-
-    private static Boolean isMeizu = null;
     public static boolean checkIsMeizuRom() {
         //return Build.MANUFACTURER.contains("Meizu");
         if (isMeizu == null) {
@@ -171,7 +173,6 @@ public class RomUtils {
         return isMeizu;
     }
 
-    private static Boolean is360 = null;
     public static boolean checkIs360Rom() {
         //fix issue https://github.com/zhaozepeng/FloatWindowPermission/issues/9
         if (is360 == null) {

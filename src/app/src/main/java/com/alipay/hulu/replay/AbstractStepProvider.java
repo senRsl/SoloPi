@@ -15,10 +15,9 @@
  */
 package com.alipay.hulu.replay;
 
-import android.content.Context;
-import android.content.DialogInterface;
-import androidx.appcompat.app.AlertDialog;
-import android.view.View;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 import com.alipay.hulu.R;
 import com.alipay.hulu.bean.ReplayResultBean;
@@ -27,9 +26,10 @@ import com.alipay.hulu.common.utils.LogUtil;
 import com.alipay.hulu.service.CaseReplayManager;
 import com.alipay.hulu.shared.node.tree.export.bean.OperationStep;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.view.View;
+import androidx.appcompat.app.AlertDialog;
 
 /**
  * Created by qiaoruikai on 2018/10/16 12:40 AM.
@@ -47,6 +47,7 @@ public abstract class AbstractStepProvider {
 
     /**
      * 是否可以手动调用启动
+     *
      * @return
      */
     public boolean canStart() {
@@ -55,19 +56,22 @@ public abstract class AbstractStepProvider {
 
     /**
      * 获取步骤
+     *
      * @return
      */
     public abstract OperationStep provideStep();
 
     /**
      * 是否还有下一步
+     *
      * @return
      */
     public abstract boolean hasNext();
 
     /**
      * 上报故障步骤
-     * @param step 步骤
+     *
+     * @param step   步骤
      * @param reason 故障原因
      * @return 是否是故障
      */
@@ -75,6 +79,7 @@ public abstract class AbstractStepProvider {
 
     /**
      * 获取回放结果
+     *
      * @return
      */
     public List<ReplayResultBean> genReplayResult() {
@@ -88,6 +93,7 @@ public abstract class AbstractStepProvider {
 
     /**
      * 上报当前步骤操作信息
+     *
      * @param bean
      */
     public abstract void onStepInfo(ReplayStepInfoBean bean);
@@ -103,6 +109,7 @@ public abstract class AbstractStepProvider {
 
     /**
      * 提供悬浮窗界面
+     *
      * @param context
      * @return
      */
@@ -112,9 +119,10 @@ public abstract class AbstractStepProvider {
 
     /**
      * 展示操作dialog
-     * @param message 消息
+     *
+     * @param message       消息
      * @param confirmAction 确定动作
-     * @param cancelAction 取消动作
+     * @param cancelAction  取消动作
      */
     protected void showFunctionView(Context context, String message, final Runnable confirmAction, final Runnable cancelAction) {
         try {

@@ -14,47 +14,48 @@
   ~ limitations under the License.
 -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/control_dp8"
     android:paddingLeft="@dimen/control_dp16"
     android:paddingRight="@dimen/control_dp16"
-    android:paddingTop="@dimen/control_dp8"
-    android:paddingBottom="@dimen/control_dp8"
-    >
+    android:paddingTop="@dimen/control_dp8">
+
     <LinearLayout
+        android:id="@+id/layout_case_result_item_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:gravity="center_vertical"
-        android:id="@+id/layout_case_result_item_title">
+        android:orientation="horizontal">
+
         <ImageView
             android:id="@+id/toggle_case_result"
             android:layout_width="@dimen/control_dp20"
             android:layout_height="@dimen/control_dp20"
-            android:src="@drawable/case_result_item_toggle"
             android:scaleType="fitCenter"
-            />
+            android:src="@drawable/case_result_item_toggle" />
+
         <TextView
             android:id="@+id/text_case_result_item_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:maxLines="1"
+            android:layout_alignBaseline="@id/toggle_case_result"
             android:layout_marginLeft="@dimen/control_dp12"
             android:layout_toRightOf="@id/toggle_case_result"
-            android:layout_alignBaseline="@id/toggle_case_result"
-            android:textSize="@dimen/textsize_16"
+            android:maxLines="1"
             android:textColor="@color/primaryText"
-            />
+            android:textSize="@dimen/textsize_16" />
     </LinearLayout>
+
     <TextView
         android:id="@+id/text_case_result_item_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/control_dp8"
-        android:textColor="@color/secondaryText"
-        android:textSize="@dimen/textsize_14"
         android:layout_below="@id/layout_case_result_item_title"
         android:layout_marginLeft="@dimen/control_dp32"
-        />
+        android:layout_marginTop="@dimen/control_dp8"
+        android:textColor="@color/secondaryText"
+        android:textSize="@dimen/textsize_14" />
 
 </RelativeLayout>

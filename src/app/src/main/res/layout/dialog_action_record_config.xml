@@ -15,64 +15,64 @@
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
 
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/dialog_action_record_title_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/control_dp12"
-        android:layout_marginRight="@dimen/control_dp16"
-        >
+        android:layout_marginRight="@dimen/control_dp16">
+
         <com.google.android.material.textfield.TextInputEditText
-            android:hint="@string/record_config__report_title"
-            android:textSize="@dimen/textsize_16"
             android:id="@+id/dialog_action_record_title"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:hint="@string/record_config__report_title"
+            android:textSize="@dimen/textsize_16" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.alipay.hulu.screenRecord.TextSpinner
         android:id="@+id/dialog_action_record_resolution"
-        app:name="@string/record_config__resolution"
         android:layout_width="match_parent"
         android:layout_height="@dimen/control_dp30"
-        android:layout_marginTop="@dimen/control_dp8"
         android:layout_marginLeft="@dimen/control_dp16"
         android:layout_marginRight="@dimen/control_dp16"
-        app:entries="@array/video_resolutions"/>
+        android:layout_marginTop="@dimen/control_dp8"
+        app:entries="@array/video_resolutions"
+        app:name="@string/record_config__resolution" />
 
     <com.alipay.hulu.screenRecord.TextSpinner
         android:id="@+id/dialog_action_record_bitrate"
-        app:name="@string/record_config__bitrate"
         android:layout_width="match_parent"
         android:layout_height="@dimen/control_dp30"
-        android:layout_marginTop="@dimen/control_dp8"
         android:layout_marginLeft="@dimen/control_dp16"
         android:layout_marginRight="@dimen/control_dp16"
-        app:entries="@array/video_bitrates">
+        android:layout_marginTop="@dimen/control_dp8"
+        app:entries="@array/video_bitrates"
+        app:name="@string/record_config__bitrate">
 
     </com.alipay.hulu.screenRecord.TextSpinner>
 
     <com.alipay.hulu.screenRecord.TextSpinner
         android:id="@+id/dialog_action_record_fps"
-        app:name="@string/record_config__framerate"
         android:layout_width="match_parent"
         android:layout_height="@dimen/control_dp30"
-        android:layout_marginTop="@dimen/control_dp8"
         android:layout_marginLeft="@dimen/control_dp16"
         android:layout_marginRight="@dimen/control_dp16"
-        app:entries="@array/video_framerates"/>
+        android:layout_marginTop="@dimen/control_dp8"
+        app:entries="@array/video_framerates"
+        app:name="@string/record_config__framerate" />
 
     <com.alipay.hulu.screenRecord.TextSpinner
         android:id="@+id/dialog_action_record_diff"
-        app:name="@string/record_config__expect_diff"
         android:layout_width="match_parent"
         android:layout_height="@dimen/control_dp30"
-        android:layout_marginTop="@dimen/control_dp8"
         android:layout_marginLeft="@dimen/control_dp16"
         android:layout_marginRight="@dimen/control_dp16"
-        app:entries="@array/video_except_diff"/>
+        android:layout_marginTop="@dimen/control_dp8"
+        app:entries="@array/video_except_diff"
+        app:name="@string/record_config__expect_diff" />
 </LinearLayout>

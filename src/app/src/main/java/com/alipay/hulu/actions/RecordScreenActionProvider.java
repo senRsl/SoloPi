@@ -15,17 +15,12 @@
  */
 package com.alipay.hulu.actions;
 
-import android.content.ComponentName;
-import android.content.Context;
-import android.content.Intent;
-import android.content.ServiceConnection;
-import android.os.Build;
-import android.os.IBinder;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.EditText;
+import java.io.File;
+import java.lang.ref.WeakReference;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.alipay.hulu.R;
 import com.alipay.hulu.common.annotation.Enable;
@@ -58,12 +53,17 @@ import com.alipay.hulu.shared.node.tree.AbstractNodeTree;
 import com.alipay.hulu.shared.node.utils.AssetsManager;
 import com.alipay.hulu.util.RecordUtil;
 
-import java.io.File;
-import java.lang.ref.WeakReference;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.atomic.AtomicBoolean;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.Build;
+import android.os.IBinder;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.EditText;
 
 import static com.alipay.hulu.common.application.LauncherApplication.DISMISS_LOADING_DIALOG;
 import static com.alipay.hulu.common.application.LauncherApplication.SHOW_LOADING_DIALOG;
@@ -82,15 +82,10 @@ public class RecordScreenActionProvider implements ActionProvider {
     private static final String KEY_RECORD_RESOLUTION = "resolution";
     private static final String KEY_RECORD_UPLOAD_URL = "url";
     private static final String KEY_RECORD_UPLOAD_TITLE = "title";
-
-    private InjectorService injectorService;
-
-    private boolean inMasterMode = false;
-
     public volatile boolean isRecording = false;
-
     public Intent extraData;
-
+    private InjectorService injectorService;
+    private boolean inMasterMode = false;
     private String uploadUrl;
     private String uploadTitle;
 
@@ -200,6 +195,7 @@ public class RecordScreenActionProvider implements ActionProvider {
 
     /**
      * 生成录屏Intent
+     *
      * @param method
      * @return
      */
@@ -243,11 +239,12 @@ public class RecordScreenActionProvider implements ActionProvider {
 
     /**
      * 处理视频
+     *
      * @param path
      */
     private void processVideo(String path, long videoStartTime) {
         VideoAnalyzer.getInstance().doAnalyze(realTouchTime - videoStartTime, targetDiff
-                ,path, new VideoAnalyzer.AnalyzeListener() {
+                , path, new VideoAnalyzer.AnalyzeListener() {
                     @Override
                     public void onAnalyzeFinished(final long result) {
                         UIOperationMessage message = new UIOperationMessage();
@@ -262,8 +259,8 @@ public class RecordScreenActionProvider implements ActionProvider {
                                 @Override
                                 public void run() {
                                     // 确保上传标题非空
-                                    String toUpload = StringUtil.isEmpty(uploadTitle)?
-                                            Long.toString(System.currentTimeMillis()): uploadTitle;
+                                    String toUpload = StringUtil.isEmpty(uploadTitle) ?
+                                            Long.toString(System.currentTimeMillis()) : uploadTitle;
 
                                     RecordUtil.uploadRecordData(uploadUrl, result, toUpload);
 
@@ -402,7 +399,7 @@ public class RecordScreenActionProvider implements ActionProvider {
     public void onReceiveEvent(PerformActionEnum actionEnum) {
         if ((actionEnum == PerformActionEnum.CLICK
                 || actionEnum == PerformActionEnum.CLICK_IF_EXISTS
-                ||actionEnum == PerformActionEnum.CLICK_QUICK)
+                || actionEnum == PerformActionEnum.CLICK_QUICK)
                 && waitForClick.compareAndSet(true, false)) {
             firstActionTime = System.currentTimeMillis();
 
@@ -441,6 +438,7 @@ public class RecordScreenActionProvider implements ActionProvider {
 
         /**
          * 初始化
+         *
          * @param pvd
          */
         RecordServiceConnection(RecordScreenActionProvider pvd) {

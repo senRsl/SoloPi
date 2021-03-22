@@ -67,6 +67,7 @@ public interface Displayable {
 
     /**
      * 停止录制并返回录制数据
+     *
      * @return
      */
     Map<RecordPattern, List<RecordPattern.RecordItem>> stopRecord();

@@ -15,44 +15,47 @@
 -->
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:gravity="center_vertical"
     android:paddingLeft="@dimen/control_dp16"
-    android:paddingTop="@dimen/control_dp12"
-    android:layout_height="wrap_content">
+    android:paddingTop="@dimen/control_dp12">
+
     <LinearLayout
         android:id="@+id/param_item_title_group"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical">
+
         <TextView
+            android:id="@+id/param_item_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/param_item_title"
             android:textColor="@color/primaryText"
-            android:textSize="@dimen/textsize_16"/>
+            android:textSize="@dimen/textsize_16" />
+
         <TextView
             android:id="@+id/param_item_desc"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/control_dp2"
             android:textColor="@color/secondaryText"
-            android:textSize="@dimen/textsize_14"/>
+            android:textSize="@dimen/textsize_14" />
     </LinearLayout>
 
     <TextView
         android:id="@+id/param_item_default_value"
-        android:layout_marginTop="@dimen/control_dp6"
-        android:layout_marginRight="@dimen/control_dp16"
-        android:layout_alignParentRight="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="@dimen/control_dp16"
+        android:layout_marginTop="@dimen/control_dp6"
         android:textColor="@color/primaryText"
-        android:textSize="@dimen/textsize_12"
-        />
+        android:textSize="@dimen/textsize_12" />
+
     <View
-        android:layout_marginTop="@dimen/control_dp12"
-        android:background="@drawable/divider"
-        android:layout_below="@id/param_item_title_group"
         android:layout_width="match_parent"
-        android:layout_height="1px" />
+        android:layout_height="1px"
+        android:layout_below="@id/param_item_title_group"
+        android:layout_marginTop="@dimen/control_dp12"
+        android:background="@drawable/divider" />
 </RelativeLayout>

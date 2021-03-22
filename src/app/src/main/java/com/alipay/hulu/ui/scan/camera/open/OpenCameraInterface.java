@@ -24,20 +24,21 @@ import android.util.Log;
  */
 public final class OpenCameraInterface {
 
+    /**
+     * For {@link #open(int)}, means no preference for which camera to open.
+     */
+    public static final int NO_REQUESTED_CAMERA = -1;
     private static final String TAG = OpenCameraInterface.class.getName();
 
     private OpenCameraInterface() {
     }
 
-    /** For {@link #open(int)}, means no preference for which camera to open. */
-    public static final int NO_REQUESTED_CAMERA = -1;
-
     /**
      * Opens the requested camera with {@link Camera#open(int)}, if one exists.
      *
      * @param cameraId camera ID of the camera to use. A negative value
-     *  or {@link #NO_REQUESTED_CAMERA} means "no preference", in which case a rear-facing
-     *  camera is returned if possible or else any camera
+     *                 or {@link #NO_REQUESTED_CAMERA} means "no preference", in which case a rear-facing
+     *                 camera is returned if possible or else any camera
      * @return handle to {@link OpenCamera} that was opened
      */
     public static OpenCamera open(int cameraId) {

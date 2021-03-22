@@ -15,19 +15,6 @@
  */
 package com.alipay.hulu.common.utils;
 
-import android.content.ContentUris;
-import android.content.Context;
-import android.content.Intent;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.Build;
-import android.os.Environment;
-import android.provider.DocumentsContract;
-import android.provider.MediaStore;
-
-import com.alipay.hulu.common.application.LauncherApplication;
-import com.alipay.hulu.common.service.SPService;
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -41,6 +28,19 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.math.BigInteger;
 import java.security.MessageDigest;
+
+import com.alipay.hulu.common.application.LauncherApplication;
+import com.alipay.hulu.common.service.SPService;
+
+import android.content.ContentUris;
+import android.content.Context;
+import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Environment;
+import android.provider.DocumentsContract;
+import android.provider.MediaStore;
 
 /**
  * Created by ruyao.yry on 2018/3/25.
@@ -97,6 +97,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 
     /**
      * 强制设置根目录
+     *
      * @param path
      */
     public static void setSolopiBaseDir(String path) {
@@ -128,6 +129,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 
     /**
      * 获取Solopi文件夹目录名称
+     *
      * @return
      */
     public static String getSolopiFolderName() {
@@ -140,6 +142,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 
     /**
      * 获取Solopi输出目录
+     *
      * @return
      */
     public static File getSolopiDir() {
@@ -160,6 +163,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 
     /**
      * 只有在开了IO权限也写不了的情况下才会fallback
+     *
      * @param context
      * @return
      */
@@ -192,16 +196,18 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 
     /**
      * 获取需要自动清理文件夹列表
+     *
      * @return
      */
     public static File[] getAutoClearDirs() {
-        return new File[] {getSubDir("download"), getSubDir("screenshot"),
+        return new File[]{getSubDir("download"), getSubDir("screenshot"),
                 getSubDir("tmp"), getSubDir("logcat"), getSubDir("ScreenCaptures"),
                 new File(LauncherApplication.getInstance().getExternalCacheDir(), "logs")};
     }
 
     /**
      * 获取SoloPi子目录
+     *
      * @return
      */
     public static File getSubDir(String name) {
@@ -215,6 +221,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 
     /**
      * 获取SoloPiCache目录
+     *
      * @param name
      * @return
      */
@@ -229,6 +236,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 
     /**
      * 获取shell下的路径
+     *
      * @param file
      * @return
      */
@@ -252,6 +260,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 
     /**
      * 获取SoloPi子目录
+     *
      * @return
      */
     public static File getInnerSubDir(String name) {
@@ -263,12 +272,12 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
         return subDir;
     }
 
-    public static byte[] getFileBytes(File file){
+    public static byte[] getFileBytes(File file) {
         byte[] buf = null;
         try {
             InputStream in = new FileInputStream(file);
             buf = new byte[in.available()];
-            while (in.read(buf) != -1);
+            while (in.read(buf) != -1) ;
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -368,6 +377,7 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
 
     /**
      * 检查文件MD5值
+     *
      * @param file
      * @param md5
      * @return

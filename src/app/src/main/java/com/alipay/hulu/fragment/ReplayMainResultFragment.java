@@ -16,16 +16,8 @@
 package com.alipay.hulu.fragment;
 
 
-import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import android.util.Pair;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.alipay.hulu.R;
 import com.alipay.hulu.bean.ReplayResultBean;
@@ -35,8 +27,16 @@ import com.alipay.hulu.common.utils.StringUtil;
 import com.alipay.hulu.shared.node.tree.export.bean.OperationStep;
 import com.alipay.hulu.ui.RecycleViewDivider;
 
-import java.util.ArrayList;
-import java.util.List;
+import android.os.Bundle;
+import android.util.Pair;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 
 public class ReplayMainResultFragment extends Fragment {
@@ -143,6 +143,7 @@ public class ReplayMainResultFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getActivity()));
         recyclerView.setAdapter(new RecyclerView.Adapter<ResultItemViewHolder>() {
             private LayoutInflater mInflater = LayoutInflater.from(ReplayMainResultFragment.this.getActivity());
+
             @Override
             public ResultItemViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
                 return new ResultItemViewHolder(mInflater.inflate(R.layout.item_case_result, parent, false));
@@ -156,7 +157,7 @@ public class ReplayMainResultFragment extends Fragment {
 
             @Override
             public int getItemCount() {
-                return contents == null? 0: contents.size();
+                return contents == null ? 0 : contents.size();
             }
         });
 

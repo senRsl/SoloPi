@@ -15,12 +15,13 @@
  */
 package com.alipay.hulu.scheme;
 
-import android.app.Activity;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.content.Context;
-import android.content.pm.ApplicationInfo;
-import android.provider.Settings;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import com.alipay.hulu.R;
 import com.alipay.hulu.activity.MyApplication;
@@ -38,14 +39,11 @@ import com.alipay.hulu.shared.display.DisplayProvider;
 import com.alipay.hulu.shared.display.items.base.RecordPattern;
 import com.alipay.hulu.util.RecordUtil;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import android.app.Activity;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.content.Context;
+import android.content.pm.ApplicationInfo;
 
 /**
  * Created by qiaoruikai on 2019/12/4 4:47 PM.
@@ -58,9 +56,8 @@ public class PerformanceSchemeResolver implements SchemeActionResolver {
     private static final String NORMAL_ITEMS = "items";
     private static final String REPORT_URL = "url";
     private static final String ACTION = "action";
-
-    private Notification notification;
     private static final int PERFORMANCE_RECORD_ID = 12201;
+    private Notification notification;
     private boolean isRecording = false;
 
     @Override
@@ -80,6 +77,7 @@ public class PerformanceSchemeResolver implements SchemeActionResolver {
 
     /**
      * 处理正常性能录制
+     *
      * @param context
      * @param params
      * @return
@@ -117,7 +115,7 @@ public class PerformanceSchemeResolver implements SchemeActionResolver {
             // 逐项开启
             List<DisplayItemInfo> displayItems = displayProvider.getAllDisplayItems();
             Set<String> allPermissions = new HashSet<>();
-            for (DisplayItemInfo info: displayItems) {
+            for (DisplayItemInfo info : displayItems) {
                 if (items.contains(info.getKey())) {
                     allPermissions.addAll(info.getPermissions());
                 }

@@ -15,10 +15,10 @@
  */
 package com.alipay.hulu.shared.io.db;
 
+import org.greenrobot.greendao.database.Database;
+
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
-
-import org.greenrobot.greendao.database.Database;
 
 
 /**

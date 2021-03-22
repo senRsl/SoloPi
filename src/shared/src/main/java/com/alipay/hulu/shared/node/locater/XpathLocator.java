@@ -15,6 +15,13 @@
  */
 package com.alipay.hulu.shared.node.locater;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.alipay.hulu.common.service.SPService;
 import com.alipay.hulu.common.utils.LogUtil;
 import com.alipay.hulu.common.utils.StringUtil;
@@ -22,13 +29,6 @@ import com.alipay.hulu.shared.node.locater.comparator.ItemComparator;
 import com.alipay.hulu.shared.node.tree.AbstractNodeTree;
 import com.alipay.hulu.shared.node.tree.FakeNodeTree;
 import com.alipay.hulu.shared.node.tree.accessibility.tree.AccessibilityNodeTree;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 
 /**
@@ -57,7 +57,7 @@ public class XpathLocator {
         if (!(root instanceof FakeNodeTree)) {
             AbstractNodeTree fakeNode = new AccessibilityNodeTree(null, null);
             fakeNode.setChildrenNodes(Arrays.asList(root));
-            findResult= Arrays.asList(fakeNode);
+            findResult = Arrays.asList(fakeNode);
         } else {
             findResult = Arrays.asList(root);
         }
@@ -85,11 +85,12 @@ public class XpathLocator {
 
     /**
      * 在当前子节点列表中查找匹配规则对象
-     * @param items 子节点列表
+     *
+     * @param items            子节点列表
      * @param isDirectToParent 是否只查询直接子节点
-     * @param itemType 查询对象类型
-     * @param itemIdx 查询对象顺序
-     * @param findResult 存储查询结果
+     * @param itemType         查询对象类型
+     * @param itemIdx          查询对象顺序
+     * @param findResult       存储查询结果
      * @return 是否查询到
      */
     private static boolean findNodeWithRule(List<AbstractNodeTree> items, boolean isDirectToParent, final String itemType, int itemIdx, final Map<String, String> filter, List<AbstractNodeTree> findResult) {
@@ -110,7 +111,7 @@ public class XpathLocator {
                             return false;
                         }
 
-                        for (String key: filter.keySet()) {
+                        for (String key : filter.keySet()) {
                             flag = StringUtil.equals(StringUtil.toString(item.getField(key)), filter.get(key));
 
                             if (!flag) {
@@ -122,7 +123,7 @@ public class XpathLocator {
                 };
 
                 // ID只用找一个
-                for (AbstractNodeTree node: items) {
+                for (AbstractNodeTree node : items) {
                     if (comparator.isEqual(node)) {
                         findResult.add(node);
                         return true;
@@ -175,7 +176,7 @@ public class XpathLocator {
                             return false;
                         }
 
-                        for (String key: filter.keySet()) {
+                        for (String key : filter.keySet()) {
                             flag = StringUtil.equals(StringUtil.toString(item.getField(key)), filter.get(key));
 
                             if (!flag) {
@@ -259,7 +260,7 @@ public class XpathLocator {
 
         String[] split = xpath.replace("//", "/#").replace("]", "").split("/");
 
-        for (String part: split) {
+        for (String part : split) {
             if (part.length() == 0) {
                 continue;
             }
@@ -284,7 +285,7 @@ public class XpathLocator {
                     filter.put(kv[0].substring(1), kv[1].substring(1, kv[1].length() - 1));
                     current.filter = filter;
                     current.itemIndex = 0;
-                // [12]
+                    // [12]
                 } else {
                     current.itemIndex = Integer.parseInt(tagAndConfig[1]);
                 }
@@ -296,12 +297,13 @@ public class XpathLocator {
 
     /**
      * 去重并排序查找结果
+     *
      * @param nodeList
      * @return
      */
-    private static List<AbstractNodeTree>  sortNodeLists(List<AbstractNodeTree> nodeList) {
+    private static List<AbstractNodeTree> sortNodeLists(List<AbstractNodeTree> nodeList) {
         List<AbstractNodeTree> resultList = new ArrayList<>();
-        for (AbstractNodeTree nodeTree: nodeList) {
+        for (AbstractNodeTree nodeTree : nodeList) {
             if (!resultList.contains(nodeTree)) {
                 resultList.add(nodeTree);
             }
@@ -424,7 +426,7 @@ public class XpathLocator {
                 sb.append("itemType='").append(StringUtil.hash(itemType)).append('\'');
                 sb.append(", filter=[");
                 if (filter != null) {
-                    for (String key: filter.keySet()) {
+                    for (String key : filter.keySet()) {
                         sb.append(key).append("=").append(StringUtil.hash(filter.get(key))).append(',');
                     }
                 }

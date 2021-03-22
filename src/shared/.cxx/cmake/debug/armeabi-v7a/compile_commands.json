@@ -1,0 +1,19 @@
+[
+{
+  "directory": "/Users/senrsl/temp/SoloPi/src/shared/.cxx/cmake/debug/armeabi-v7a",
+  "command": "/Users/senrsl/android/android-ndk-r14b/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang --target=armv7-none-linux-androideabi --gcc-toolchain=/Users/senrsl/android/android-ndk-r14b/toolchains/arm-linux-androideabi-4.9/prebuilt/darwin-x86_64 --sysroot=/Users/senrsl/android/android-ndk-r14b/platforms/android-18/arch-arm -DnativeModule_EXPORTS  -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16 -fno-integrated-as -mthumb -Wa,--noexecstack -Wformat -Werror=format-security -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16 -fno-integrated-as -mthumb -Wa,--noexecstack -Wformat -Werror=format-security  -O0 -fno-limit-debug-info -O0 -fno-limit-debug-info  -fPIC   -o CMakeFiles/nativeModule.dir/memory_malloc.c.o   -c /Users/senrsl/temp/SoloPi/src/shared/src/main/cpp/memory_malloc.c",
+  "file": "/Users/senrsl/temp/SoloPi/src/shared/src/main/cpp/memory_malloc.c"
+},
+
+{
+  "directory": "/Users/senrsl/temp/SoloPi/src/shared/.cxx/cmake/debug/armeabi-v7a",
+  "command": "/Users/senrsl/android/android-ndk-r14b/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang --target=armv7-none-linux-androideabi --gcc-toolchain=/Users/senrsl/android/android-ndk-r14b/toolchains/arm-linux-androideabi-4.9/prebuilt/darwin-x86_64 --sysroot=/Users/senrsl/android/android-ndk-r14b/platforms/android-18/arch-arm -DnativeModule_EXPORTS  -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16 -fno-integrated-as -mthumb -Wa,--noexecstack -Wformat -Werror=format-security -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16 -fno-integrated-as -mthumb -Wa,--noexecstack -Wformat -Werror=format-security  -O0 -fno-limit-debug-info -O0 -fno-limit-debug-info  -fPIC   -o CMakeFiles/nativeModule.dir/cpu_usage.c.o   -c /Users/senrsl/temp/SoloPi/src/shared/src/main/cpp/cpu_usage.c",
+  "file": "/Users/senrsl/temp/SoloPi/src/shared/src/main/cpp/cpu_usage.c"
+},
+
+{
+  "directory": "/Users/senrsl/temp/SoloPi/src/shared/.cxx/cmake/debug/armeabi-v7a",
+  "command": "/Users/senrsl/android/android-ndk-r14b/toolchains/llvm/prebuilt/darwin-x86_64/bin/clang --target=armv7-none-linux-androideabi --gcc-toolchain=/Users/senrsl/android/android-ndk-r14b/toolchains/arm-linux-androideabi-4.9/prebuilt/darwin-x86_64 --sysroot=/Users/senrsl/android/android-ndk-r14b/platforms/android-18/arch-arm -DnativeModule_EXPORTS  -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16 -fno-integrated-as -mthumb -Wa,--noexecstack -Wformat -Werror=format-security -g -DANDROID -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -march=armv7-a -mfloat-abi=softfp -mfpu=vfpv3-d16 -fno-integrated-as -mthumb -Wa,--noexecstack -Wformat -Werror=format-security  -O0 -fno-limit-debug-info -O0 -fno-limit-debug-info  -fPIC   -o CMakeFiles/nativeModule.dir/time_convert.c.o   -c /Users/senrsl/temp/SoloPi/src/shared/src/main/cpp/time_convert.c",
+  "file": "/Users/senrsl/temp/SoloPi/src/shared/src/main/cpp/time_convert.c"
+}
+]

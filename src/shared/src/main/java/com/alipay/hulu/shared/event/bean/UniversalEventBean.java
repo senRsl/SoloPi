@@ -15,13 +15,13 @@
  */
 package com.alipay.hulu.shared.event.bean;
 
-import androidx.annotation.NonNull;
-import androidx.collection.ArrayMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import com.alipay.hulu.common.utils.StringUtil;
 
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import androidx.annotation.NonNull;
+import androidx.collection.ArrayMap;
 
 /**
  * 通用事件bean
@@ -50,6 +50,7 @@ public class UniversalEventBean {
 
     /**
      * 设置时间
+     *
      * @param time
      * @param timeUnit
      */
@@ -59,15 +60,8 @@ public class UniversalEventBean {
     }
 
     /**
-     * 设置毫秒时间
-     * @param time
-     */
-    public void setTime(long time) {
-        setTime(time, TimeUnit.MILLISECONDS);
-    }
-
-    /**
      * 获取毫秒制时间
+     *
      * @return
      */
     public long getTime() {
@@ -75,7 +69,17 @@ public class UniversalEventBean {
     }
 
     /**
+     * 设置毫秒时间
+     *
+     * @param time
+     */
+    public void setTime(long time) {
+        setTime(time, TimeUnit.MILLISECONDS);
+    }
+
+    /**
      * 获取特定格式时间
+     *
      * @param timeUnit
      * @return
      */
@@ -89,6 +93,7 @@ public class UniversalEventBean {
 
     /**
      * 设置参数
+     *
      * @param key
      * @param value
      */
@@ -98,6 +103,7 @@ public class UniversalEventBean {
 
     /**
      * 获取参数
+     *
      * @param key
      */
     public <T> T getParam(String key) {
@@ -141,7 +147,7 @@ public class UniversalEventBean {
         return "UniversalEventBean{" +
                 "eventTime=" + getTime() +
                 ", eventType='" + eventType + '\'' +
-                ", extras=" + StringUtil.hide(extras)  +
+                ", extras=" + StringUtil.hide(extras) +
                 '}';
     }
 }

@@ -15,6 +15,14 @@
  */
 package com.alipay.hulu.ui;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import com.alipay.hulu.R;
+import com.alipay.hulu.common.utils.ContextUtil;
+import com.alipay.hulu.common.utils.LogUtil;
+
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -28,19 +36,11 @@ import android.graphics.Rect;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
-
-import com.alipay.hulu.R;
-import com.alipay.hulu.common.utils.ContextUtil;
-import com.alipay.hulu.common.utils.LogUtil;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  * Created by qiaoruikai on 2019/12/6 4:50 PM.
@@ -108,7 +108,10 @@ public class GesturePadView extends View {
     private Paint gesturePaint;
 
     private List<Point> points;
-
+    private int oldWidth = -1;
+    private long lastBtnTime = -1L;
+    private boolean onPointTrack = false;
+    private long lastPointTime = -1L;
 
     public GesturePadView(Context context) {
         this(context, null);
@@ -133,6 +136,7 @@ public class GesturePadView extends View {
 
     /**
      * 读取参数
+     *
      * @param attrs
      */
     private void initAttrs(Context context, AttributeSet attrs) {
@@ -196,6 +200,7 @@ public class GesturePadView extends View {
 
     /**
      * 获取操作路径
+     *
      * @return
      */
     public List<PointF> getGesturePath() {
@@ -209,27 +214,29 @@ public class GesturePadView extends View {
 
         Rect rect = targetImg.getBounds();
         List<PointF> pointFS = new ArrayList<>(points.size() + 1);
-        for (Point p: points) {
-            pointFS.add(new PointF((p.x - (float) rect.left)/ rect.width(), (p.y - (float) rect.top)/ rect.height()));
+        for (Point p : points) {
+            pointFS.add(new PointF((p.x - (float) rect.left) / rect.width(), (p.y - (float) rect.top) / rect.height()));
         }
 
         return pointFS;
     }
 
     /**
-     * 设置触摸事件时间间隔
-     * @param gestureFilter
-     */
-    public void setGestureFilter(int gestureFilter) {
-        this.gestureActionFilter = gestureFilter;
-    }
-
-    /**
      * 获取触摸事件时间间隔
+     *
      * @return
      */
     public int getGestureFilter() {
         return gestureActionFilter;
+    }
+
+    /**
+     * 设置触摸事件时间间隔
+     *
+     * @param gestureFilter
+     */
+    public void setGestureFilter(int gestureFilter) {
+        this.gestureActionFilter = gestureFilter;
     }
 
     public void clear() {
@@ -253,6 +260,7 @@ public class GesturePadView extends View {
 
     /**
      * 加载操作图片
+     *
      * @param drawable
      */
     public void setTargetImage(@NonNull Drawable drawable) {
@@ -273,11 +281,9 @@ public class GesturePadView extends View {
         }
     }
 
-    private int oldWidth = -1;
-
     private void reloadWidth(int width) {
         oldWidth = width;
-        backgroundRes.setBounds(0, 0 ,width, width);
+        backgroundRes.setBounds(0, 0, width, width);
         clearBtnRect.set(width - clearBtnSize - padding, padding, width - padding, clearBtnSize + padding);
         int padding = (int) (clearBtnRect.height() * 0.2F);
         clearBtnRes.setBounds(clearBtnRect.left + padding, clearBtnRect.top + padding,
@@ -366,11 +372,6 @@ public class GesturePadView extends View {
         }
     }
 
-    private long lastBtnTime = -1L;
-
-    private boolean onPointTrack = false;
-    private long lastPointTime = -1L;
-
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         int[] originScreen = new int[2];
@@ -385,7 +386,7 @@ public class GesturePadView extends View {
                 if (clearBtnRect.contains(x, y)) {
                     lastBtnTime = System.currentTimeMillis();
                     onPointTrack = false;
-                } else if (targetImg != null && targetImg.getBounds().contains(x, y))  {
+                } else if (targetImg != null && targetImg.getBounds().contains(x, y)) {
                     points.add(new Point(x, y));
                     invalidate();
                     onPointTrack = true;
@@ -400,7 +401,7 @@ public class GesturePadView extends View {
                     if (!clearBtnRect.contains(x, y)) {
                         lastBtnTime = -1;
                     }
-                } else if (onPointTrack)  {
+                } else if (onPointTrack) {
                     if (targetImg.getBounds().contains(x, y)) {
                         if (System.currentTimeMillis() - lastPointTime >= gestureActionFilter) {
 
@@ -430,7 +431,7 @@ public class GesturePadView extends View {
                         points.clear();
                         invalidate();
                     }
-                } else if (onPointTrack)  {
+                } else if (onPointTrack) {
                     if (targetImg.getBounds().contains(x, y)) {
                         if (System.currentTimeMillis() - lastPointTime >= gestureActionFilter) {
                             int count = (int) ((System.currentTimeMillis() - lastPointTime) / gestureActionFilter);

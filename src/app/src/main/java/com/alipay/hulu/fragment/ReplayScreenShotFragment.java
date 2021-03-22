@@ -15,17 +15,12 @@
  */
 package com.alipay.hulu.fragment;
 
-import android.os.Bundle;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import android.util.Pair;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import com.alipay.hulu.R;
 import com.alipay.hulu.bean.ReplayResultBean;
@@ -36,12 +31,17 @@ import com.alipay.hulu.util.DialogUtils;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 
-import java.io.File;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import android.os.Bundle;
+import android.util.Pair;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * Created by qiaoruikai on 2018/11/7 4:55 PM.
@@ -50,11 +50,9 @@ public class ReplayScreenShotFragment extends Fragment {
     public static final String RESULT_BEAN_TAG = "ReplayStepBean";
 
     private static final String TAG = "ReplayScreenFrag";
-
-    private RecyclerView recyclerView;
-
-    private ReplayResultBean resultBean;
     List<Pair<String, Object>> screenshots;
+    private RecyclerView recyclerView;
+    private ReplayResultBean resultBean;
 
     public static ReplayScreenShotFragment newInstance(ReplayResultBean data) {
         ReplayScreenShotFragment fragment = new ReplayScreenShotFragment();
@@ -166,7 +164,7 @@ public class ReplayScreenShotFragment extends Fragment {
 
             @Override
             public int getItemCount() {
-                return screenshots == null? 0: screenshots.size();
+                return screenshots == null ? 0 : screenshots.size();
             }
         });
     }

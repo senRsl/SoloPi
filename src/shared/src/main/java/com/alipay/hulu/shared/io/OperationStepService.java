@@ -15,8 +15,6 @@
  */
 package com.alipay.hulu.shared.io;
 
-import android.content.Context;
-
 import com.alipay.hulu.common.application.LauncherApplication;
 import com.alipay.hulu.common.injector.InjectorService;
 import com.alipay.hulu.common.injector.param.Subscriber;
@@ -26,6 +24,8 @@ import com.alipay.hulu.common.service.base.LocalService;
 import com.alipay.hulu.common.utils.LogUtil;
 import com.alipay.hulu.shared.io.bean.OperationStepMessage;
 import com.alipay.hulu.shared.io.bean.RecordCaseInfo;
+
+import android.content.Context;
 
 /**
  * Created by qiaoruikai on 2018/10/10 8:35 PM.
@@ -52,6 +52,7 @@ public class OperationStepService implements ExportService {
 
     /**
      * 配置步骤处理器
+     *
      * @param processor
      */
     public void registerStepProcessor(OperationStepProcessor processor) {
@@ -60,6 +61,7 @@ public class OperationStepService implements ExportService {
 
     /**
      * 启动用例录制
+     *
      * @param recordCaseInfo
      */
     public void startRecord(RecordCaseInfo recordCaseInfo) {

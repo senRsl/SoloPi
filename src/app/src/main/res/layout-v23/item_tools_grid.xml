@@ -22,19 +22,20 @@
         android:layout_width="@dimen/dp_48"
         android:layout_height="@dimen/dp_48"
         android:orientation="vertical">
-            <TextView
-                android:layout_width="@dimen/control_dp64"
-                android:layout_height="@dimen/index_bandage_height"
-                android:layout_marginLeft="@dimen/minus_dp19"
-                android:layout_marginTop="@dimen/control_dp6"
-                android:textStyle="bold"
-                android:rotation="-45"
-                android:gravity="center"
-                android:paddingLeft="@dimen/control_dp16"
-                android:paddingRight="@dimen/control_dp16"
-                android:textColor="@color/white"
-                android:id="@+id/index_corner"
-                android:textSize="@dimen/textsize_10" />
+
+        <TextView
+            android:id="@+id/index_corner"
+            android:layout_width="@dimen/control_dp64"
+            android:layout_height="@dimen/index_bandage_height"
+            android:layout_marginLeft="@dimen/minus_dp19"
+            android:layout_marginTop="@dimen/control_dp6"
+            android:gravity="center"
+            android:paddingLeft="@dimen/control_dp16"
+            android:paddingRight="@dimen/control_dp16"
+            android:rotation="-45"
+            android:textColor="@color/white"
+            android:textSize="@dimen/textsize_10"
+            android:textStyle="bold" />
     </LinearLayout>
 
     <!-- 标题拦 -->
@@ -43,8 +44,7 @@
         android:layout_width="@dimen/dp_56"
         android:layout_height="@dimen/dp_56"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="@dimen/control_dp30"
-        />
+        android:layout_marginTop="@dimen/control_dp30" />
 
     <TextView
         android:id="@+id/tv"

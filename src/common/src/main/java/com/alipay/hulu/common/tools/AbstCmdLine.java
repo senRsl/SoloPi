@@ -22,7 +22,10 @@ import java.io.IOException;
  */
 public interface AbstCmdLine {
     void writeCommand(String cmd);
+
     String readOutput();
+
     void close() throws IOException;
+
     boolean isClosed();
 }

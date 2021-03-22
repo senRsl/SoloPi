@@ -15,6 +15,8 @@
  */
 package com.alipay.hulu.screenRecord;
 
+import com.alipay.hulu.R;
+
 import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationChannel;
@@ -24,10 +26,6 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
 import android.os.Build;
-import android.os.SystemClock;
-import android.text.format.DateUtils;
-
-import com.alipay.hulu.R;
 
 /**
  * @author yrom
@@ -46,6 +44,20 @@ public class Notifications extends ContextWrapper {
 
     public Notifications(Context context) {
         super(context);
+    }
+
+    public static Notification.Builder generateNotificationBuilder(Context context) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            String channelId = HULU_NOTIFICATIONS_CHANNEL_ID;
+            NotificationChannel channel = new NotificationChannel(channelId, channelId, NotificationManager.IMPORTANCE_DEFAULT);
+            NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            if (nm.getNotificationChannel(channelId) == null) {
+                nm.createNotificationChannel(channel);
+            }
+            return new Notification.Builder(context, channelId);
+        } else {
+            return new Notification.Builder(context);
+        }
     }
 
     public void recording(long timeMs) {
@@ -75,20 +87,6 @@ public class Notifications extends ContextWrapper {
                     .setUsesChronometer(true);
         }
         return mBuilder;
-    }
-
-    public static Notification.Builder generateNotificationBuilder(Context context) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            String channelId = HULU_NOTIFICATIONS_CHANNEL_ID;
-            NotificationChannel channel = new NotificationChannel(channelId, channelId, NotificationManager.IMPORTANCE_DEFAULT);
-            NotificationManager nm = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-            if (nm.getNotificationChannel(channelId) == null) {
-                nm.createNotificationChannel(channel);
-            }
-            return new Notification.Builder(context, channelId);
-        } else {
-            return new Notification.Builder(context);
-        }
     }
 
     private Notification.Action stopAction() {

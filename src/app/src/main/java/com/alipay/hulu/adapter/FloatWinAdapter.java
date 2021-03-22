@@ -15,31 +15,30 @@
  */
 package com.alipay.hulu.adapter;
 
-import android.content.Context;
-import androidx.recyclerview.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.MotionEvent;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.alipay.hulu.R;
 import com.alipay.hulu.common.utils.StringUtil;
 import com.alipay.hulu.service.DisplayManager;
 import com.alipay.hulu.shared.display.DisplayItemInfo;
 
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
-import java.util.List;
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+import androidx.recyclerview.widget.RecyclerView;
 
 public class FloatWinAdapter extends RecyclerView.Adapter<FloatWinAdapter.InformationViewHolder> {
-	private String TAG = "FloatWinAdapter";
-	private LayoutInflater mInflater;
+    Context context;
+    private String TAG = "FloatWinAdapter";
+    private LayoutInflater mInflater;
     private List<DisplayItemInfo> listViewData;
     private List<String> contents;
     private WeakReference<DisplayManager> managerRef;
-	Context context;
-
     private View.OnTouchListener listener = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
@@ -47,19 +46,19 @@ public class FloatWinAdapter extends RecyclerView.Adapter<FloatWinAdapter.Inform
         }
     };
 
+    public FloatWinAdapter(Context context, DisplayManager manager, List<DisplayItemInfo> listViewData) {
+        this.context = context;
+        this.managerRef = new WeakReference<>(manager);
+        this.listViewData = listViewData;
+        this.contents = new ArrayList<>();
+        mInflater = LayoutInflater.from(context);
+    }
+
     public void updateListViewSource(List<DisplayItemInfo> infoList, List<String> messages) {
         this.listViewData = infoList;
         this.contents = messages;
         notifyDataSetChanged();
     }
-
-    public FloatWinAdapter(Context context, DisplayManager manager, List<DisplayItemInfo> listViewData) {
-		this.context = context;
-		this.managerRef = new WeakReference<>(manager);
-		this.listViewData = listViewData;
-		this.contents = new ArrayList<>();
-        mInflater = LayoutInflater.from(context);
-	}
 
     @Override
     public InformationViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -86,7 +85,7 @@ public class FloatWinAdapter extends RecyclerView.Adapter<FloatWinAdapter.Inform
     }
 
     static final class InformationViewHolder extends RecyclerView.ViewHolder {
-		private TextView content;
+        private TextView content;
         private TextView appTitle;
         private TextView trigger;
         private DisplayItemInfo currentInfo;

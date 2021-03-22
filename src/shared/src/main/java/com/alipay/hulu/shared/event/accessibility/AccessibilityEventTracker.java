@@ -15,14 +15,8 @@
  */
 package com.alipay.hulu.shared.event.accessibility;
 
-import android.accessibilityservice.AccessibilityService;
-import android.app.Notification;
-import android.graphics.Rect;
-import android.os.Build;
-import android.os.Parcelable;
-import android.os.SystemClock;
-import android.view.accessibility.AccessibilityEvent;
-import android.view.accessibility.AccessibilityNodeInfo;
+import java.lang.ref.WeakReference;
+import java.util.List;
 
 import com.alipay.hulu.common.application.LauncherApplication;
 import com.alipay.hulu.common.injector.InjectorService;
@@ -42,15 +36,21 @@ import com.alipay.hulu.shared.node.locater.OperationNodeLocator;
 import com.alipay.hulu.shared.node.tree.AbstractNodeTree;
 import com.android.permission.rom.RomUtils;
 
-import java.lang.ref.WeakReference;
-import java.util.List;
+import android.accessibilityservice.AccessibilityService;
+import android.app.Notification;
+import android.graphics.Rect;
+import android.os.Build;
+import android.os.Parcelable;
+import android.os.SystemClock;
+import android.view.accessibility.AccessibilityEvent;
+import android.view.accessibility.AccessibilityNodeInfo;
 
 /**
  * Created by qiaoruikai on 2018/10/9 4:05 PM.
  */
 @Provider(@Param(value = Constant.EVENT_TOAST_MSG, type = String.class))
 public class AccessibilityEventTracker {
-    private static final String TAG ="AccessEventTracker";
+    private static final String TAG = "AccessEventTracker";
 
     private WeakReference<AccessibilityListener> accessibilityListenerRef;
 
@@ -100,6 +100,7 @@ public class AccessibilityEventTracker {
 
     /**
      * 通知手势
+     *
      * @param gesture
      */
     protected void notifyGestureEvent(int gesture) {
@@ -110,6 +111,7 @@ public class AccessibilityEventTracker {
 
     /**
      * 通知AccessibilityEvent
+     *
      * @param event
      */
     protected void notifyAccessibilityEvent(AccessibilityEvent event) {
@@ -130,7 +132,7 @@ public class AccessibilityEventTracker {
                         operationRef.get().doSomeAction(method, null);
                     }
                 }, 10);
-            // Vivo的悬浮窗比较特殊
+                // Vivo的悬浮窗比较特殊
             } else if (RomUtils.isVivoSystem() && StringUtil.equals(event.getPackageName(), "android")
                     && StringUtil.equals(event.getClassName(), "android.app.AlertDialog")
                     && event.getSource() != null) {
@@ -146,7 +148,7 @@ public class AccessibilityEventTracker {
                         }
                     }, 10);
                 }
-            // 小米的权限弹窗
+                // 小米的权限弹窗
             } else if (RomUtils.checkIsMiuiRom() && StringUtil.equals(event.getPackageName(), "com.lbe.security.miui")
                     && event.getSource() != null) {
                 BackgroundExecutor.execute(new Runnable() {
@@ -157,7 +159,7 @@ public class AccessibilityEventTracker {
                         operationRef.get().doSomeAction(method, null);
                     }
                 }, 10);
-            // 锤子的悬浮窗
+                // 锤子的悬浮窗
             } else if (RomUtils.isSmartisanSystem() && StringUtil.equals(event.getClassName(), "com.android.server.SmtPermissionDialog")) {
                 BackgroundExecutor.execute(new Runnable() {
                     @Override
@@ -167,9 +169,9 @@ public class AccessibilityEventTracker {
                         operationRef.get().doSomeAction(method, null);
                     }
                 }, 10);
-            // Sony的悬浮窗
+                // Sony的悬浮窗
             } else if (RomUtils.isSonySystem() && StringUtil.equals(event.getPackageName(), "com.sonymobile.cta")
-                    &&StringUtil.contains(event.getClassName(), "GrantPermissionsActivity")) {
+                    && StringUtil.contains(event.getClassName(), "GrantPermissionsActivity")) {
                 BackgroundExecutor.execute(new Runnable() {
                     @Override
                     public void run() {
@@ -178,7 +180,7 @@ public class AccessibilityEventTracker {
                         operationRef.get().doSomeAction(method, null);
                     }
                 }, 10);
-            // 三星的权限提示框
+                // 三星的权限提示框
             } else if (RomUtils.isSamSungSystem() && StringUtil.equals(event.getPackageName(), "com.samsung.android.packageinstaller")
                     && event.getSource() != null) {
                 // 找下确认按钮
@@ -200,7 +202,7 @@ public class AccessibilityEventTracker {
                         }
                     });
                 }
-            // 华为9.0之后出现的权限弹窗，特别处理下
+                // 华为9.0之后出现的权限弹窗，特别处理下
             } else if (Build.VERSION.SDK_INT >= 28 && RomUtils.checkIsHuaweiRom()
                     && StringUtil.equals(event.getPackageName(), "com.android.packageinstaller")
                     && StringUtil.contains(event.getClassName(), "AlertDialog")) {
@@ -213,9 +215,9 @@ public class AccessibilityEventTracker {
                         operationRef.get().doSomeAction(method, null);
                     }
                 }, 10);
-            // Android Q 权限处理
+                // Android Q 权限处理
             } else if (Build.VERSION.SDK_INT >= 29 && (StringUtil.equals(event.getPackageName(), "com.android.permissioncontroller")
-                        || StringUtil.equals(event.getPackageName(), "com.google.android.permissioncontroller"))
+                    || StringUtil.equals(event.getPackageName(), "com.google.android.permissioncontroller"))
                     && event.getSource() != null) {
                 // Google官方系统弹窗
                 BackgroundExecutor.execute(new Runnable() {
@@ -310,7 +312,7 @@ public class AccessibilityEventTracker {
                     }
                 }
             }
-        } else if(event.getEventType() == AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED) {
+        } else if (event.getEventType() == AccessibilityEvent.TYPE_NOTIFICATION_STATE_CHANGED) {
             //获取消息来源
             String sourcePackageName = (String) event.getPackageName();
             //获取事件具体信息
@@ -337,6 +339,7 @@ public class AccessibilityEventTracker {
 
     /**
      * 获取系统启动的时间
+     *
      * @return
      */
     private long getMilliSecondsSinceDeviceStart() {
@@ -352,6 +355,7 @@ public class AccessibilityEventTracker {
      */
     public interface AccessibilityListener {
         void onAccessibilityEvent(long time, int eventType, AccessibilityNodeInfo node, String sourcePackage);
+
         void onGesture(int gesture);
     }
 }

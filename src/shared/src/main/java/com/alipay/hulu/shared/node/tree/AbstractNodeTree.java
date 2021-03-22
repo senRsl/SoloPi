@@ -16,9 +16,13 @@
 package com.alipay.hulu.shared.node.tree;
 
 
-import android.graphics.Rect;
-
-import androidx.annotation.NonNull;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Queue;
 
 import com.alipay.hulu.common.injector.InjectorService;
 import com.alipay.hulu.common.tools.CmdTools;
@@ -32,13 +36,8 @@ import com.alipay.hulu.shared.node.action.OperationMethod;
 import com.alipay.hulu.shared.node.action.PerformActionEnum;
 import com.alipay.hulu.shared.node.utils.NodeTreeUtil;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import android.graphics.Rect;
+import androidx.annotation.NonNull;
 
 /**
  * 抽象节点树
@@ -123,6 +122,7 @@ public abstract class AbstractNodeTree implements Iterable<AbstractNodeTree> {
 
     /**
      * 是否能够执行操作
+     *
      * @param action 操作类型
      * @return
      */
@@ -130,7 +130,8 @@ public abstract class AbstractNodeTree implements Iterable<AbstractNodeTree> {
 
     /**
      * 执行操作
-     * @param method 操作方法
+     *
+     * @param method  操作方法
      * @param context 执行上下文
      * @return
      */
@@ -246,7 +247,8 @@ public abstract class AbstractNodeTree implements Iterable<AbstractNodeTree> {
                 if (toHeight < 40) {
                     toHeight = 40;
                 }
-                context.executor.executeScroll(x, fromHeight, x, toHeight, 300);;
+                context.executor.executeScroll(x, fromHeight, x, toHeight, 300);
+                ;
                 break;
             case SCROLL_TO_BOTTOM:
                 LogUtil.i(TAG, "Start ADB scroll " + x + "," + y);
@@ -342,6 +344,7 @@ public abstract class AbstractNodeTree implements Iterable<AbstractNodeTree> {
 
     /**
      * 获取根节点
+     *
      * @return
      */
     public AbstractNodeTree getRoot() {
@@ -354,6 +357,7 @@ public abstract class AbstractNodeTree implements Iterable<AbstractNodeTree> {
 
     /**
      * 是否属于父节点
+     *
      * @param nodeTree
      * @return
      */
@@ -371,6 +375,7 @@ public abstract class AbstractNodeTree implements Iterable<AbstractNodeTree> {
 
     /**
      * 打印树结构
+     *
      * @param builder
      * @return
      */
@@ -378,12 +383,14 @@ public abstract class AbstractNodeTree implements Iterable<AbstractNodeTree> {
 
     /**
      * 自身是否可用于辅助定位
+     *
      * @return
      */
     public abstract boolean isSelfUsableForLocating();
 
     /**
      * 获取字段
+     *
      * @param key
      * @return
      */
@@ -397,7 +404,7 @@ public abstract class AbstractNodeTree implements Iterable<AbstractNodeTree> {
 
             // 查找该方法
             Method targetMethod = null;
-            for (Method method: allMethods) {
+            for (Method method : allMethods) {
                 if (StringUtil.equals(methodName, method.getName())) {
                     targetMethod = method;
                 }
@@ -429,20 +436,20 @@ public abstract class AbstractNodeTree implements Iterable<AbstractNodeTree> {
         childrenNodes.add(child);
     }
 
-    public void setChildrenNodes(List<AbstractNodeTree> children) {
-        this.childrenNodes = children;
-    }
-
-    public void setParent(AbstractNodeTree parent) {
-        this.parent = parent;
-    }
-
     public List<AbstractNodeTree> getChildrenNodes() {
         return childrenNodes;
     }
 
+    public void setChildrenNodes(List<AbstractNodeTree> children) {
+        this.childrenNodes = children;
+    }
+
     public AbstractNodeTree getParent() {
         return parent;
+    }
+
+    public void setParent(AbstractNodeTree parent) {
+        this.parent = parent;
     }
 
     public String getPackageName() {

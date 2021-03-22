@@ -15,32 +15,6 @@
  */
 package com.alipay.hulu.shared.node.tree.accessibility;
 
-import android.accessibilityservice.AccessibilityService;
-import android.graphics.Rect;
-import android.os.Build;
-import android.util.Pair;
-import android.view.accessibility.AccessibilityNodeInfo;
-import android.view.accessibility.AccessibilityWindowInfo;
-
-import com.alipay.hulu.common.application.LauncherApplication;
-import com.alipay.hulu.common.injector.InjectorService;
-import com.alipay.hulu.common.injector.param.SubscribeParamEnum;
-import com.alipay.hulu.common.injector.param.Subscriber;
-import com.alipay.hulu.common.injector.provider.Param;
-import com.alipay.hulu.common.service.SPService;
-import com.alipay.hulu.common.tools.CmdTools;
-import com.alipay.hulu.common.utils.Callback;
-import com.alipay.hulu.common.utils.LogUtil;
-import com.alipay.hulu.common.utils.MiscUtil;
-import com.alipay.hulu.common.utils.StringUtil;
-import com.alipay.hulu.shared.R;
-import com.alipay.hulu.shared.event.accessibility.AccessibilityServiceImpl;
-import com.alipay.hulu.shared.node.AbstractProvider;
-import com.alipay.hulu.shared.node.tree.FakeNodeTree;
-import com.alipay.hulu.shared.node.tree.MetaTree;
-import com.alipay.hulu.shared.node.tree.annotation.NodeProvider;
-import com.alipay.hulu.shared.node.utils.NodeContext;
-
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -48,6 +22,30 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+
+import com.alipay.hulu.common.application.LauncherApplication;
+import com.alipay.hulu.common.injector.InjectorService;
+import com.alipay.hulu.common.injector.param.SubscribeParamEnum;
+import com.alipay.hulu.common.injector.param.Subscriber;
+import com.alipay.hulu.common.injector.provider.Param;
+import com.alipay.hulu.common.tools.CmdTools;
+import com.alipay.hulu.common.utils.Callback;
+import com.alipay.hulu.common.utils.LogUtil;
+import com.alipay.hulu.common.utils.MiscUtil;
+import com.alipay.hulu.common.utils.StringUtil;
+import com.alipay.hulu.shared.R;
+import com.alipay.hulu.shared.node.AbstractProvider;
+import com.alipay.hulu.shared.node.tree.FakeNodeTree;
+import com.alipay.hulu.shared.node.tree.MetaTree;
+import com.alipay.hulu.shared.node.tree.annotation.NodeProvider;
+import com.alipay.hulu.shared.node.utils.NodeContext;
+
+import android.accessibilityservice.AccessibilityService;
+import android.graphics.Rect;
+import android.os.Build;
+import android.util.Pair;
+import android.view.accessibility.AccessibilityNodeInfo;
+import android.view.accessibility.AccessibilityWindowInfo;
 
 import static com.alipay.hulu.common.utils.activity.PermissionDialogActivity.cleanInstrumentationAndUiAutomator;
 
@@ -129,6 +127,7 @@ public class AccessibilityProvider implements AbstractProvider {
 
     /**
      * 获取根节点
+     *
      * @return
      */
     private MetaTree getRootInWindows() {
@@ -254,7 +253,7 @@ public class AccessibilityProvider implements AbstractProvider {
 
             // 最后全回收掉
             if (windowInfos.size() > 0) {
-                for (AccessibilityWindowInfo windowInfo: windowInfos) {
+                for (AccessibilityWindowInfo windowInfo : windowInfos) {
                     windowInfo.recycle();
                 }
             }
@@ -304,6 +303,7 @@ public class AccessibilityProvider implements AbstractProvider {
 
     /**
      * 加载Meta树
+     *
      * @return
      */
     private MetaTree loadMetaTree() {
@@ -311,7 +311,7 @@ public class AccessibilityProvider implements AbstractProvider {
         int retryCount = 0;
         while ((rootNode == null || rootNode.getCurrentNode() == null) && retryCount < 3) {
             MiscUtil.sleep(500);
-            retryCount ++;
+            retryCount++;
             rootNode = getRootInWindows();
         }
 
@@ -326,7 +326,7 @@ public class AccessibilityProvider implements AbstractProvider {
         Queue<Pair<MetaTree, AccessibilityNodeInfo>> nodeQueue = new LinkedList<>();
 
         if (rootNode.getCurrentNode() instanceof FakeNodeTree) {
-            for (MetaTree child: rootNode.getChildren()) {
+            for (MetaTree child : rootNode.getChildren()) {
                 nodeQueue.add(new Pair<>(child, (AccessibilityNodeInfo) child.getCurrentNode()));
             }
         } else {
@@ -341,7 +341,7 @@ public class AccessibilityProvider implements AbstractProvider {
             // 遇到WebView，重新加载
             if (!reloadFlag &&
                     (StringUtil.equals(info.getClassName(), "android.webkit.WebView")
-                    || StringUtil.contains(info.getClassName(), "com.uc.webkit"))) {
+                            || StringUtil.contains(info.getClassName(), "com.uc.webkit"))) {
                 reloadFlag = true;
                 LogUtil.d(TAG, "发现WebView，重载下界面");
                 info.performAction(AccessibilityNodeInfo.ACTION_ACCESSIBILITY_FOCUS);
@@ -462,6 +462,7 @@ public class AccessibilityProvider implements AbstractProvider {
 
     /**
      * 回收下临时的Node
+     *
      * @param root
      */
     private void recycleTmpTree(MetaTree root) {

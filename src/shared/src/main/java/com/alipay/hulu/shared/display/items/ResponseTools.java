@@ -15,9 +15,10 @@
  */
 package com.alipay.hulu.shared.display.items;
 
-import android.provider.Settings;
-import android.view.accessibility.AccessibilityEvent;
-import android.view.accessibility.AccessibilityNodeInfo;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.alipay.hulu.common.application.LauncherApplication;
 import com.alipay.hulu.common.injector.InjectorService;
@@ -26,7 +27,6 @@ import com.alipay.hulu.common.injector.param.Subscriber;
 import com.alipay.hulu.common.injector.provider.Param;
 import com.alipay.hulu.common.utils.LogUtil;
 import com.alipay.hulu.common.utils.StringUtil;
-import com.alipay.hulu.shared.R;
 import com.alipay.hulu.shared.display.items.base.DisplayItem;
 import com.alipay.hulu.shared.display.items.base.Displayable;
 import com.alipay.hulu.shared.display.items.base.RecordPattern;
@@ -36,10 +36,9 @@ import com.alipay.hulu.shared.event.EventService;
 import com.alipay.hulu.shared.event.bean.UniversalEventBean;
 import com.alipay.hulu.shared.event.constant.Constant;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import android.provider.Settings;
+import android.view.accessibility.AccessibilityEvent;
+import android.view.accessibility.AccessibilityNodeInfo;
 
 /**
  * Created by cathor on 17/7/25.
@@ -49,21 +48,15 @@ import java.util.Map;
 public class ResponseTools implements Displayable {
     public static final int RES = 1;
     private static final String TAG = "ResponseTools";
-
-    private EventsResponseType eventResponse = new EventsResponseType();
     private static long filter = 3000;
-
-    private String app;
-
-    private InjectorService service;
-    private EventService eventService;
-
-    private volatile boolean restartFlag = false;
-
     private static Long startTime;
-
     private static List<RecordPattern.RecordItem> responseList;
     private static List<RecordPattern.RecordItem> refreshList;
+    private EventsResponseType eventResponse = new EventsResponseType();
+    private String app;
+    private InjectorService service;
+    private EventService eventService;
+    private volatile boolean restartFlag = false;
 
     @Subscriber(@Param(SubscribeParamEnum.APP))
     public void setApp(String app) {
@@ -155,7 +148,7 @@ public class ResponseTools implements Displayable {
         }
 
         if (responseList != null && refreshList != null) {
-            LogUtil.d(TAG, "响应： [%d::%d]",  eventResponse.getResponsDate() - eventResponse.getClickDate(), eventResponse.getRefreshDate() - eventResponse.getClickDate());
+            LogUtil.d(TAG, "响应： [%d::%d]", eventResponse.getResponsDate() - eventResponse.getClickDate(), eventResponse.getRefreshDate() - eventResponse.getClickDate());
             // 响应时间，从点击到第一次窗口变化的时间间隔
             responseList.add(new RecordPattern.RecordItem(sendTime, (float) (eventResponse.getResponsDate() - eventResponse.getClickDate()), text + eventResponse.getOperation()));
             // 刷新时间，从点击到最后一次窗口变化的时间间隔
@@ -165,6 +158,7 @@ public class ResponseTools implements Displayable {
 
     /**
      * 处理点击事件
+     *
      * @param clickTime
      */
     private void processClickEvent(long clickTime) {
@@ -180,21 +174,19 @@ public class ResponseTools implements Displayable {
 
     /**
      * 处理内容变化事件
+     *
      * @param changeTime
      */
     private void processContentChange(long changeTime) {
-        if ( restartFlag == true )//第一次点击控件或者点击新控件
+        if (restartFlag == true)//第一次点击控件或者点击新控件
         {
             // 点击之后的第一次窗口变化时间为响应时间
             eventResponse.setResponsDate(changeTime);
             eventResponse.setRefreshDate(changeTime);
             restartFlag = false;
-        }
-        else
-        {
+        } else {
             // 持续更新刷新时间，直到两次的刷新间隔大于250ms
-            if ( changeTime - eventResponse.getRefreshDate() < filter )
-            {
+            if (changeTime - eventResponse.getRefreshDate() < filter) {
                 eventResponse.setRefreshDate(changeTime);
             }
         }

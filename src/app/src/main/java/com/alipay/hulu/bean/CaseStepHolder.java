@@ -15,9 +15,6 @@
  */
 package com.alipay.hulu.bean;
 
-import com.alipay.hulu.shared.io.bean.RecordCaseInfo;
-import com.alipay.hulu.shared.node.tree.export.bean.OperationStep;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,18 +22,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.alipay.hulu.shared.io.bean.RecordCaseInfo;
+import com.alipay.hulu.shared.node.tree.export.bean.OperationStep;
+
 /**
  * Created by qiaoruikai on 2019-04-25 20:29.
  */
 public class CaseStepHolder {
+    private static final AtomicInteger counter = new AtomicInteger(1);
+    private static final AtomicInteger replayCounter = new AtomicInteger(1);
     private static Map<Integer, RecordCaseInfo> caseHolder = new HashMap<>();
     private static Map<Integer, ReplayResultBean> replayHolder = new HashMap<>();
     private static List<OperationStep> pasteContentHolder;
-    private static final AtomicInteger counter = new AtomicInteger(1);
-    private static final AtomicInteger replayCounter = new AtomicInteger(1);
 
     /**
      * 暂存用例
+     *
      * @param caseInfo
      * @return
      */
@@ -49,6 +50,7 @@ public class CaseStepHolder {
 
     /**
      * 暂存拷贝步骤
+     *
      * @param pasteContent
      */
     public static void storePasteContent(List<OperationStep> pasteContent) {
@@ -57,6 +59,7 @@ public class CaseStepHolder {
 
     /**
      * 获取并置空拷贝步骤
+     *
      * @return
      */
     public static List<OperationStep> getPasteContent() {
@@ -69,6 +72,7 @@ public class CaseStepHolder {
 
     /**
      * 是否包含拷贝步骤
+     *
      * @return
      */
     public static boolean containsPasteContent() {
@@ -77,6 +81,7 @@ public class CaseStepHolder {
 
     /**
      * 获取用例
+     *
      * @param id
      * @return
      */
@@ -86,6 +91,7 @@ public class CaseStepHolder {
 
     /**
      * 暂存结果
+     *
      * @param caseInfo
      * @return
      */
@@ -98,6 +104,7 @@ public class CaseStepHolder {
 
     /**
      * 获取结果
+     *
      * @param id
      * @return
      */

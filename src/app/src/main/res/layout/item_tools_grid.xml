@@ -22,18 +22,19 @@
         android:layout_width="@dimen/dp_48"
         android:layout_height="@dimen/control_dp32"
         android:orientation="horizontal">
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="@dimen/control_dp16"
-                android:layout_marginLeft="@dimen/minus_dp19"
-                android:layout_gravity="center_vertical"
-                android:textStyle="bold"
-                android:gravity="right|center_vertical"
-                android:paddingLeft="@dimen/control_dp16"
-                android:paddingRight="@dimen/control_dp12"
-                android:textColor="@color/white"
-                android:id="@+id/index_corner"
-                android:textSize="@dimen/textsize_10" />
+
+        <TextView
+            android:id="@+id/index_corner"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/control_dp16"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="@dimen/minus_dp19"
+            android:gravity="right|center_vertical"
+            android:paddingLeft="@dimen/control_dp16"
+            android:paddingRight="@dimen/control_dp12"
+            android:textColor="@color/white"
+            android:textSize="@dimen/textsize_10"
+            android:textStyle="bold" />
     </LinearLayout>
 
     <!-- 标题拦 -->
@@ -42,7 +43,7 @@
         android:layout_width="@dimen/dp_56"
         android:layout_height="@dimen/dp_56"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="@dimen/control_dp30"/>
+        android:layout_marginTop="@dimen/control_dp30" />
 
     <TextView
         android:id="@+id/tv"

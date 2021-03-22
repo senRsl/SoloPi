@@ -32,21 +32,19 @@
 
 package com.alipay.hulu.ui.scan.camera;
 
-import android.hardware.Camera;
-import android.os.AsyncTask;
-import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.RejectedExecutionException;
 
+import android.hardware.Camera;
+import android.os.AsyncTask;
+import android.util.Log;
+
 final class AutoFocusManager implements Camera.AutoFocusCallback {
 
-    private static final String TAG = AutoFocusManager.class.getSimpleName();
-
     protected static final long DEFAULT_AUTO_FOCUS_INTERVAL_MS = 5000L;
+    private static final String TAG = AutoFocusManager.class.getSimpleName();
     private static final Collection<String> FOCUS_MODES_CALLING_AF;
-    private long autofocusIntervalMs = DEFAULT_AUTO_FOCUS_INTERVAL_MS;
 
     static {
         FOCUS_MODES_CALLING_AF = new ArrayList<>(2);
@@ -54,10 +52,11 @@ final class AutoFocusManager implements Camera.AutoFocusCallback {
         FOCUS_MODES_CALLING_AF.add(Camera.Parameters.FOCUS_MODE_MACRO);
     }
 
-    private boolean stopped;
-    private boolean focusing;
     private final boolean useAutoFocus;
     private final Camera camera;
+    private long autofocusIntervalMs = DEFAULT_AUTO_FOCUS_INTERVAL_MS;
+    private boolean stopped;
+    private boolean focusing;
     private AsyncTask<?, ?, ?> outstandingTask;
 
     AutoFocusManager(Camera camera) {
@@ -68,7 +67,8 @@ final class AutoFocusManager implements Camera.AutoFocusCallback {
         start();
     }
 
-    @Override public synchronized void onAutoFocus(boolean success, Camera theCamera) {
+    @Override
+    public synchronized void onAutoFocus(boolean success, Camera theCamera) {
         focusing = false;
         autoFocusAgainLater();
     }
@@ -133,7 +133,8 @@ final class AutoFocusManager implements Camera.AutoFocusCallback {
     }
 
     private final class AutoFocusTask extends AsyncTask<Object, Object, Object> {
-        @Override protected Object doInBackground(Object... voids) {
+        @Override
+        protected Object doInBackground(Object... voids) {
             try {
                 Thread.sleep(autofocusIntervalMs);
             } catch (InterruptedException e) {

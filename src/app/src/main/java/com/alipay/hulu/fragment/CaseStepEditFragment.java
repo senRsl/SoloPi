@@ -15,34 +15,12 @@
  */
 package com.alipay.hulu.fragment;
 
-import android.app.Dialog;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.Parcel;
-import android.provider.Settings;
-import androidx.annotation.Nullable;
-
-import com.alipay.hulu.shared.scan.ScanCodeType;
-import com.google.android.material.tabs.TabLayout;
-import androidx.appcompat.app.AlertDialog;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-import android.util.DisplayMetrics;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.view.WindowManager;
-import android.view.animation.AnimationUtils;
-import android.view.animation.LayoutAnimationController;
-import android.widget.AdapterView;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.alibaba.fastjson.JSON;
 import com.alipay.hulu.R;
@@ -78,10 +56,12 @@ import com.alipay.hulu.shared.node.tree.export.bean.OperationStep;
 import com.alipay.hulu.shared.node.utils.AppUtil;
 import com.alipay.hulu.shared.node.utils.LogicUtil;
 import com.alipay.hulu.shared.node.utils.PrepareUtil;
+import com.alipay.hulu.shared.scan.ScanCodeType;
 import com.alipay.hulu.ui.MaxHeightScrollView;
 import com.alipay.hulu.ui.TwoLevelSelectLayout;
 import com.alipay.hulu.util.CaseAppendOperationProcessor;
 import com.alipay.hulu.util.FunctionSelectUtil;
+import com.google.android.material.tabs.TabLayout;
 import com.yydcdut.sdlv.Menu;
 import com.yydcdut.sdlv.MenuItem;
 import com.yydcdut.sdlv.SlideAndDragListView;
@@ -89,37 +69,142 @@ import com.zhy.view.flowlayout.FlowLayout;
 import com.zhy.view.flowlayout.TagAdapter;
 import com.zhy.view.flowlayout.TagFlowLayout;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
+import android.app.Dialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Parcel;
+import android.provider.Settings;
+import android.util.DisplayMetrics;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.animation.AnimationUtils;
+import android.view.animation.LayoutAnimationController;
+import android.widget.AdapterView;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import static com.alipay.hulu.shared.node.utils.LogicUtil.SCOPE;
 
-public class CaseStepEditFragment extends BaseFragment implements TagFlowLayout.OnTagClickListener, CaseEditActivity.OnCaseSaveListener{
+public class CaseStepEditFragment extends BaseFragment implements TagFlowLayout.OnTagClickListener, CaseEditActivity.OnCaseSaveListener {
+    protected static final List<Integer> GLOBAL_KEYS = new ArrayList<>();
+    protected static final List<Integer> GLOBAL_ICONS = new ArrayList<>();
+    protected static final Map<Integer, List<TwoLevelSelectLayout.SubMenuItem>> GLOBAL_ACTION_MAP = new HashMap<>();
+    protected static final List<Integer> NODE_KEYS = new ArrayList<>();
+    protected static final List<Integer> NODE_ICONS = new ArrayList<>();
+    protected static final Map<Integer, List<TwoLevelSelectLayout.SubMenuItem>> NODE_ACTION_MAP = new HashMap<>();
     private static final String TAG = "CaseStepEditFragment";
+
+    // 初始化二级菜单
+    static {
+        // 节点操作
+        NODE_KEYS.add(R.string.function_group__click);
+        NODE_ICONS.add(R.drawable.dialog_action_drawable_quick_click_2);
+        List<TwoLevelSelectLayout.SubMenuItem> clickActions = new ArrayList<>();
+        clickActions.add(convertPerformActionToSubMenu(PerformActionEnum.CLICK));
+        clickActions.add(convertPerformActionToSubMenu(PerformActionEnum.LONG_CLICK));
+        clickActions.add(convertPerformActionToSubMenu(PerformActionEnum.CLICK_IF_EXISTS));
+        clickActions.add(convertPerformActionToSubMenu(PerformActionEnum.CLICK_QUICK));
+        clickActions.add(convertPerformActionToSubMenu(PerformActionEnum.MULTI_CLICK));
+        NODE_ACTION_MAP.put(R.string.function_group__click, clickActions);
+
+        NODE_KEYS.add(R.string.function_group__input);
+        NODE_ICONS.add(R.drawable.dialog_action_drawable_input);
+        List<TwoLevelSelectLayout.SubMenuItem> inputActions = new ArrayList<>();
+        inputActions.add(convertPerformActionToSubMenu(PerformActionEnum.INPUT));
+        inputActions.add(convertPerformActionToSubMenu(PerformActionEnum.INPUT_SEARCH));
+        NODE_ACTION_MAP.put(R.string.function_group__input, inputActions);
+
+        NODE_KEYS.add(R.string.function_group__scroll);
+        NODE_ICONS.add(R.drawable.dialog_action_drawable_scroll);
+        List<TwoLevelSelectLayout.SubMenuItem> scrollActions = new ArrayList<>();
+        scrollActions.add(convertPerformActionToSubMenu(PerformActionEnum.SCROLL_TO_BOTTOM));
+        scrollActions.add(convertPerformActionToSubMenu(PerformActionEnum.SCROLL_TO_TOP));
+        scrollActions.add(convertPerformActionToSubMenu(PerformActionEnum.SCROLL_TO_LEFT));
+        scrollActions.add(convertPerformActionToSubMenu(PerformActionEnum.SCROLL_TO_RIGHT));
+        scrollActions.add(convertPerformActionToSubMenu(PerformActionEnum.GESTURE));
+        NODE_ACTION_MAP.put(R.string.function_group__scroll, scrollActions);
+
+        NODE_KEYS.add(R.string.function_group__assert);
+        NODE_ICONS.add(R.drawable.dialog_action_drawable_assert);
+        List<TwoLevelSelectLayout.SubMenuItem> assertActions = new ArrayList<>();
+        assertActions.add(convertPerformActionToSubMenu(PerformActionEnum.ASSERT));
+        assertActions.add(convertPerformActionToSubMenu(PerformActionEnum.SLEEP_UNTIL));
+        assertActions.add(convertPerformActionToSubMenu(PerformActionEnum.LET_NODE));
+        assertActions.add(convertPerformActionToSubMenu(PerformActionEnum.CHECK_NODE));
+        NODE_ACTION_MAP.put(R.string.function_group__assert, assertActions);
+
+        // 全局操作
+        GLOBAL_KEYS.add(R.string.function_group__device);
+        GLOBAL_ICONS.add(R.drawable.dialog_action_drawable_device_operation);
+        List<TwoLevelSelectLayout.SubMenuItem> gDeviceActions = new ArrayList<>();
+        gDeviceActions.add(convertPerformActionToSubMenu(PerformActionEnum.BACK));
+        gDeviceActions.add(convertPerformActionToSubMenu(PerformActionEnum.HOME));
+        gDeviceActions.add(convertPerformActionToSubMenu(PerformActionEnum.HANDLE_ALERT));
+        gDeviceActions.add(convertPerformActionToSubMenu(PerformActionEnum.SCREENSHOT));
+        gDeviceActions.add(convertPerformActionToSubMenu(PerformActionEnum.SLEEP));
+        gDeviceActions.add(convertPerformActionToSubMenu(PerformActionEnum.EXECUTE_SHELL));
+        gDeviceActions.add(convertPerformActionToSubMenu(PerformActionEnum.NOTIFICATION));
+        gDeviceActions.add(convertPerformActionToSubMenu(PerformActionEnum.RECENT_TASK));
+        GLOBAL_ACTION_MAP.put(R.string.function_group__device, gDeviceActions);
+
+        GLOBAL_KEYS.add(R.string.function_group__app);
+        GLOBAL_ICONS.add(R.drawable.dialog_action_drawable_app_operation);
+        List<TwoLevelSelectLayout.SubMenuItem> gAppActions = new ArrayList<>();
+        gAppActions.add(convertPerformActionToSubMenu(PerformActionEnum.GOTO_INDEX));
+        gAppActions.add(convertPerformActionToSubMenu(PerformActionEnum.CHANGE_MODE));
+        gAppActions.add(convertPerformActionToSubMenu(PerformActionEnum.JUMP_TO_PAGE));
+        gAppActions.add(convertPerformActionToSubMenu(PerformActionEnum.GENERATE_QR_CODE));
+        gAppActions.add(convertPerformActionToSubMenu(PerformActionEnum.GENERATE_BAR_CODE));
+        gAppActions.add(convertPerformActionToSubMenu(PerformActionEnum.KILL_PROCESS));
+        GLOBAL_ACTION_MAP.put(R.string.function_group__app, gAppActions);
+
+        GLOBAL_KEYS.add(R.string.function_group__scroll);
+        GLOBAL_ICONS.add(R.drawable.dialog_action_drawable_scroll);
+        List<TwoLevelSelectLayout.SubMenuItem> gScrollActions = new ArrayList<>();
+        gScrollActions.add(convertPerformActionToSubMenu(PerformActionEnum.GLOBAL_SCROLL_TO_BOTTOM));
+        gScrollActions.add(convertPerformActionToSubMenu(PerformActionEnum.GLOBAL_SCROLL_TO_TOP));
+        gScrollActions.add(convertPerformActionToSubMenu(PerformActionEnum.GLOBAL_SCROLL_TO_LEFT));
+        gScrollActions.add(convertPerformActionToSubMenu(PerformActionEnum.GLOBAL_SCROLL_TO_RIGHT));
+        gScrollActions.add(convertPerformActionToSubMenu(PerformActionEnum.GLOBAL_PINCH_OUT));
+        gScrollActions.add(convertPerformActionToSubMenu(PerformActionEnum.GLOBAL_PINCH_IN));
+        GLOBAL_ACTION_MAP.put(R.string.function_group__scroll, gScrollActions);
+
+        // 循环逻辑控制
+        GLOBAL_KEYS.add(R.string.function_group__logic);
+        GLOBAL_ICONS.add(R.drawable.dialog_action_drawable_logic);
+        List<TwoLevelSelectLayout.SubMenuItem> gLoopActions = new ArrayList<>();
+        gLoopActions.add(convertPerformActionToSubMenu(PerformActionEnum.IF));
+        gLoopActions.add(convertPerformActionToSubMenu(PerformActionEnum.LET));
+        gLoopActions.add(convertPerformActionToSubMenu(PerformActionEnum.CHECK));
+        gLoopActions.add(convertPerformActionToSubMenu(PerformActionEnum.WHILE));
+        gLoopActions.add(convertPerformActionToSubMenu(PerformActionEnum.CONTINUE));
+        gLoopActions.add(convertPerformActionToSubMenu(PerformActionEnum.BREAK));
+        gLoopActions.add(convertPerformActionToSubMenu(PerformActionEnum.LOAD_PARAM));
+        GLOBAL_ACTION_MAP.put(R.string.function_group__logic, gLoopActions);
+    }
+
     private boolean isOverrideInstall = false;
-
     private boolean selectMode = false;
-
     private RecordCaseInfo recordCase;
-
     private int tmpPosition = -1;
-
     private TagFlowLayout tagGroup;
-
     private SlideAndDragListView dragList;
-
     private List<OperationStep> stepList;
-
     private String storePath;
-
     private List<CaseStepAdapter.MyDataWrapper> dragEntities;
-
     private AtomicInteger currentIdx;
-
     private CaseStepAdapter adapter;
 
     /**
@@ -131,6 +216,17 @@ public class CaseStepEditFragment extends BaseFragment implements TagFlowLayout.
         CaseStepEditFragment fragment = new CaseStepEditFragment();
         fragment.recordCase = recordCaseInfo;
         return fragment;
+    }
+
+    /**
+     * 转换为菜单
+     *
+     * @param actionEnum
+     * @return
+     */
+    private static TwoLevelSelectLayout.SubMenuItem convertPerformActionToSubMenu(PerformActionEnum actionEnum) {
+        return new TwoLevelSelectLayout.SubMenuItem(actionEnum.getDesc(),
+                actionEnum.getCode(), actionEnum.getIcon());
     }
 
     @Nullable
@@ -204,8 +300,8 @@ public class CaseStepEditFragment extends BaseFragment implements TagFlowLayout.
             case ScanSuccessEvent.SCAN_TYPE_QR_CODE:
             case ScanSuccessEvent.SCAN_TYPE_BAR_CODE:
                 // 向handler发送请求
-                method = new OperationMethod(event.getType() == ScanSuccessEvent.SCAN_TYPE_QR_CODE?
-                        PerformActionEnum.GENERATE_QR_CODE: PerformActionEnum.GENERATE_BAR_CODE);
+                method = new OperationMethod(event.getType() == ScanSuccessEvent.SCAN_TYPE_QR_CODE ?
+                        PerformActionEnum.GENERATE_QR_CODE : PerformActionEnum.GENERATE_BAR_CODE);
                 method.putParam(OperationExecutor.SCHEME_KEY, event.getContent());
                 if (event.getType() == ScanSuccessEvent.SCAN_TYPE_BAR_CODE) {
                     ScanCodeType type = event.getCodeType();
@@ -271,7 +367,7 @@ public class CaseStepEditFragment extends BaseFragment implements TagFlowLayout.
         stepTags.add(getString(R.string.step_edit__select_mode));
         stepTags.add(getString(R.string.step_edit__paste));
         stepTags.add(getString(R.string.step_edit__record_step));
-        for (OperationStep step: stepList) {
+        for (OperationStep step : stepList) {
             CaseStepAdapter.MyDataWrapper entity = new CaseStepAdapter.MyDataWrapper(clone(step), currentIdx.getAndIncrement());
             dragEntities.add(entity);
             stepTags.add(step.getOperationMethod().getActionEnum().getDesc());
@@ -558,7 +654,7 @@ public class CaseStepEditFragment extends BaseFragment implements TagFlowLayout.
                     return true;
                 }
                 List<OperationStep> steps = new ArrayList<>(wrappers.size() + 1);
-                for (CaseStepAdapter.MyDataWrapper wrapper: wrappers) {
+                for (CaseStepAdapter.MyDataWrapper wrapper : wrappers) {
                     steps.add(wrapper.currentStep);
                 }
 
@@ -572,7 +668,7 @@ public class CaseStepEditFragment extends BaseFragment implements TagFlowLayout.
         } else if (position == 2) {
             List<OperationStep> pasteSteps = CaseStepHolder.getPasteContent();
             if (pasteSteps != null && pasteSteps.size() > 0) {
-                for (OperationStep step: pasteSteps) {
+                for (OperationStep step : pasteSteps) {
                     CaseStepAdapter.MyDataWrapper wrapper = new CaseStepAdapter.MyDataWrapper(step, currentIdx.getAndIncrement());
                     dragEntities.add(wrapper);
                 }
@@ -681,7 +777,7 @@ public class CaseStepEditFragment extends BaseFragment implements TagFlowLayout.
         saveScopeInfo();
 
         List<OperationStep> operations = new ArrayList<>(dragEntities.size() + 1);
-        for (CaseStepAdapter.MyDataWrapper wrapper: dragEntities) {
+        for (CaseStepAdapter.MyDataWrapper wrapper : dragEntities) {
             operations.add(wrapper.currentStep);
         }
 
@@ -695,6 +791,7 @@ public class CaseStepEditFragment extends BaseFragment implements TagFlowLayout.
 
     /**
      * 显示编辑框
+     *
      * @param wrapper
      */
     private void showEditDialog(final CaseStepAdapter.MyDataWrapper wrapper) {
@@ -817,6 +914,7 @@ public class CaseStepEditFragment extends BaseFragment implements TagFlowLayout.
 
     /**
      * 基于Parcel拷贝一份数据
+     *
      * @param origin
      * @return
      */
@@ -847,7 +945,7 @@ public class CaseStepEditFragment extends BaseFragment implements TagFlowLayout.
 
                         if (which == 0) {
                             showCreateNodeView(position);
-                        } else if (which == 1){
+                        } else if (which == 1) {
                             showAddFunctionView(null, position);
                         } else if (which == 2) {
                             addRecordCases(position);
@@ -1029,119 +1127,6 @@ public class CaseStepEditFragment extends BaseFragment implements TagFlowLayout.
                     });
         }
     }
-
-    protected static final List<Integer> GLOBAL_KEYS = new ArrayList<>();
-
-    protected static final List<Integer> GLOBAL_ICONS = new ArrayList<>();
-
-    protected static final Map<Integer, List<TwoLevelSelectLayout.SubMenuItem>> GLOBAL_ACTION_MAP = new HashMap<>();
-
-    protected static final List<Integer> NODE_KEYS = new ArrayList<>();
-
-    protected static final List<Integer> NODE_ICONS = new ArrayList<>();
-
-    protected static final Map<Integer, List<TwoLevelSelectLayout.SubMenuItem>> NODE_ACTION_MAP = new HashMap<>();
-
-
-    // 初始化二级菜单
-    static {
-        // 节点操作
-        NODE_KEYS.add(R.string.function_group__click);
-        NODE_ICONS.add(R.drawable.dialog_action_drawable_quick_click_2);
-        List<TwoLevelSelectLayout.SubMenuItem> clickActions = new ArrayList<>();
-        clickActions.add(convertPerformActionToSubMenu(PerformActionEnum.CLICK));
-        clickActions.add(convertPerformActionToSubMenu(PerformActionEnum.LONG_CLICK));
-        clickActions.add(convertPerformActionToSubMenu(PerformActionEnum.CLICK_IF_EXISTS));
-        clickActions.add(convertPerformActionToSubMenu(PerformActionEnum.CLICK_QUICK));
-        clickActions.add(convertPerformActionToSubMenu(PerformActionEnum.MULTI_CLICK));
-        NODE_ACTION_MAP.put(R.string.function_group__click, clickActions);
-
-        NODE_KEYS.add(R.string.function_group__input);
-        NODE_ICONS.add(R.drawable.dialog_action_drawable_input);
-        List<TwoLevelSelectLayout.SubMenuItem> inputActions = new ArrayList<>();
-        inputActions.add(convertPerformActionToSubMenu(PerformActionEnum.INPUT));
-        inputActions.add(convertPerformActionToSubMenu(PerformActionEnum.INPUT_SEARCH));
-        NODE_ACTION_MAP.put(R.string.function_group__input, inputActions);
-
-        NODE_KEYS.add(R.string.function_group__scroll);
-        NODE_ICONS.add(R.drawable.dialog_action_drawable_scroll);
-        List<TwoLevelSelectLayout.SubMenuItem> scrollActions = new ArrayList<>();
-        scrollActions.add(convertPerformActionToSubMenu(PerformActionEnum.SCROLL_TO_BOTTOM));
-        scrollActions.add(convertPerformActionToSubMenu(PerformActionEnum.SCROLL_TO_TOP));
-        scrollActions.add(convertPerformActionToSubMenu(PerformActionEnum.SCROLL_TO_LEFT));
-        scrollActions.add(convertPerformActionToSubMenu(PerformActionEnum.SCROLL_TO_RIGHT));
-        scrollActions.add(convertPerformActionToSubMenu(PerformActionEnum.GESTURE));
-        NODE_ACTION_MAP.put(R.string.function_group__scroll, scrollActions);
-
-        NODE_KEYS.add(R.string.function_group__assert);
-        NODE_ICONS.add(R.drawable.dialog_action_drawable_assert);
-        List<TwoLevelSelectLayout.SubMenuItem> assertActions = new ArrayList<>();
-        assertActions.add(convertPerformActionToSubMenu(PerformActionEnum.ASSERT));
-        assertActions.add(convertPerformActionToSubMenu(PerformActionEnum.SLEEP_UNTIL));
-        assertActions.add(convertPerformActionToSubMenu(PerformActionEnum.LET_NODE));
-        assertActions.add(convertPerformActionToSubMenu(PerformActionEnum.CHECK_NODE));
-        NODE_ACTION_MAP.put(R.string.function_group__assert, assertActions);
-
-        // 全局操作
-        GLOBAL_KEYS.add(R.string.function_group__device);
-        GLOBAL_ICONS.add(R.drawable.dialog_action_drawable_device_operation);
-        List<TwoLevelSelectLayout.SubMenuItem> gDeviceActions = new ArrayList<>();
-        gDeviceActions.add(convertPerformActionToSubMenu(PerformActionEnum.BACK));
-        gDeviceActions.add(convertPerformActionToSubMenu(PerformActionEnum.HOME));
-        gDeviceActions.add(convertPerformActionToSubMenu(PerformActionEnum.HANDLE_ALERT));
-        gDeviceActions.add(convertPerformActionToSubMenu(PerformActionEnum.SCREENSHOT));
-        gDeviceActions.add(convertPerformActionToSubMenu(PerformActionEnum.SLEEP));
-        gDeviceActions.add(convertPerformActionToSubMenu(PerformActionEnum.EXECUTE_SHELL));
-        gDeviceActions.add(convertPerformActionToSubMenu(PerformActionEnum.NOTIFICATION));
-        gDeviceActions.add(convertPerformActionToSubMenu(PerformActionEnum.RECENT_TASK));
-        GLOBAL_ACTION_MAP.put(R.string.function_group__device, gDeviceActions);
-
-        GLOBAL_KEYS.add(R.string.function_group__app);
-        GLOBAL_ICONS.add(R.drawable.dialog_action_drawable_app_operation);
-        List<TwoLevelSelectLayout.SubMenuItem> gAppActions = new ArrayList<>();
-        gAppActions.add(convertPerformActionToSubMenu(PerformActionEnum.GOTO_INDEX));
-        gAppActions.add(convertPerformActionToSubMenu(PerformActionEnum.CHANGE_MODE));
-        gAppActions.add(convertPerformActionToSubMenu(PerformActionEnum.JUMP_TO_PAGE));
-        gAppActions.add(convertPerformActionToSubMenu(PerformActionEnum.GENERATE_QR_CODE));
-        gAppActions.add(convertPerformActionToSubMenu(PerformActionEnum.GENERATE_BAR_CODE));
-        gAppActions.add(convertPerformActionToSubMenu(PerformActionEnum.KILL_PROCESS));
-        GLOBAL_ACTION_MAP.put(R.string.function_group__app, gAppActions);
-
-        GLOBAL_KEYS.add(R.string.function_group__scroll);
-        GLOBAL_ICONS.add(R.drawable.dialog_action_drawable_scroll);
-        List<TwoLevelSelectLayout.SubMenuItem> gScrollActions = new ArrayList<>();
-        gScrollActions.add(convertPerformActionToSubMenu(PerformActionEnum.GLOBAL_SCROLL_TO_BOTTOM));
-        gScrollActions.add(convertPerformActionToSubMenu(PerformActionEnum.GLOBAL_SCROLL_TO_TOP));
-        gScrollActions.add(convertPerformActionToSubMenu(PerformActionEnum.GLOBAL_SCROLL_TO_LEFT));
-        gScrollActions.add(convertPerformActionToSubMenu(PerformActionEnum.GLOBAL_SCROLL_TO_RIGHT));
-        gScrollActions.add(convertPerformActionToSubMenu(PerformActionEnum.GLOBAL_PINCH_OUT));
-        gScrollActions.add(convertPerformActionToSubMenu(PerformActionEnum.GLOBAL_PINCH_IN));
-        GLOBAL_ACTION_MAP.put(R.string.function_group__scroll, gScrollActions);
-
-        // 循环逻辑控制
-        GLOBAL_KEYS.add(R.string.function_group__logic);
-        GLOBAL_ICONS.add(R.drawable.dialog_action_drawable_logic);
-        List<TwoLevelSelectLayout.SubMenuItem> gLoopActions = new ArrayList<>();
-        gLoopActions.add(convertPerformActionToSubMenu(PerformActionEnum.IF));
-        gLoopActions.add(convertPerformActionToSubMenu(PerformActionEnum.LET));
-        gLoopActions.add(convertPerformActionToSubMenu(PerformActionEnum.CHECK));
-        gLoopActions.add(convertPerformActionToSubMenu(PerformActionEnum.WHILE));
-        gLoopActions.add(convertPerformActionToSubMenu(PerformActionEnum.CONTINUE));
-        gLoopActions.add(convertPerformActionToSubMenu(PerformActionEnum.BREAK));
-        gLoopActions.add(convertPerformActionToSubMenu(PerformActionEnum.LOAD_PARAM));
-        GLOBAL_ACTION_MAP.put(R.string.function_group__logic, gLoopActions);
-    }
-
-    /**
-     * 转换为菜单
-     * @param actionEnum
-     * @return
-     */
-    private static TwoLevelSelectLayout.SubMenuItem convertPerformActionToSubMenu(PerformActionEnum actionEnum) {
-        return new TwoLevelSelectLayout.SubMenuItem(actionEnum.getDesc(),
-                actionEnum.getCode(), actionEnum.getIcon());
-    }
-
 
     private static class FakeLocatingNode extends AbstractNodeTree {
         private FakeLocatingNode(OperationNode node) {

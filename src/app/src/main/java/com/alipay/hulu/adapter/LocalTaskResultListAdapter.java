@@ -15,19 +15,19 @@
  */
 package com.alipay.hulu.adapter;
 
-import android.content.Context;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 import com.alipay.hulu.R;
 import com.alipay.hulu.bean.ReplayResultBean;
 import com.alipay.hulu.common.bean.DeviceInfo;
 import com.alipay.hulu.common.utils.StringUtil;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Locale;
+import android.content.Context;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
 public class LocalTaskResultListAdapter extends SoloBaseAdapter<ReplayResultBean> {
     private static DateFormat SIMPLE_FORMAT = new SimpleDateFormat("HH:mm:ss", Locale.CHINA);

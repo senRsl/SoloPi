@@ -15,19 +15,9 @@
  */
 package com.alipay.hulu.activity;
 
-import android.os.Bundle;
-import android.provider.Settings;
-import androidx.annotation.Nullable;
-import com.google.android.material.tabs.TabLayout;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentPagerAdapter;
-import androidx.viewpager.widget.ViewPager;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.Button;
-import android.widget.CheckBox;
-import android.widget.TextView;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import com.alipay.hulu.R;
 import com.alipay.hulu.adapter.BatchExecutionListAdapter;
@@ -40,26 +30,36 @@ import com.alipay.hulu.shared.io.bean.RecordCaseInfo;
 import com.alipay.hulu.shared.node.utils.AppUtil;
 import com.alipay.hulu.ui.HeadControlPanel;
 import com.alipay.hulu.util.CaseReplayUtil;
+import com.google.android.material.tabs.TabLayout;
 import com.zhy.view.flowlayout.FlowLayout;
 import com.zhy.view.flowlayout.TagAdapter;
 import com.zhy.view.flowlayout.TagFlowLayout;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import android.os.Bundle;
+import android.provider.Settings;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.TextView;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
+import androidx.viewpager.widget.ViewPager;
 
 /**
  * Created by lezhou.wyl on 2018/8/19.
  */
 public class BatchExecutionActivity extends BaseActivity
-        implements BatchExecutionListAdapter.Delegate , TagFlowLayout.OnTagClickListener{
+        implements BatchExecutionListAdapter.Delegate, TagFlowLayout.OnTagClickListener {
 
+    private final List<RecordCaseInfo> currentCases = new ArrayList<>();
     private ViewPager mPager;
     private CheckBox mRestartApp;
     private TabLayout mTabLayout;
     private HeadControlPanel mHeadPanel;
     private TagFlowLayout tagGroup;
-    private final List<RecordCaseInfo> currentCases = new ArrayList<>();
     private TagAdapter<RecordCaseInfo> tagAdapter;
 
     private Button startExecutionBtn;
@@ -174,6 +174,7 @@ public class BatchExecutionActivity extends BaseActivity
 
     /**
      * 检察权限
+     *
      * @param callback
      */
     private void checkPermissions(PermissionUtil.OnPermissionCallback callback) {
@@ -199,6 +200,7 @@ public class BatchExecutionActivity extends BaseActivity
         public CharSequence getPageTitle(int position) {
             return BatchExecutionFragment.getTypeName(PAGES[position]);
         }
+
         @Override
         public int getCount() {
             return PAGES.length;

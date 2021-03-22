@@ -14,74 +14,77 @@
   ~ limitations under the License.
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    >
+    android:orientation="horizontal">
+
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="match_parent">
+
         <View
-            android:layout_alignParentLeft="true"
             android:layout_width="@dimen/control_dp2"
             android:layout_height="match_parent"
-            android:layout_alignParentTop="true"
             android:layout_alignParentBottom="true"
-            android:background="#fc6b3f"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
             android:layout_marginLeft="@dimen/dp_19"
-            />
+            android:background="#fc6b3f" />
 
 
         <ImageView
             android:layout_width="@dimen/control_dp24"
             android:layout_height="@dimen/control_dp24"
-            android:layout_marginLeft="@dimen/control_dp8"
             android:layout_centerVertical="true"
-            android:src="@drawable/case_result_item_toggle"/>
+            android:layout_marginLeft="@dimen/control_dp8"
+            android:src="@drawable/case_result_item_toggle" />
 
     </RelativeLayout>
 
     <LinearLayout
-        android:orientation="vertical"
+        android:id="@+id/layout_case_result_wrapper"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/minus_dp32"
+        android:orientation="vertical"
         android:paddingRight="@dimen/control_dp8"
-        android:id="@+id/layout_case_result_wrapper"
         android:paddingTop="@dimen/control_dp8">
 
         <TextView
             android:id="@+id/text_case_result_screenshot"
-            android:layout_marginLeft="@dimen/control_dp40"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/control_dp40"
             android:text=""
             android:textColor="@color/primaryText"
-            android:textSize="@dimen/textsize_18"/>
+            android:textSize="@dimen/textsize_18" />
 
         <TextView
             android:id="@+id/text_case_result_screenshot_pos"
-            android:layout_marginLeft="@dimen/control_dp40"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/control_dp40"
             android:layout_marginTop="@dimen/control_dp8"
-            android:text=""
             android:singleLine="false"
+            android:text=""
             android:textColor="@color/secondaryText"
-            android:textSize="@dimen/textsize_14"/>
+            android:textSize="@dimen/textsize_14" />
+
         <ImageView
             android:id="@+id/img_case_result_screenshot"
-            android:layout_marginTop="@dimen/control_dp8"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/app_list_250dp"
             android:layout_marginBottom="@dimen/control_dp8"
             android:layout_marginLeft="@dimen/control_dp40"
-            android:layout_width="match_parent"
-            android:src="@drawable/performance_icon"
+            android:layout_marginTop="@dimen/control_dp8"
             android:scaleType="fitCenter"
-            android:layout_height="@dimen/app_list_250dp" />
+            android:src="@drawable/performance_icon" />
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1px"
-            android:background="@color/divider_color"
             android:layout_alignParentBottom="true"
-            android:layout_marginLeft="@dimen/dp_21"/>
+            android:layout_marginLeft="@dimen/dp_21"
+            android:background="@color/divider_color" />
     </LinearLayout>
 </LinearLayout>

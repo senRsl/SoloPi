@@ -15,6 +15,13 @@
  */
 package com.alipay.hulu.shared.display.items;
 
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.alipay.hulu.common.application.LauncherApplication;
 import com.alipay.hulu.common.bean.ProcessInfo;
 import com.alipay.hulu.common.injector.InjectorService;
@@ -29,40 +36,53 @@ import com.alipay.hulu.shared.display.items.base.FixedLengthCircularArray;
 import com.alipay.hulu.shared.display.items.base.RecordPattern;
 import com.alipay.hulu.shared.display.items.util.FinalR;
 
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 @DisplayItem(nameRes = FinalR.PROCESS_STATUS, key = "Status", permissions = "adb")
 public class StatusTools implements Displayable {
     private static final String TAG = StatusTools.class.getSimpleName();
-
-    private static Long startTime = 0L;
-
-    private ProcessInfo pid = null;
-    private List<ProcessInfo> pids = null;
-
-    private static boolean processChanged = true;
-
     private static final int CACHE_LENGTH = 10;
+    private static Long startTime = 0L;
+    private static boolean processChanged = true;
     private static int preserveCount = CACHE_LENGTH;
     private static ProcessInfo previousPid = null;
-
     private static Map<String, List<RecordPattern.RecordItem>> appThreadCount;
     private static Map<String, List<RecordPattern.RecordItem>> appVmSize;
     private static Map<String, List<RecordPattern.RecordItem>> appVmRSS;
     private static Map<String, FixedLengthCircularArray<RecordPattern.RecordItem>> threadsCountCachedData;
     private static Map<String, FixedLengthCircularArray<RecordPattern.RecordItem>> appVmSizeCachedData;
     private static Map<String, FixedLengthCircularArray<RecordPattern.RecordItem>> appVmRSSCachedData;
-
+    private ProcessInfo pid = null;
+    private List<ProcessInfo> pids = null;
     private InjectorService service;
     private DecimalFormat mFormat;
 
+    private static float[] getProcessesStatus(int[] pids) {
+        try {
+            String appLines;
+            StringBuilder cmd = new StringBuilder("grep -E 'VmSize|VmRSS|Threads' ");
+            for (int pid : pids) {
+                cmd.append("/proc/").append(pid).append("/status ");
+            }
+
+            LogUtil.d(TAG, "cmd: %s", cmd);
+            appLines = CmdTools.execAdbCmd(cmd.toString(), 0);
+            LogUtil.d(TAG, "close reader, result: %s", appLines);
+
+            String[] origin = appLines.split("\n");
+            float[] result = new float[3 * pids.length];
+            for (int i = 0; i < origin.length; i += 3) {
+                result[i] = Float.parseFloat(origin[i].split("\t")[1].replaceAll("\\D", "").trim()) / 1024f;
+                result[i + 1] = Float.parseFloat(origin[i + 1].split("\t")[1].replaceAll("\\D", "").trim()) / 1024f;
+                result[i + 2] = Float.parseFloat(origin[i + 2].split("\t")[1].replaceAll("\\D", "").trim());
+            }
+            return result;
+        } catch (Exception e) {
+            LogUtil.e(TAG, "Catch Exception: " + e.getMessage(), e);
+            return new float[0];
+        }
+    }
+
     @Subscriber(@Param(SubscribeParamEnum.PID))
-    public void setPid(ProcessInfo pid){
+    public void setPid(ProcessInfo pid) {
         if (pid != null && (this.pid == null || pid.getPid() != this.pid.getPid())) {
             previousPid = pid;
             processChanged = true;
@@ -72,7 +92,7 @@ public class StatusTools implements Displayable {
     }
 
     @Subscriber(@Param(SubscribeParamEnum.PID_CHILDREN))
-    public void setPids(List<ProcessInfo> pids){
+    public void setPids(List<ProcessInfo> pids) {
         this.pids = pids;
     }
 
@@ -103,7 +123,7 @@ public class StatusTools implements Displayable {
                 if (content != null) {
                     String[] lines = content.split("\n");
                     StringBuilder sb = new StringBuilder();
-                    for (String line: lines) {
+                    for (String line : lines) {
                         String curContent = "";
                         if (line.trim().startsWith("VmSize")) {
                             curContent = line.replaceAll("\\D", "").trim();
@@ -208,9 +228,9 @@ public class StatusTools implements Displayable {
             for (int i = 0; i < pidArray.length; i++) {
                 int pid = pidArray[i];
                 String processName = processNames[i];
-                RecordPattern.RecordItem vmSizeRecord = new RecordPattern.RecordItem(System.currentTimeMillis(), result[i*3], "");
-                RecordPattern.RecordItem vmRSSRecord = new RecordPattern.RecordItem(System.currentTimeMillis(), result[i*3+1], "");
-                RecordPattern.RecordItem threadRecord = new RecordPattern.RecordItem(System.currentTimeMillis(), result[i*3+2], "");
+                RecordPattern.RecordItem vmSizeRecord = new RecordPattern.RecordItem(System.currentTimeMillis(), result[i * 3], "");
+                RecordPattern.RecordItem vmRSSRecord = new RecordPattern.RecordItem(System.currentTimeMillis(), result[i * 3 + 1], "");
+                RecordPattern.RecordItem threadRecord = new RecordPattern.RecordItem(System.currentTimeMillis(), result[i * 3 + 2], "");
 
                 if (!appVmSizeCachedData.containsKey(processName)) {
                     appVmSizeCachedData.put(processName, new FixedLengthCircularArray<RecordPattern.RecordItem>(CACHE_LENGTH));
@@ -255,21 +275,21 @@ public class StatusTools implements Displayable {
                 } else if (previousPid != null && pid == previousPid.getPid() && preserveCount > 0) {
                     List<RecordPattern.RecordItem> previousVssRecord = appVmSize.get(processName);
                     if (previousVssRecord == null) {
-                        LogUtil.e(TAG, "Record item for pid " + pid +  " disappeared");
+                        LogUtil.e(TAG, "Record item for pid " + pid + " disappeared");
                         continue;
                     }
                     previousVssRecord.add(vmSizeRecord);
 
                     List<RecordPattern.RecordItem> previousRssRecord = appVmRSS.get(processName);
                     if (previousRssRecord == null) {
-                        LogUtil.e(TAG, "Record item for pid " + pid +  " disappeared");
+                        LogUtil.e(TAG, "Record item for pid " + pid + " disappeared");
                         continue;
                     }
                     previousRssRecord.add(vmRSSRecord);
 
                     List<RecordPattern.RecordItem> previousThreadRecord = appThreadCount.get(processName);
                     if (previousThreadRecord == null) {
-                        LogUtil.e(TAG, "Record item for pid " + pid +  " disappeared");
+                        LogUtil.e(TAG, "Record item for pid " + pid + " disappeared");
                         continue;
                     }
                     previousThreadRecord.add(threadRecord);
@@ -330,33 +350,6 @@ public class StatusTools implements Displayable {
             threadsCountCachedData.clear();
         }
         return result;
-    }
-
-
-    private static float[] getProcessesStatus(int[] pids) {
-        try {
-            String appLines;
-            StringBuilder cmd = new StringBuilder("grep -E 'VmSize|VmRSS|Threads' ");
-            for (int pid: pids) {
-                cmd.append("/proc/").append(pid).append("/status ");
-            }
-
-            LogUtil.d(TAG, "cmd: %s", cmd);
-            appLines = CmdTools.execAdbCmd(cmd.toString(), 0);
-            LogUtil.d(TAG, "close reader, result: %s", appLines);
-
-            String[] origin = appLines.split("\n");
-            float[] result = new float[3 * pids.length];
-            for (int i = 0; i < origin.length; i+=3) {
-                result[i] = Float.parseFloat(origin[i].split("\t")[1].replaceAll("\\D", "").trim()) / 1024f;
-                result[i+1]= Float.parseFloat(origin[i+1].split("\t")[1].replaceAll("\\D", "").trim()) / 1024f;
-                result[i+2] = Float.parseFloat(origin[i+2].split("\t")[1].replaceAll("\\D", "").trim());
-            }
-            return result;
-        } catch (Exception e) {
-            LogUtil.e(TAG, "Catch Exception: " + e.getMessage(), e);
-            return new float[0];
-        }
     }
 
 }

@@ -15,11 +15,9 @@
  */
 package com.alipay.hulu.scheme;
 
-import android.app.Activity;
-import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.pm.ApplicationInfo;
-import android.provider.Settings;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 import com.alipay.hulu.activity.MyApplication;
 import com.alipay.hulu.common.application.LauncherApplication;
@@ -35,9 +33,11 @@ import com.alipay.hulu.shared.io.db.OperationLogHandler;
 import com.alipay.hulu.shared.node.utils.PrepareUtil;
 import com.alipay.hulu.util.DialogUtils;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.provider.Settings;
 
 /**
  * Created by qiaoruikai on 2019/11/11 11:47 AM.
@@ -50,6 +50,34 @@ public class RecordSchemeResolver implements SchemeActionResolver {
     public static final String TARGET_APP = "targetApp";
 
     public static final String MODE_NORMAL = "normal";
+
+    private static RecordCaseInfo loadBaseInfo(Context context, Map<String, String> params) {
+        if (params == null) {
+            return null;
+        }
+        String app = params.get(TARGET_APP);
+        if (StringUtil.isEmpty(app)) {
+            return null;
+        }
+        String appLabel = null;
+        List<ApplicationInfo> appList = MyApplication.getInstance().loadAppList();
+        for (ApplicationInfo appInfo : appList) {
+            if (StringUtil.equals(appInfo.packageName, app)) {
+                appLabel = appInfo.loadLabel(context.getPackageManager()).toString();
+            }
+        }
+        // 没找到对应应用
+        if (StringUtil.isEmpty(appLabel)) {
+            return null;
+        }
+
+        RecordCaseInfo caseInfo = new RecordCaseInfo();
+        caseInfo.setCaseName(params.get(CASE_NAME));
+        caseInfo.setCaseDesc(params.get(CASE_DESC));
+        caseInfo.setTargetAppPackage(app);
+        caseInfo.setTargetAppLabel(appLabel);
+        return caseInfo;
+    }
 
     @Override
     public boolean processScheme(Context context, Map<String, String> params) {
@@ -67,6 +95,7 @@ public class RecordSchemeResolver implements SchemeActionResolver {
 
     /**
      * 通常模式启动录制
+     *
      * @param context
      * @param params
      * @return
@@ -113,34 +142,6 @@ public class RecordSchemeResolver implements SchemeActionResolver {
         });
 
         return true;
-    }
-
-    private static RecordCaseInfo loadBaseInfo(Context context, Map<String, String> params) {
-        if (params == null) {
-            return null;
-        }
-        String app = params.get(TARGET_APP);
-        if (StringUtil.isEmpty(app)) {
-            return null;
-        }
-        String appLabel = null;
-        List<ApplicationInfo> appList = MyApplication.getInstance().loadAppList();
-        for (ApplicationInfo appInfo: appList) {
-            if (StringUtil.equals(appInfo.packageName, app)) {
-                appLabel = appInfo.loadLabel(context.getPackageManager()).toString();
-            }
-        }
-        // 没找到对应应用
-        if (StringUtil.isEmpty(appLabel)) {
-            return null;
-        }
-
-        RecordCaseInfo caseInfo = new RecordCaseInfo();
-        caseInfo.setCaseName(params.get(CASE_NAME));
-        caseInfo.setCaseDesc(params.get(CASE_DESC));
-        caseInfo.setTargetAppPackage(app);
-        caseInfo.setTargetAppLabel(appLabel);
-        return caseInfo;
     }
 
     public void dismissProgressDialog(final ProgressDialog progressDialog) {

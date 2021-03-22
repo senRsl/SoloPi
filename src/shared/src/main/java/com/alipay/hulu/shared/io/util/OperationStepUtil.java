@@ -15,6 +15,13 @@
  */
 package com.alipay.hulu.shared.io.util;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.List;
+import java.util.UUID;
+
 import com.alibaba.fastjson.JSON;
 import com.alipay.hulu.common.application.LauncherApplication;
 import com.alipay.hulu.common.utils.FileUtils;
@@ -23,15 +30,9 @@ import com.alipay.hulu.common.utils.StringUtil;
 import com.alipay.hulu.shared.io.bean.GeneralOperationLogBean;
 import com.alipay.hulu.shared.node.tree.export.bean.OperationStep;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.List;
-import java.util.UUID;
-
 public class OperationStepUtil {
     private static final String TAG = "OperationStepUtil";
+
     public static void beforeStore(GeneralOperationLogBean logBean) {
         LogUtil.i(TAG, "BeforeStoreCaseToDB");
         saveCases(logBean);
@@ -48,9 +49,9 @@ public class OperationStepUtil {
     }
 
 
-
     /**
      * load steps
+     *
      * @param logBean
      */
     private static void loadCases(GeneralOperationLogBean logBean) {
@@ -83,6 +84,7 @@ public class OperationStepUtil {
 
     /**
      * save steps to file, store file path
+     *
      * @param logBean
      */
     private static void saveCases(GeneralOperationLogBean logBean) {

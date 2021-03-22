@@ -15,10 +15,11 @@
  */
 package com.alipay.hulu.common.tools;
 
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageManager;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.alipay.hulu.common.application.LauncherApplication;
 import com.alipay.hulu.common.bean.ProcessInfo;
@@ -26,24 +27,23 @@ import com.alipay.hulu.common.injector.param.SubscribeParamEnum;
 import com.alipay.hulu.common.injector.param.Subscriber;
 import com.alipay.hulu.common.injector.provider.Param;
 import com.alipay.hulu.common.injector.provider.Provider;
-import com.alipay.hulu.common.service.SPService;
 import com.alipay.hulu.common.utils.LogUtil;
 import com.alipay.hulu.common.utils.StringUtil;
+
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.os.Build;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 public class AppInfoProvider {
-    private static final String TAG = "AppInfoProvider";
     public static final String MAIN = "main";
-
+    private static final String TAG = "AppInfoProvider";
+    private volatile static AppInfoProvider _PROVIDER_INSTANCE;
     private String appName;
 
-    private volatile static AppInfoProvider _PROVIDER_INSTANCE;
+    private AppInfoProvider() {
+    }
 
     public static AppInfoProvider getInstance() {
         if (_PROVIDER_INSTANCE == null) {
@@ -55,9 +55,6 @@ public class AppInfoProvider {
         }
 
         return _PROVIDER_INSTANCE;
-    }
-
-    private AppInfoProvider() {
     }
 
     @Subscriber(@Param(SubscribeParamEnum.APP))
@@ -134,6 +131,7 @@ public class AppInfoProvider {
     /**
      * 通过顶层ACTIVITY查找pid
      * Android Q 之后
+     *
      * @param result
      * @param activity
      * @return
@@ -176,14 +174,14 @@ public class AppInfoProvider {
             if (targetLine != null) {
                 String[] pidStrs = targetLine.split("\\s+");
                 String targetPidInfo = null;
-                for (String pidStr: pidStrs) {
+                for (String pidStr : pidStrs) {
                     if (pidStr.contains(":")) {
                         targetPidInfo = pidStr.split("\\:")[0];
                     }
                 }
 
                 LogUtil.i(TAG, "Get pid info：" + targetPidInfo);
-                return targetPidInfo != null? Integer.parseInt(targetPidInfo): -1;
+                return targetPidInfo != null ? Integer.parseInt(targetPidInfo) : -1;
             }
 
             return -1;
@@ -194,6 +192,7 @@ public class AppInfoProvider {
 
     /**
      * 通过顶层ACTIVITY查找pid
+     *
      * @param result
      * @param activity
      * @return
@@ -230,11 +229,12 @@ public class AppInfoProvider {
 
     /**
      * 处理单行ps
-     * @param filterPid 过滤pid
-     * @param lineContent ps行数据
+     *
+     * @param filterPid       过滤pid
+     * @param lineContent     ps行数据
      * @param childrenPackage 子进程package列表
-     * @param childrenPid 子进程Pid列表
-     * @param result 查找结果
+     * @param childrenPid     子进程Pid列表
+     * @param result          查找结果
      */
     private void processPsLine(int filterPid, String lineContent, List<String> childrenPackage, List<ProcessInfo> childrenPid, Map<String, Object> result) {
         String[] contents = lineContent.trim().split("\\s+");

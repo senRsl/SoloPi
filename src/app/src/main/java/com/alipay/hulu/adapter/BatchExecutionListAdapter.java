@@ -15,6 +15,15 @@
  */
 package com.alipay.hulu.adapter;
 
+import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import com.alipay.hulu.R;
+import com.alipay.hulu.common.utils.StringUtil;
+import com.alipay.hulu.shared.io.bean.RecordCaseInfo;
+
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,37 +31,25 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
-import com.alipay.hulu.R;
-import com.alipay.hulu.common.utils.StringUtil;
-import com.alipay.hulu.shared.io.bean.RecordCaseInfo;
-
-import java.text.DateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
 /**
  * Created by lezhou.wyl on 2018/8/19.
  */
 
-public class BatchExecutionListAdapter extends BaseAdapter{
+public class BatchExecutionListAdapter extends BaseAdapter {
 
+    private static Date sDate = new Date();
     private Context mContext;
     private List<RecordCaseInfo> mData = new ArrayList<>();
-    private static Date sDate = new Date();
     private Delegate mDelegate;
-
-    public interface Delegate {
-        void onItemAdd(RecordCaseInfo caseInfo);
-    }
 
     public BatchExecutionListAdapter(Context context) {
         mContext = context;
     }
 
-    public void setDelegate (Delegate delegate) {
+    public void setDelegate(Delegate delegate) {
         mDelegate = delegate;
     }
+
     public void updateData(List<RecordCaseInfo> data) {
         if (data == null) {
             return;
@@ -117,6 +114,10 @@ public class BatchExecutionListAdapter extends BaseAdapter{
         }
 
         return convertView;
+    }
+
+    public interface Delegate {
+        void onItemAdd(RecordCaseInfo caseInfo);
     }
 
     static class ViewHolder {
