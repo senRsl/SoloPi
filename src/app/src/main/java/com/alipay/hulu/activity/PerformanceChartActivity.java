@@ -320,18 +320,18 @@ public class PerformanceChartActivity extends BaseActivity {
 
                 }
             });
-            chartView.setOnLongClickListener(new View.OnLongClickListener() {
+            findViewById(R.id.layout_chart).setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
 
-                    Bitmap bitmap = Bitmap.createBitmap(v.getWidth(), v.getHeight(),
-                            Bitmap.Config.ARGB_8888);
+                    Bitmap bitmap = Bitmap.createBitmap(v.getWidth(), v.getHeight(), Bitmap.Config.ARGB_8888);
                     Canvas canvas = new Canvas(bitmap);
                     v.draw(canvas);
 
                     String filePath = Environment.getExternalStorageDirectory().getPath();
-                    File file = new File(filePath + "/SENRSL/solops/" + System.currentTimeMillis() + ".png");
+                    File file = new File(filePath + "/SENRSL/solops/" + recordItemSpinner.getSelectedItem().toString().replace(" ", "").replace("{title=", "").replace("}", "") + System.currentTimeMillis() + ".png");
                     try {
+                        if (!file.getParentFile().exists()) file.getParentFile().mkdirs();
                         file.createNewFile();
 
 
@@ -339,14 +339,14 @@ public class PerformanceChartActivity extends BaseActivity {
                         bitmap.compress(Bitmap.CompressFormat.PNG, 100, fOut);
 
                         Log.w("TEST", "保存图片：" + file.getAbsolutePath());
-                        Toast.makeText(PerformanceChartActivity.this, "保存成功" + file.getAbsolutePath(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(PerformanceChartActivity.this, "保存成功" + file.getAbsolutePath(), Toast.LENGTH_LONG).show();
 
                         fOut.flush();
                         fOut.close();
                     } catch (IOException e) {
                         e.printStackTrace();
                         Log.w("TEST", "保存图片：" + e.getMessage());
-                        Toast.makeText(PerformanceChartActivity.this, "保存失败 " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(PerformanceChartActivity.this, "保存失败 " + e.getMessage(), Toast.LENGTH_LONG).show();
                     }
 
                     return true;
